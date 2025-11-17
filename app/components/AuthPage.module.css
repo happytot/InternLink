@@ -185,38 +185,45 @@
   color: #ee7428;
 }
 
-/* Make container split into 2 columns */
+
+/* FIX: Ensure side-by-side layout stays horizontal */
 .container {
   display: flex;
-  background: #fff;
-  width: 900px;
+  flex-direction: row; /* <-- forces horizontal layout */
+  align-items: stretch; /* match heights */
+  justify-content: center;
+
+  width: 1200px;
   height: 550px;
-  border-radius: 20px;
+
+  background: #ffffff;
+  border-radius: 18px;
   overflow: hidden;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 }
 
-/* Left image panel */
+/* LEFT IMAGE SIDE */
 .imageSection {
-  width: 50%;
-  background: #f4f4f4;
+  flex: 1; /* share space equally */
   display: flex;
   justify-content: center;
   align-items: center;
-  overflow: hidden;
+  background: #e9eef3;
 }
 
 .imageSection img {
-  width: 100%;
+  width: 700px;
   height: 100%;
   object-fit: cover;
+  border-radius: 18px;
 }
 
-/* Right side for login/signup forms */
+/* RIGHT FORM SIDE */
 .formContainer {
-  width: 50%;
-  padding: 40px;
+  flex: 1; /* share space equally */
   display: flex;
-  justify-content: center;
-  align-items: center;
+  flex-direction: column;
+  justify-content: center; /* center vertically */
+  padding: 40px;
+  position: relative;
 }

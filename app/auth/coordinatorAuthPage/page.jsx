@@ -107,10 +107,21 @@ export default function CoordinatorAuthPage() {
   };
 
   return (
-    <div className={styles.bodyContainer}>
-      <Toaster richColors position="top-right" />
+  <div className={styles.bodyContainer}>
+    <Toaster richColors position="top-right" />
 
-      <div className={styles.container}>
+    <div className={styles.container}>
+
+      {/* LEFT SIDE IMAGE */}
+      <div className={styles.imageSection}>
+        <img 
+          src="https://t4.ftcdn.net/jpg/08/33/25/31/360_F_833253131_Ndkht9RxSR3EABQtOzdvRkFpAXCpxLzi.jpg"
+          alt="Coordinator Illustration"
+        />
+      </div>
+
+      {/* RIGHT SIDE FORMS */}
+      <div className={styles.formContainer}>
         <button className={styles.backButton} onClick={handleGoBack}>
           &times;
         </button>
@@ -120,23 +131,21 @@ export default function CoordinatorAuthPage() {
           <h2>Coordinator Login</h2>
           <form onSubmit={handleLogin}>
             <div className={styles.inputGroup}>
-              <label htmlFor="email-login">Email</label>
+              <label>Email</label>
               <input
                 type="email"
-                id="email-login"
                 name="email"
                 value={loginData.email}
                 onChange={handleLoginChange}
                 required
               />
             </div>
-            {/* --- Updated Password Input --- */}
+
             <div className={styles.inputGroup}>
-              <label htmlFor="password-login">Password</label>
+              <label>Password</label>
               <div className={styles.passwordWrapper}>
                 <input
-                  type={showPassword ? 'text' : 'password'}
-                  id="password-login"
+                  type={showPassword ? "text" : "password"}
                   name="password"
                   value={loginData.password}
                   onChange={handleLoginChange}
@@ -151,9 +160,10 @@ export default function CoordinatorAuthPage() {
                 </button>
               </div>
             </div>
+
             <button type="submit">Login as Coordinator</button>
             <p>
-              Don’t have an account?{' '}
+              Don’t have an account?{" "}
               <button
                 type="button"
                 className={styles.linkButton}
@@ -170,34 +180,32 @@ export default function CoordinatorAuthPage() {
           <h2>Coordinator Sign Up</h2>
           <form onSubmit={handleSignup}>
             <div className={styles.inputGroup}>
-              <label htmlFor="fullName-signup">Full Name</label>
+              <label>Full Name</label>
               <input
                 type="text"
-                id="fullName-signup"
                 name="fullName"
                 value={signupData.fullName}
                 onChange={handleSignupChange}
                 required
               />
             </div>
+
             <div className={styles.inputGroup}>
-              <label htmlFor="email-signup">Email</label>
+              <label>Email</label>
               <input
                 type="email"
-                id="email-signup"
                 name="email"
                 value={signupData.email}
                 onChange={handleSignupChange}
                 required
               />
             </div>
-            {/* --- Updated Password Input --- */}
+
             <div className={styles.inputGroup}>
-              <label htmlFor="password-signup">Password</label>
+              <label>Password</label>
               <div className={styles.passwordWrapper}>
                 <input
-                  type={showPassword ? 'text' : 'password'}
-                  id="password-signup"
+                  type={showPassword ? "text" : "password"}
                   name="password"
                   value={signupData.password}
                   onChange={handleSignupChange}
@@ -212,9 +220,10 @@ export default function CoordinatorAuthPage() {
                 </button>
               </div>
             </div>
+
             <button type="submit">Sign Up as Coordinator</button>
             <p>
-              Already have an account?{' '}
+              Already have an account?{" "}
               <button
                 type="button"
                 className={styles.linkButton}
@@ -227,5 +236,6 @@ export default function CoordinatorAuthPage() {
         </div>
       </div>
     </div>
-  );
+  </div>
+);
 }

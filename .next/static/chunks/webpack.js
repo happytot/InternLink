@@ -163,7 +163,7 @@
 /******/ 		// This function allow to reference async chunks
 /******/ 		__webpack_require__.u = function(chunkId) {
 /******/ 			// return url for filenames based on template
-/******/ 			return undefined;
+/******/ 			return "static/chunks/" + chunkId + ".js";
 /******/ 		};
 /******/ 	}();
 /******/ 	
@@ -192,7 +192,7 @@
 /******/ 	
 /******/ 	/* webpack/runtime/getFullHash */
 /******/ 	!function() {
-/******/ 		__webpack_require__.h = function() { return "f32ce0bf23b7b43f"; }
+/******/ 		__webpack_require__.h = function() { return "a362336dd70c4f3c"; }
 /******/ 	}();
 /******/ 	
 /******/ 	/* webpack/runtime/global */
@@ -835,7 +835,8 @@
 /******/ 			"css-app_components_AuthPage_module_css": 0,
 /******/ 			"css-app_company_messages_messages_css": 0,
 /******/ 			"css-app_components_CompanyNav_css": 0,
-/******/ 			"css-app_company_profile_profile_css": 0
+/******/ 			"css-app_company_profile_profile_css": 0,
+/******/ 			"css-app_components_CoordinatorSidebar_css-app_coordinator_dashboard_dashboard_css": 0
 /******/ 		};
 /******/ 		
 /******/ 		__webpack_require__.f.j = function(chunkId, promises) {
@@ -847,7 +848,7 @@
 /******/ 					if(installedChunkData) {
 /******/ 						promises.push(installedChunkData[2]);
 /******/ 					} else {
-/******/ 						if(!/^(css\-app_(comp(any_(messages_messages|profile_profile)_css|onents_((AuthPage_modu|InternNav_css\-app_globals_css\-app_index_css\-app_intern_profile_Profi)le|CompanyNav)_css)|LandingPage_css)|webpack)$/.test(chunkId)) {
+/******/ 						if(!/^(css\-app_(comp(any_(messages_messages|profile_profile)_css|onents_(Co(mpanyNav|ordinatorSidebar_css\-app_coordinator_dashboard_dashboard)_css|(AuthPage_modu|InternNav_css\-app_globals_css\-app_index_css\-app_intern_profile_Profi)le_css))|LandingPage_css)|webpack)$/.test(chunkId)) {
 /******/ 							// setup Promise in chunk cache
 /******/ 							var promise = new Promise(function(resolve, reject) { installedChunkData = installedChunks[chunkId] = [resolve, reject]; });
 /******/ 							promises.push(installedChunkData[2] = promise);

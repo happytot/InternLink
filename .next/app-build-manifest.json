@@ -48,6 +48,18 @@
       "static/css/css-app_company_profile_profile_css.css",
       "static/chunks/app/company/profile/page.js"
     ],
+    "/auth/companyAuthPage/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/css-app_components_AuthPage_module_css.css",
+      "static/chunks/app/auth/companyAuthPage/page.js"
+    ],
+    "/coordinator/dashboard/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/css-app_components_CoordinatorSidebar_css-app_coordinator_dashboard_dashboard_css.css",
+      "static/chunks/app/coordinator/dashboard/page.js"
+    ],
     "/_not-found/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",

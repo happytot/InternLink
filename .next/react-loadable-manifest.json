@@ -1,4 +1,10 @@
 {
+  "app\\coordinator\\dashboard\\page.jsx -> react-apexcharts": {
+    "id": "app\\coordinator\\dashboard\\page.jsx -> react-apexcharts",
+    "files": [
+      "static/chunks/_app-pages-browser_node_modules_react-apexcharts_dist_react-apexcharts_min_js.js"
+    ]
+  },
   "node_modules\\@supabase\\functions-js\\dist\\module\\helper.js -> @supabase/node-fetch": {
     "id": "node_modules\\@supabase\\functions-js\\dist\\module\\helper.js -> @supabase/node-fetch",
     "files": []
