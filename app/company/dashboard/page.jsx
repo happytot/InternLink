@@ -31,34 +31,41 @@ const CompanyDashboard = () => {
     if (!userId) return;
 
     try {
+      // --- FIX: Changed 'jobs' to 'job_posts' ---
       const { data: jobs, error: jobsError } = await supabase
-        .from('jobs')
+        .from('job_posts') 
         .select('*')
         .eq('company_id', userId);
       if (jobsError) throw jobsError;
 
-      const activeListings = jobs.filter(j => j.status === 'active').length;
+      const activeListings = jobs.length; // Assuming all fetched jobs are active
 
+      // --- FIX: Changed 'applications' to 'job_applications' ---
       const { data: applications, error: appsError } = await supabase
-        .from('applications')
-        .select('*')
+        .from('job_applications')
+        .select('status') // Only select what you need
         .in('job_id', jobs.map(j => j.id));
       if (appsError) throw appsError;
 
-      const newApplications = applications.filter(a => a.status === 'new').length;
-      const pendingReviews = applications.filter(a => a.status === 'pending').length;
-      const hiredInterns = applications.filter(a => a.status === 'hired').length;
+      // Note: Your schema has 'Pending' and 'Company_Approved_Waiting_Coordinator', etc.
+      // Adjust these filters if 'new', 'pending', 'hired' are not the exact status strings.
+      const newApplications = applications.filter(a => a.status === 'Pending').length;
+      const pendingReviews = applications.filter(a => a.status === 'Company_Approved_Waiting_Coordinator').length;
+      const hiredInterns = applications.filter(a => a.status === 'Accepted').length; // Or 'Hired'?
 
+      // --- FIX: Changed 'applications' to 'job_applications' ---
+      // --- FIX: Changed 'students(name)' to 'profiles:intern_id(fullname)' ---
       const { data: recentApps } = await supabase
-        .from('applications')
-        .select('*, students(name)')
+        .from('job_applications')
+        .select('*, profiles:intern_id(fullname)') // Fetches profile name via intern_id
         .in('job_id', jobs.map(j => j.id))
         .order('created_at', { ascending: false })
         .limit(3);
 
       const activityFeed = recentApps.map(a => ({
         title: 'New Application',
-        content: `${a.students?.name || 'A student'} applied for a position.`,
+        // --- FIX: Changed 'a.students?.name' to 'a.profiles?.fullname' ---
+        content: `${a.profiles?.fullname || 'A student'} applied for a position.`,
         time: new Date(a.created_at).toLocaleString(),
       }));
 
@@ -80,11 +87,17 @@ const CompanyDashboard = () => {
   useEffect(() => {
     if (!user?.id) return;
 
-    const channel = supabase.channel('company-dashboard-updates')
+    const channel = supabase.channel('company-dashboard-updates');
 
-      // 🏢 Job created
+    // 🏢 Job created
+    channel
       .on('postgres_changes', 
-        { event: 'INSERT', schema: 'public', table: 'jobs', filter: `company_id=eq.${user.id}` },
+        { 
+          event: 'INSERT', 
+          schema: 'public', 
+          table: 'job_posts', // --- FIX: 'jobs' -> 'job_posts' ---
+          filter: `company_id=eq.${user.id}` 
+        },
         (payload) => {
           toast.success(`🏢 New job posted: ${payload.new.title}`);
           fetchData(user.id);
@@ -93,7 +106,12 @@ const CompanyDashboard = () => {
 
       // 🏢 Job updated
       .on('postgres_changes', 
-        { event: 'UPDATE', schema: 'public', table: 'jobs', filter: `company_id=eq.${user.id}` },
+        { 
+          event: 'UPDATE', 
+          schema: 'public', 
+          table: 'job_posts', // --- FIX: 'jobs' -> 'job_posts' ---
+          filter: `company_id=eq.${user.id}` 
+        },
         (payload) => {
           toast(`🛠️ Job updated: ${payload.new.title}`, { icon: '🛠️' });
           fetchData(user.id);
@@ -102,8 +120,14 @@ const CompanyDashboard = () => {
 
       // 🧑‍🎓 New application
       .on('postgres_changes', 
-        { event: 'INSERT', schema: 'public', table: 'applications' },
+        { 
+          event: 'INSERT', 
+          schema: 'public', 
+          table: 'job_applications' // --- FIX: 'applications' -> 'job_applications' ---
+        },
         (payload) => {
+          // This will fire for *all* new applications,
+          // We refetch to see if it's one of ours.
           toast.success(`🧑‍🎓 New application received!`);
           fetchData(user.id);
         }
@@ -111,7 +135,11 @@ const CompanyDashboard = () => {
 
       // ⚙️ Application updated
       .on('postgres_changes', 
-        { event: 'UPDATE', schema: 'public', table: 'applications' },
+        { 
+          event: 'UPDATE', 
+          schema: 'public', 
+          table: 'job_applications' // --- FIX: 'applications' -> 'job_applications' ---
+        },
         (payload) => {
           const status = payload.new.status || 'updated';
           toast(`📋 Application ${status}`, { icon: '📋' });

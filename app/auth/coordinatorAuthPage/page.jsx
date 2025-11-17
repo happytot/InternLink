@@ -1,19 +1,21 @@
-'use client'; 
+'use client';
 
 import { useState } from 'react';
-import { supabase } from '../../../lib/supabase';
-import styles from '../../components/AuthPage.module.css';
+import { supabase } from '../../../lib/supabase'; // <-- Corrected path
+import styles from '../../components/AuthPage.module.css'; // <-- Corrected path
 import { useRouter } from 'next/navigation';
+import { Toaster, toast } from 'sonner';
+import { FaEye, FaEyeSlash } from 'react-icons/fa'; // <-- Added icons
 
 const translateSupabaseError = (error) => {
-  if (!error) return '';
+  if (!error) return 'An unknown error occurred.';
   switch (error.message) {
     case 'Invalid login credentials':
-      return '❌ Invalid Credentials. Please check your email and password.';
+      return 'Invalid Credentials. Please check your email and password.';
     case 'User already registered':
-      return '❌ This email address is already registered.';
+      return 'This email address is already registered.';
     default:
-      return `❌ ${error.message}`;
+      return error.message;
   }
 };
 
@@ -22,26 +24,27 @@ export default function CoordinatorAuthPage() {
 
   const [isLoginView, setIsLoginView] = useState(true);
   const [loginData, setLoginData] = useState({ email: '', password: '' });
-  const [signupData, setSignupData] = useState({ fullName: '', email: '', password: '' });
-  const [message, setMessage] = useState('');
-
-  const showMessage = (text, color = 'red') => {
-    setMessage({ text, color });
-    setTimeout(() => setMessage(''), 3000);
-  };
+  const [signupData, setSignupData] = useState({
+    fullName: '',
+    email: '',
+    password: '',
+  });
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleGoBack = () => router.push('/');
 
-  // --- LOGIN HANDLER (This logic is correct and unchanged) ---
+  // --- LOGIN HANDLER ---
   const handleLogin = async (e) => {
     e.preventDefault();
-    setMessage('');
     const { email, password } = loginData;
 
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
 
     if (error) {
-      showMessage(translateSupabaseError(error));
+      toast.error(translateSupabaseError(error));
       return;
     }
 
@@ -54,48 +57,43 @@ export default function CoordinatorAuthPage() {
 
       if (profileError || !profile) {
         await supabase.auth.signOut();
-        showMessage('❌ Profile not found.');
+        toast.error('Profile not found.');
         return;
       }
 
       if (profile.user_type === 'coordinator') {
-        router.push('/coordinator/dashboard'); 
+        router.push('/coordinator/dashboard');
       } else {
         await supabase.auth.signOut();
-        showMessage('❌ You are not authorized as a coordinator.');
+        toast.error('You are not authorized as a coordinator.');
       }
     } else {
-      showMessage('❌ Login failed.');
+      toast.error('Login failed.');
     }
   };
 
   // ✅ --- UPDATED SIGNUP HANDLER (USING TRIGGER) ---
   const handleSignup = async (e) => {
     e.preventDefault();
-    setMessage('');
     const { fullName, email, password } = signupData;
 
-    // 1. Sign up the user with metadata
-    // The SQL trigger will read this metadata to create the profile.
-    const { data, error } = await supabase.auth.signUp({ 
-      email, 
+    const { data, error } = await supabase.auth.signUp({
+      email,
       password,
       options: {
         data: {
-          user_type: 'coordinator', // This will be read by the trigger
-          fullname: fullName        // This will be read by the trigger
-        }
-      }
+          user_type: 'coordinator',
+          fullname: fullName,
+        },
+      },
     });
 
     if (error) {
-      showMessage(translateSupabaseError(error));
+      toast.error(translateSupabaseError(error));
       return;
     }
 
-    // 2. That's it! The trigger handles the profile creation.
-    // We just show a message telling them to check their email.
-    showMessage(`✅ Signup successful! Please check your email to confirm your account.`, 'green');
+    toast.success('Signup successful! Please check your email to confirm your account.');
     setSignupData({ fullName: '', email: '', password: '' });
     setIsLoginView(true);
   };
@@ -110,12 +108,14 @@ export default function CoordinatorAuthPage() {
 
   return (
     <div className={styles.bodyContainer}>
+      <Toaster richColors position="top-right" />
+
       <div className={styles.container}>
         <button className={styles.backButton} onClick={handleGoBack}>
           &times;
         </button>
 
-        {/* LOGIN FORM (No HTML changes) */}
+        {/* LOGIN FORM */}
         <div className={`${styles.formBox} ${!isLoginView ? styles.hidden : ''}`}>
           <h2>Coordinator Login</h2>
           <form onSubmit={handleLogin}>
@@ -130,16 +130,26 @@ export default function CoordinatorAuthPage() {
                 required
               />
             </div>
+            {/* --- Updated Password Input --- */}
             <div className={styles.inputGroup}>
               <label htmlFor="password-login">Password</label>
-              <input
-                type="password"
-                id="password-login"
-                name="password"
-                value={loginData.password}
-                onChange={handleLoginChange}
-                required
-              />
+              <div className={styles.passwordWrapper}>
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  id="password-login"
+                  name="password"
+                  value={loginData.password}
+                  onChange={handleLoginChange}
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className={styles.eyeButton}
+                >
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                </button>
+              </div>
             </div>
             <button type="submit">Login as Coordinator</button>
             <p>
@@ -153,12 +163,9 @@ export default function CoordinatorAuthPage() {
               </button>
             </p>
           </form>
-          {message && isLoginView && (
-            <div style={{ color: message.color, marginTop: '10px' }}>{message.text}</div>
-          )}
         </div>
 
-        {/* SIGNUP FORM (No HTML changes) */}
+        {/* SIGNUP FORM */}
         <div className={`${styles.formBox} ${isLoginView ? styles.hidden : ''}`}>
           <h2>Coordinator Sign Up</h2>
           <form onSubmit={handleSignup}>
@@ -184,16 +191,26 @@ export default function CoordinatorAuthPage() {
                 required
               />
             </div>
+            {/* --- Updated Password Input --- */}
             <div className={styles.inputGroup}>
               <label htmlFor="password-signup">Password</label>
-              <input
-                type="password"
-                id="password-signup"
-                name="password"
-                value={signupData.password}
-                onChange={handleSignupChange}
-                required
-              />
+              <div className={styles.passwordWrapper}>
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  id="password-signup"
+                  name="password"
+                  value={signupData.password}
+                  onChange={handleSignupChange}
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className={styles.eyeButton}
+                >
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                </button>
+              </div>
             </div>
             <button type="submit">Sign Up as Coordinator</button>
             <p>
@@ -207,9 +224,6 @@ export default function CoordinatorAuthPage() {
               </button>
             </p>
           </form>
-          {message && !isLoginView && (
-            <div style={{ color: message.color, marginTop: '10px' }}>{message.text}</div>
-          )}
         </div>
       </div>
     </div>

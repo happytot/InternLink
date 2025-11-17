@@ -11,8 +11,8 @@
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    width: 100%; 
-    background-image: url("/assets/desktop-bg.png"); 
+    width: 100%;
+    background-image: url("/assets/desktop-bg.png");
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
@@ -21,19 +21,19 @@
 /* Container */
 .AuthPage_container__PtD_P {
     width: 350px;
-    background: rgba(255, 255, 255, 0.5); 
+    background: rgba(255, 255, 255, 0.5);
     /* ✅ FIX: Reduced padding from 30px to 20px */
-    padding: 20px 30px; 
+    padding: 20px 30px;
     border-radius: 10px;
     box-shadow: 0px 5px 20px rgba(0,0,0,0.1);
     box-sizing: border-box;
     margin: 15px;
     margin-top: 70px;
-    position: relative; 
-    padding-top: 40px; 
+    position: relative;
+    padding-top: 40px;
     
     /* 💥 FINAL FIX: Force container to shrink-wrap its content vertically */
-    height: max-content; 
+    height: max-content;
     display: flex; /* Helps containment of children */
     flex-direction: column; /* Stacks children vertically */
 }
@@ -41,12 +41,12 @@
 /* Back Button Style */
 .AuthPage_backButton__k7X0R {
     position: absolute;
-    top: 10px; 
-    right: 10px; 
+    top: 10px;
+    right: 10px;
     background: none;
     border: none;
-    font-size: 24px; 
-    color: #333; 
+    font-size: 24px;
+    color: #333;
     cursor: pointer;
     padding: 5px;
     line-height: 1;
@@ -67,14 +67,14 @@
 }
 
 .AuthPage_formBox__Cj5Ka h2 {
-    margin: 0 0 20px 0; 
+    margin: 0 0 20px 0;
     color: #333;
 }
 
 /* Input fields */
 .AuthPage_inputGroup__Vq_bt {
     /* ✅ FIX: Reduced vertical margin to 15px */
-    margin-bottom: 15px; 
+    margin-bottom: 15px;
     text-align: left;
 }
 
@@ -82,7 +82,7 @@
     display: block;
     font-size: 14px;
     /* ✅ FIX: Reduced label-to-input space to 4px */
-    margin-bottom: 4px; 
+    margin-bottom: 4px;
     color: #555;
 }
 
@@ -106,7 +106,7 @@
     border-radius: 6px;
     cursor: pointer;
     transition: background 0.3s;
-    margin-top: 10px; 
+    margin-top: 10px;
 }
 
 .AuthPage_formBox__Cj5Ka button:hover {
@@ -116,7 +116,7 @@
 /* Links */
 .AuthPage_formBox__Cj5Ka p {
     /* ✅ FIX: Controlled margins to ensure link spacing is compact */
-    margin: 15px 0 10px 0; 
+    margin: 15px 0 10px 0;
     font-size: 14px;
     color: black;
 }
@@ -126,7 +126,7 @@
     font-weight: bolder;
     color: #000000;
     text-decoration: none;
-    cursor: pointer; 
+    cursor: pointer;
 }
 
 .AuthPage_formBox__Cj5Ka a:hover {
@@ -136,4 +136,54 @@
 /* Hide forms */
 .AuthPage_hidden__v_9Sf {
     display: none;
+}
+
+/* --- Password Toggle Styles (FIXED) --- */
+
+/* Wrapper for password input and eye icon */
+.AuthPage_passwordWrapper__3PuIx {
+  position: relative;
+  width: 100%;
+}
+
+/* Make the input inside the wrapper take full width
+   AND add space on the right for the button */
+.AuthPage_passwordWrapper__3PuIx input {
+  /* This selector is more specific than just .inputGroup input */
+  width: 100%;
+  padding-right: 45px !important; /* Use !important to override existing .inputGroup input padding */
+  box-sizing: border-box;
+}
+
+/* Style for the eye button 
+  This selector is now more specific than '.formBox button'
+*/
+.AuthPage_formBox__Cj5Ka .AuthPage_passwordWrapper__3PuIx .AuthPage_eyeButton__7_L__ {
+  position: absolute;
+  right: 0px;
+  top: 50%;
+  transform: translateY(-50%);
+
+  /* --- Resets for .formBox button styles --- */
+  background: none;
+  border: none;
+  color: #555;
+  width: 40px; /* Clickable area */
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-size: 20px; /* Emoji size */
+  /* --- End Resets --- */
+
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+/* Make eye button hover more specific too */
+.AuthPage_formBox__Cj5Ka .AuthPage_passwordWrapper__3PuIx .AuthPage_eyeButton__7_L__:hover {
+  background: transparent; /* Ensure no hover bg */
+  color: #ee7428;
 }

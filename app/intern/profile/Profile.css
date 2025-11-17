@@ -2,73 +2,75 @@
 
 /* --- Color Variables --- */
 :root {
-    --primary-orange: #EE7428; /* Internlink Primary Color (Orange/Coral) */
-    --secondary-teal: #17a2b8; /* Modern Accent Color (Teal) */
-    --background-light: #f4f6f9; /* Soft light background */
+    --primary-orange: #EE7428;
+    --secondary-teal: #17a2b8;
+    --background-light: #f2f2f7; /* iOS-style light grey */
     --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    --primary-dark: #333; /* For text and main titles */
+    --primary-dark: #333;
 }
 
 /* --- Layout & Structure --- */
 .profile-wrapper {
     min-height: 100vh;
     background-color: var(--background-light);
-    /* 🚀 MODIFIED: Padding for the fixed TOP Header (~80px height) */
-    padding-top: 80px; 
-    /* 🚀 NEW: Padding for the fixed BOTTOM InternNav (Assuming a height of ~70px-80px) */
-    padding-bottom: 90px; 
+    padding-top: 80px;
+    padding-bottom: 90px;
 }
 
 .profile-content-area {
-    display: flex;
+    display: grid;
+    grid-template-columns: 2fr 1fr; /* 66% / 33% split */
+    align-items: flex-start;
     max-width: 1400px;
     margin: 40px auto; 
     padding: 0 20px;
-    gap: 40px; 
+    gap: 30px; /* Better spacing */
 }
 
 .page-title {
-    font-size: 2.2em;
-    font-weight: 700;
+    font-size: 2.6em;
+    font-weight: 800;
     color: var(--primary-dark);
     margin-bottom: 30px;
 }
 
 .editor-main-form {
-    flex: 3; 
-    min-width: 0; 
+    min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 20px; /* Space between main card and save bar */
 }
 
 /* Modern Card Style */
 .profile-card {
     background: #fff;
-    padding: 30px; 
-    border-radius: 12px;
+    padding: 30px;
+    border-radius: 16px; /* Softer corners */
     box-shadow: var(--card-shadow);
     transition: transform 0.3s, box-shadow 0.3s;
 }
 
 .profile-card:hover {
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08); 
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
 }
 
 .section-title {
     color: var(--primary-dark);
-    font-size: 1.5em;
-    font-weight: 600;
+    font-size: 1.75rem;
+    font-weight: 700;
     margin-top: 0;
     margin-bottom: 25px;
-    padding-bottom: 10px;
-    border-bottom: 2px solid #eee;
+    padding-bottom: 0;
+    border-bottom: none; /* Cleaner look */
     display: flex;
     align-items: center;
     gap: 10px;
 }
 
 /* --- Form Elements --- */
+.form-group {
+    margin-bottom: 20px;
+}
 
 .form-group label {
     display: block;
@@ -78,31 +80,31 @@
     font-size: 0.95em;
 }
 
-/* ✅ UPDATED SELECTOR TO INCLUDE 'select' */
 .form-group input,
 .form-group textarea,
 .form-group select {
     width: 100%;
-    padding: 12px;
-    border: 1px solid #ccc;
-    border-radius: 8px; 
+    padding: 14px;
+    border: 1px solid #dcdcdc;
+    border-radius: 10px;
     box-sizing: border-box;
     font-size: 1em;
     transition: border-color 0.2s, box-shadow 0.2s;
-    background-color: #fcfcfc;
-    /* For a more native-like select appearance */
+    background-color: #f9f9f9;
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
-    /* Add custom arrow */
-    background-image: url('data:image/svg+xml;utf8,<svg fill="black" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
-    background-repeat: no-repeat;
-    background-position: right 12px center;
-    padding-right: 40px; /* Make room for arrow */
-    margin-bottom: 25px;
+    background-image: none;
+    margin-bottom: 0;
 }
 
-/* Make text inputs not have the arrow */
+.form-group select {
+    background-image: url('data:image/svg+xml;utf8,<svg fill="black" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 40px;
+}
+
 .form-group input[type="text"],
 .form-group input[type="email"],
 .form-group input[type="tel"],
@@ -111,43 +113,41 @@
     -moz-appearance: auto;
     appearance: auto;
     background-image: none;
-    padding-right: 12px;
+    padding-right: 14px;
 }
 
-
-/* ✅ ADDED: Make disabled option gray like a placeholder */
 .form-group select:invalid {
     color: #757575;
 }
 
-
-/* ✅ UPDATED SELECTOR TO INCLUDE 'select' */
 .form-group input:focus,
 .form-group textarea:focus,
 .form-group select:focus {
     border-color: var(--primary-orange);
-    box-shadow: 0 0 0 3px rgba(238, 116, 40, 0.15); 
+    box-shadow: 0 0 0 3px rgba(238, 116, 40, 0.15);
     outline: none;
+    background-color: #fff;
 }
 
 .form-grid-3 {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 20px;
-    margin-bottom: 20px;
+    margin-bottom: 0;
 }
 
 /* --- Buttons --- */
 .btn-primary, .btn-secondary {
-    padding: 10px 20px;
-    border-radius: 8px;
+    padding: 12px 22px;
+    border-radius: 10px;
     font-weight: 600;
     cursor: pointer;
     transition: background-color 0.3s, transform 0.1s;
     border: none;
     text-align: center;
-    text-decoration: none; /* For button acting as a link */
+    text-decoration: none;
     display: inline-block;
+    font-size: 0.95em;
 }
 
 .btn-primary {
@@ -156,7 +156,7 @@
 }
 
 .btn-primary:hover:not(:disabled) {
-    background-color: #cf580f; 
+    background-color: #cf580f;
     transform: translateY(-1px);
 }
 
@@ -175,17 +175,14 @@
     background-color: #dee2e6;
 }
 
-/* New Logout Button */
-.logout-btn {
-  border-radius: 8px;
-  width: 100%;
-  font-size: 1em;
-  padding: 12px 20px;
-}
-
-/* Red Button Style */
 .btn-danger {
-  background-color: #f44336; /* A clear red color */
+  padding: 12px 22px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.1s;
+  text-align: center;
+  background-color: #f44336;
   color: white;
   border: none;
 }
@@ -196,8 +193,7 @@
 }
 
 .file-upload-label {
-    /* Ensures the label acts like a block button */
-    display: block; 
+    display: block;
 }
 
 .submit-action-bar {
@@ -206,7 +202,7 @@
     align-items: center;
     background: #fff;
     padding: 15px 30px;
-    border-radius: 12px;
+    border-radius: 16px;
     box-shadow: var(--card-shadow);
 }
 .submit-action-bar .user-info {
@@ -214,40 +210,78 @@
     color: #777;
 }
 
-/* --- Education Section (Grid Style) --- */
+/* --- New Header Card Layout --- */
+.section-profile-header {
+    padding-bottom: 0;
+}
+.profile-header-grid {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 30px; /* Better spacing */
+    align-items: start;
+}
+.profile-header-pic-col {
+    min-width: 180px;
+}
+.profile-header-pic-col .profile-pic-uploader {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 15px;
+}
+.profile-header-pic-col .profile-pic-controls {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    gap: 10px; /* This adds space between buttons */
+}
+.profile-header-summary-row {
+    margin-top: 25px;
+    padding-top: 25px;
+    padding-bottom: 30px;
+    border-top: 1px solid #eee; 
+}
+.profile-header-summary-row .form-group {
+    margin-bottom: 0;
+}
+.profile-header-summary-row .section-title {
+    border-bottom: none;
+    margin-bottom: 20px;
+}
 
+/* --- Education Section --- */
 .education-grid-wrapper {
     display: flex;
     flex-direction: column;
     gap: 15px;
     margin-bottom: 15px;
 }
-
 .education-item-grid {
     display: grid;
-    grid-template-columns: 2fr 2fr 1fr; 
+    grid-template-columns: 2fr 2fr 1fr;
     gap: 15px;
-    padding: 10px 0;
+    padding-bottom: 15px;
     border-bottom: 1px dashed #eee;
 }
-
+.education-item-grid:last-child {
+    border-bottom: none;
+}
 .education-item-grid input {
     border: 1px solid #e0e0e0;
     border-radius: 6px;
     padding: 10px;
     background-color: #fff;
+    font-size: 0.95em;
 }
 .education-item-grid input:focus {
-     border-color: var(--secondary-teal); 
+     border-color: var(--secondary-teal);
      box-shadow: 0 0 0 3px rgba(23, 162, 184, 0.15);
 }
-
 .add-education-btn {
     align-self: flex-start;
 }
 
-/* --- Skills Section (Tags) --- */
-
+/* --- Skills Section --- */
 .skill-tags {
     margin-bottom: 15px;
     display: flex;
@@ -255,115 +289,137 @@
     gap: 10px;
     min-height: 40px;
 }
-
 .skill-badge {
     display: inline-flex;
-    align-items: center; 
-    background: #d1ecf1; 
+    align-items: center;
+    background: #d1ecf1;
     color: #0c5460;
     padding: 8px 12px;
-    border-radius: 25px; 
+    border-radius: 25px;
     font-size: 0.9em;
     font-weight: 600;
     border: 1px solid #bee5eb;
 }
-
-/* FIX FOR SKILL TAG FUNCTIONALITY */
 .remove-skill {
     margin-left: 8px;
-    color: #08424a; 
+    color: #08424a;
     font-weight: 700;
     cursor: pointer;
     font-size: 1.1em;
-    line-height: 1; 
+    line-height: 1;
     transition: color 0.2s;
-    /* Optional: make it look more like a button */
     padding: 0 2px;
 }
-
 .remove-skill:hover {
-    color: var(--primary-orange); 
+    color: var(--primary-orange);
 }
-/* END SKILL FIX */
-
-
 .skill-input-bar {
     display: flex;
     gap: 10px;
 }
-
 .skill-input-bar input {
     flex-grow: 1;
-    border-radius: 8px;
-    padding: 12px;
+    border-radius: 10px;
+    padding: 14px;
+    border: 1px solid #dcdcdc;
+    background-color: #f9f9f9;
 }
-
 .add-skill-btn {
     padding: 12px 20px;
+    font-size: 0.95em;
 }
 
-
+/* --- Profile Picture --- */
 .profile-pic-uploader {
     display: flex;
     align-items: center;
     gap: 20px;
 }
-
 .profile-pic-container {
-    width: 100px;
-    height: 100px;
+    width: 120px;
+    height: 120px;
     border-radius: 50%;
     overflow: hidden;
     flex-shrink: 0;
-    border: 3px solid var(--primary-orange);
+    border: 4px solid var(--primary-orange);
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
-
 .profile-avatar {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
-
 .placeholder-avatar {
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 4em;
+    font-size: 5em;
     background-color: #f0f0f0;
     color: #ccc;
-}
-
-.profile-pic-controls {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
 }
 .profile-pic-controls .file-hint {
     margin: 0;
     font-size: 0.8em;
     color: #777;
 }
-.delete-photo-btn {
-    font-size: 0.9em;
-    padding: 8px 15px;
+
+/* Button styles for your specific JSX class names */
+.btn-secondary-file-upload-label,
+.btn-secondary-delete-photo-btn {
+    /* --- Base styles copied from .btn-secondary --- */
+    padding: 12px 22px;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.1s;
+    border: 1px solid #dee2e6;
+    background-color: #e9ecef;
+    color: #495057;
+    text-align: center;
+    font-size: 0.95em;
+    text-decoration: none;
+    display: block;
+    /* --- Layout fixes --- */
+    width: 100%;
+    margin-bottom: 10px;
+    box-sizing: border-box; /* This makes widths match */
 }
 
-/* --- RIGHT COLUMN: Resume Upload --- */
+.btn-secondary-file-upload-label:hover,
+.btn-secondary-delete-photo-btn:hover {
+    background-color: #dee2e6;
+}
 
+
+/* ========================================
+FIX: THE SIDEBAR STRUCTURE
+The sidebar is now an INVISIBLE container, and the
+items inside it are now the cards.
+========================================
+*/
 .resume-upload-sidebar { 
-    flex: 1; 
-    position: sticky;
-    /* 💡 ADJUSTED STICKY POSITION for the Header */
-    top: 100px; 
     height: fit-content;
-    max-height: calc(100vh - 120px); 
-    overflow-y: auto;
-    background: #fff;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: var(--card-shadow);
-    border: 1px solid #dee2e6;
+    border: none;
+    
+    /* This creates the stack of cards */
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* This is the space BETWEEN the sidebar cards */
+}
+
+/* The sections inside the sidebar are now styled by the */
+/* default .profile-card rule, which is what we want. */
+
+.resume-upload-sidebar .section-account-actions {
+    /* This rule adds a border-top to the *last* card */
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+/* This title rule applies to "Resume", "Skills", "Education", "Account" */
+.resume-upload-sidebar .section-title {
+    margin-bottom: 20px;
+    font-size: 1.5rem; /* Make sidebar titles a bit smaller */
 }
 
 .uploaded-file-status {
@@ -372,20 +428,17 @@
     gap: 15px;
     border: 1px dashed var(--secondary-teal);
     padding: 15px;
-    border-radius: 8px;
+    border-radius: 10px;
 }
-
 .uploaded-file-status .file-name {
     margin: 0;
     font-weight: 600;
     color: var(--primary-dark);
 }
-
 .file-actions {
     display: flex;
     gap: 10px;
 }
-
 .no-file-status {
     display: flex;
     flex-direction: column;
@@ -393,14 +446,13 @@
     padding: 15px 0;
     text-align: center;
 }
-
 .file-hint {
     font-size: 0.85em;
     color: #777;
     margin-top: 10px;
 }
 
-/* --- Alerts --- */
+/* --- Alerts (No longer used, but fine) --- */
 .alert-message {
     padding: 12px 20px;
     border-radius: 8px;
@@ -408,44 +460,39 @@
     margin-bottom: 20px;
     border: 1px solid transparent;
 }
-
 .status-accepted { 
     background: #d4edda;
     color: #155724;
     border-color: #c3e6cb;
 }
-
 .status-info { 
-    background: #ffeac7; 
+    background: #ffeac7;
     color: #9d501d; 
     border-color: #ffd996;
 }
 
-/* ----------------- MODAL STYLES ----------------- */
-
+/* --- Modal Styles --- */
 .modal-backdrop {
     position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
-    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+    background-color: rgba(0, 0, 0, 0.5);
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000; /* Ensure it's on top of everything */
+    z-index: 1000;
 }
-
 .modal-content {
     background: #fff;
     padding: 30px;
-    border-radius: 12px;
+    border-radius: 16px;
     box-shadow: var(--card-shadow);
     max-width: 600px;
     width: 90%;
     position: relative;
 }
-
 .modal-close-btn {
     position: absolute;
     top: 15px;
@@ -457,20 +504,17 @@
     color: #888;
     line-height: 1;
 }
-
 .modal-title {
     color: var(--primary-orange);
     margin-top: 0;
     padding-bottom: 10px;
     border-bottom: 1px solid #eee;
 }
-
 .modal-hint {
     font-size: 0.9em;
     color: #555;
     font-style: italic;
 }
-
 .resume-viewer-placeholder {
     padding: 20px;
     background-color: #f9f9f9;
@@ -480,58 +524,59 @@
     text-align: center;
 }
 
+/* --- Account Actions --- */
+.logout-btn {
+  width: 100%;
+  font-size: 1em;
+}
+
 /*
 ========================================
 ## RESPONSIVENESS (Screens < 1000px)
 ========================================
 */
 @media (max-width: 1000px) {
-    /* 💡 ADDED: Mobile padding adjustment for top & bottom nav */
     .profile-wrapper {
         padding-top: 80px; 
-        padding-bottom: 80px; 
+        padding-bottom: 80px;
     }
     
-    /* 1. Stack the main content columns */
     .profile-content-area {
-        flex-direction: column;
-        padding: 0 15px; 
+        grid-template-columns: 1fr; /* Stack main and sidebar */
+        padding: 0 15px;
         gap: 25px;
     }
 
-    /* 2. Fix the sticky upload sidebar */
     .resume-upload-sidebar { 
         position: static;
         max-height: none;
-        order: -1; 
-        border: none; /* Remove border on mobile since it's now a section */
+        /* The tablet stacking bug fix is still here (no 'order: -1') */
+        /* And now we remove the card styles from the container */
+        background: none;
+        padding: 0;
+        box-shadow: none;
     }
     
-    /* 3. Simplify the Form Layouts */
-    
     .page-title {
-        font-size: 1.8em;
+        font-size: 2em;
         text-align: center;
         margin-top: 10px;
     }
 
-    /* Contact Info Grid: Stack inputs vertically */
     .form-grid-3 {
         grid-template-columns: 1fr;
-        gap: 15px;
+        gap: 0;
     }
 
-    /* Education Table/Grid: Simplify columns */
     .education-item-grid {
         grid-template-columns: 1fr;
         gap: 10px;
         padding: 15px;
-        background-color: #fcfcfc; 
+        background-color: #fcfcfc;
         border: 1px solid #eee;
         border-radius: 8px;
     }
 
-    /* 4. Action Bar Adjustments */
     .submit-action-bar {
         flex-direction: column;
         gap: 15px;
@@ -553,13 +598,18 @@
         flex-direction: column;
         text-align: center;
     }
+    
     .profile-pic-controls {
         align-items: center;
-        width: 100%;
+        width: 100%; /* This is the fix from last time */
+        margin-bottom: 10px;
     }
-    .profile-pic-controls .btn-secondary,
-    .profile-pic-controls .file-upload-label {
-        width: 100%; /* Make buttons full width */
+    
+    
+    /* Stack header grid on mobile */
+    .profile-header-grid {
+        grid-template-columns: 1fr;
+        gap: 25px;
     }
 }
 
@@ -569,11 +619,9 @@
 ========================================
 */
 @media (max-width: 500px) {
-    /* More compact padding on cards */
-    .profile-card,
-    .resume-upload-sidebar {
+    .profile-card { /* Simplified this rule */
         padding: 20px;
-        border-radius: 8px;
+        border-radius: 12px;
     }
     
     .section-title {
@@ -581,7 +629,6 @@
         margin-bottom: 15px;
     }
     
-    /* Skill Input bar needs to stack on smaller phones */
     .skill-input-bar {
         flex-direction: column;
     }
@@ -597,32 +644,9 @@
     .file-actions button {
         width: 100%;
     }
-
-    /* --- Add this to the bottom of Profile.css --- */
-
-/* New Account Actions Section */
-.section-account-actions {
-  /* It inherits profile-card styles, but we can add specifics */
-  background: #fff;
-  border: 1px solid #f0f0f0;
-}
-
-/* New Logout Button */
-.logout-btn {
-  width: 100%;
-  font-size: 1em;
-  padding: 12px 20px;
-}
-
-/* Red Button Style */
-.btn-danger {
-  background-color: #f44336; /* A clear red color */
-  color: white;
-  border: none;
-}
-
-.btn-danger:hover:not(:disabled) {
-  background-color: #d32f2f;
-  transform: translateY(-1px);
-}
+    
+    .education-item-grid {
+        gap: 5px;
+        padding: 10px;
+    }
 }

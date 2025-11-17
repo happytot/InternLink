@@ -1,19 +1,21 @@
-'use client'; // ✅ Make this a Client Component
+'use client';
 
 import { useState } from 'react';
-import { supabase } from '../../../lib/supabase';
-import styles from '../../components/AuthPage.module.css';
+import { supabase } from '../../../lib/supabase'; // <-- Corrected path
+import styles from '../../components/AuthPage.module.css'; // <-- Corrected path
 import { useRouter } from 'next/navigation';
+import { Toaster, toast } from 'sonner';
+import { FaEye, FaEyeSlash } from 'react-icons/fa'; // <-- Added icons
 
 const translateSupabaseError = (error) => {
-  if (!error) return '';
+  if (!error) return 'An unknown error occurred.';
   switch (error.message) {
     case 'Invalid login credentials':
-      return '❌ Invalid Credentials. Please check your email and password.';
+      return 'Invalid Credentials. Please check your email and password.';
     case 'User already registered':
-      return '❌ This email address is already registered.';
+      return 'This email address is already registered.';
     default:
-      return `❌ ${error.message}`;
+      return error.message;
   }
 };
 
@@ -22,58 +24,55 @@ export default function CompanyAuthPage() {
 
   const [isLoginView, setIsLoginView] = useState(true);
   const [loginData, setLoginData] = useState({ email: '', password: '' });
-  const [signupData, setSignupData] = useState({ companyName: '', email: '', password: '' });
-  const [message, setMessage] = useState('');
-
-  const showMessage = (text, color = 'red') => {
-    setMessage({ text, color });
-    setTimeout(() => setMessage(''), 3000);
-  };
+  const [signupData, setSignupData] = useState({
+    companyName: '',
+    email: '',
+    password: '',
+  });
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleGoBack = () => router.push('/');
 
   // LOGIN
   const handleLogin = async (e) => {
     e.preventDefault();
-    setMessage('');
 
     const { email, password } = loginData;
 
-    const { data: user, error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
 
     if (error) {
-      showMessage(translateSupabaseError(error));
+      toast.error(translateSupabaseError(error));
       return;
     }
 
-    if (!user) {
-      showMessage('❌ Login failed.');
+    if (!data.user) {
+      toast.error('Login failed.');
       return;
     }
-
-    // Optional: verify user type in Supabase profiles table
-    router.push('/company/dashboard'); // Redirect to Company Dashboard
+    router.push('/company/dashboard');
   };
 
   // SIGNUP
   const handleSignup = async (e) => {
     e.preventDefault();
-    setMessage('');
 
     const { companyName, email, password } = signupData;
 
-    const { data: user, error } = await supabase.auth.signUp({ email, password });
+    const { data, error } = await supabase.auth.signUp({ email, password });
 
     if (error) {
-      showMessage(translateSupabaseError(error));
+      toast.error(translateSupabaseError(error));
       return;
     }
 
-    if (user) {
-      // Optional: save additional profile info in Supabase "profiles" table
+    if (data.user) {
       await supabase.from('profiles').insert([
         {
-           id: data.user.id, 
+          id: data.user.id,
           company_name: companyName,
           email,
           user_type: 'company',
@@ -81,7 +80,7 @@ export default function CompanyAuthPage() {
         },
       ]);
 
-      showMessage(`✅ Signup successful for ${companyName}! Please log in.`, 'green');
+      toast.success(`Signup successful for ${companyName}! Please log in.`);
       setSignupData({ companyName: '', email: '', password: '' });
       setIsLoginView(true);
     }
@@ -97,6 +96,8 @@ export default function CompanyAuthPage() {
 
   return (
     <div className={styles.bodyContainer}>
+      <Toaster richColors position="top-right" />
+
       <div className={styles.container}>
         <button className={styles.backButton} onClick={handleGoBack}>
           &times;
@@ -108,24 +109,49 @@ export default function CompanyAuthPage() {
           <form onSubmit={handleLogin}>
             <div className={styles.inputGroup}>
               <label htmlFor="email">Email</label>
-              <input type="email" id="email" value={loginData.email} onChange={handleLoginChange} required />
+              <input
+                type="email"
+                id="email"
+                value={loginData.email}
+                onChange={handleLoginChange}
+                required
+              />
             </div>
 
+            {/* --- Updated Password Input --- */}
             <div className={styles.inputGroup}>
               <label htmlFor="password">Password</label>
-              <input type="password" id="password" value={loginData.password} onChange={handleLoginChange} required />
+              <div className={styles.passwordWrapper}>
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  id="password"
+                  value={loginData.password}
+                  onChange={handleLoginChange}
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className={styles.eyeButton}
+                >
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                </button>
+              </div>
             </div>
 
             <button type="submit">Login as Company</button>
 
             <p>
               Don't have an account?{' '}
-              <button type="button" className={styles.linkButton} onClick={() => setIsLoginView(false)}>
+              <button
+                type="button"
+                className={styles.linkButton}
+                onClick={() => setIsLoginView(false)}
+              >
                 Sign up
               </button>
             </p>
           </form>
-          {message && isLoginView && <div style={{ color: message.color, marginTop: '10px' }}>{message.text}</div>}
         </div>
 
         {/* SIGNUP FORM */}
@@ -134,29 +160,60 @@ export default function CompanyAuthPage() {
           <form onSubmit={handleSignup}>
             <div className={styles.inputGroup}>
               <label htmlFor="companyName">Company Name</label>
-              <input type="text" id="companyName" value={signupData.companyName} onChange={handleSignupChange} required />
+              <input
+                type="text"
+                id="companyName"
+                value={signupData.companyName}
+                onChange={handleSignupChange}
+                required
+              />
             </div>
 
             <div className={styles.inputGroup}>
               <label htmlFor="email">Email</label>
-              <input type="email" id="email" value={signupData.email} onChange={handleSignupChange} required />
+              <input
+                type="email"
+                id="email"
+                value={signupData.email}
+                onChange={handleSignupChange}
+                required
+              />
             </div>
 
+            {/* --- Updated Password Input --- */}
             <div className={styles.inputGroup}>
               <label htmlFor="password">Password</label>
-              <input type="password" id="password" value={signupData.password} onChange={handleSignupChange} required />
+              <div className={styles.passwordWrapper}>
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  id="password"
+                  value={signupData.password}
+                  onChange={handleSignupChange}
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className={styles.eyeButton}
+                >
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                </button>
+              </div>
             </div>
 
             <button type="submit">Sign Up as Company</button>
 
             <p>
               Already have an account?{' '}
-              <button type="button" className={styles.linkButton} onClick={() => setIsLoginView(true)}>
+              <button
+                type="button"
+                className={styles.linkButton}
+                onClick={() => setIsLoginView(true)}
+              >
                 Login
               </button>
             </p>
           </form>
-          {message && !isLoginView && <div style={{ color: message.color, marginTop: '10px' }}>{message.text}</div>}
         </div>
       </div>
     </div>

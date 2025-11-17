@@ -91,8 +91,8 @@ export default function CoordinatorCompanies() {
               <tr>
                 <th>#</th>
                 <th> <FaCalendarAlt style={{ marginRight: "5px" }} />Updated</th>
-                <th>Company Name</th>
-                <th>Location</th>
+                <th> <FaBuilding style={{ marginRight: "5px" }} />Company Name</th>
+                <th><FaMapMarkerAlt style={{ marginRight: "5px" }} />Location</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -107,11 +107,11 @@ export default function CoordinatorCompanies() {
                       : "N/A"}
                   </td>
                   <td>
-                    <FaBuilding style={{ marginRight: "5px" }} />
+                   
                     {c.name || "N/A"}
                   </td>
                   <td>
-                    <FaMapMarkerAlt style={{ marginRight: "5px" }} />
+                    
                     {c.location || "N/A"}
                   </td>
                   <td>
@@ -119,7 +119,7 @@ export default function CoordinatorCompanies() {
                       className="info-btn"
                       onClick={() => setSelectedCompany(c)}
                     >
-                      <FaInfoCircle style={{ marginRight: "5px" }} />
+                      
                       Full Info
                     </button>
                   </td>

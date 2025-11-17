@@ -231,6 +231,7 @@ const RecommendedMatches = ({ user, openModal }) => {
 };
 
 // --- 5. Announcements ---
+// --- 5. Announcements ---
 const Announcements = () => {
   const [announcements, setAnnouncements] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -238,16 +239,27 @@ const Announcements = () => {
   useEffect(() => {
     const fetchAnnouncements = async () => {
       try {
-        const { data, error } = await supabase
+        // Fetch announcements
+        const { data: annData, error: annError } = await supabase
           .from('announcements')
-          .select(`
-            *,
-            created_by_profile:profiles!announcements_created_by_fkey ( fullname )
-          `)
+          .select('*')
           .order('created_at', { ascending: false })
           .limit(5);
-        if (error) throw error;
-        setAnnouncements(data || []);
+        if (annError) throw annError;
+
+        // Fetch all profiles
+        const { data: profiles, error: profilesError } = await supabase
+          .from('profiles')
+          .select('id, fullname');
+        if (profilesError) throw profilesError;
+
+        // Map announcements to include profile info
+        const combined = annData.map(a => ({
+          ...a,
+          created_by_profile: profiles.find(p => p.id === a.created_by),
+        }));
+
+        setAnnouncements(combined);
       } catch (err) {
         console.error("Error fetching announcements:", err.message);
       } finally {
@@ -265,13 +277,16 @@ const Announcements = () => {
       <div className="announcement-list">
         {announcements.map(ann => (
           <div key={ann.id} className="announcement-card">
-            {ann.image_url && <img src={ann.image_url} alt={ann.title} className="announcement-image" />}
+            {ann.image_url && (
+              <img src={ann.image_url} alt={ann.title} className="announcement-image" />
+            )}
             <div className="announcement-content">
               <h3>{ann.title}</h3>
               <p>{ann.content}</p>
-             <small>
-                By {ann.created_by_profile?.fullname || 'Admin'} • {new Date(ann.created_at).toLocaleDateString()}
-             </small>
+              <small>
+                By {ann.created_by_profile?.fullname || 'Admin'} •{' '}
+                {new Date(ann.created_at).toLocaleDateString()}
+              </small>
             </div>
           </div>
         ))}
@@ -279,6 +294,7 @@ const Announcements = () => {
     </section>
   );
 };
+
 
 // --- 6. Sidebar Widget ---
 const ProfileWidget = () => (

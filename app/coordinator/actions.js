@@ -7,63 +7,54 @@ import { supabase } from '../../lib/supabase'; // Adjust path based on your file
 // =================================================================
 
 /**
- * Finalizes the status of an application and links the intern profile upon approval.
+ * Finalizes the status of an application by calling a trusted SQL function.
  * @param {string} applicationId - The ID of the job_applications record.
  * @param {string} newStatus - 'approved_by_coordinator' or 'rejected_by_coordinator'.
  */
 export async function finalizeApplicationStatus(applicationId, newStatus) {
-    if (!applicationId || !newStatus) {
-        return { success: false, error: 'Application ID and new status are required.' };
+  if (!applicationId || !newStatus) {
+    return { success: false, error: 'Application ID and new status are required.' };
+  }
+  
+  console.log(`[Action] Calling RPC 'coordinator_finalize_application' for app: ${applicationId}`);
+
+  try {
+    // --- THIS IS THE FIX ---
+    // We are no longer using .from('job_applications').
+    // We are calling the SQL function we just created.
+    const { data, error } = await supabase
+      .rpc('coordinator_finalize_application', {
+        application_id_in: applicationId,
+        new_status_in: newStatus
+      });
+
+    if (error) {
+      // This will catch network errors
+      console.error('RPC call error:', error.message);
+      throw new Error(error.message);
+    }
+    
+    // This is the JSON object returned from our SQL function
+    const result = data; 
+    
+    if (result.success === false) {
+      // This will catch logical errors from the SQL (e.g., "Not found")
+      console.error('RPC logical error:', result.error);
+      return { success: false, error: result.error };
     }
 
-    try {
-        // 1. Update the application status
-        const { error: appUpdateError } = await supabase
-            .from('job_applications')
-            .update({ status: newStatus })
-            .eq('id', applicationId);
+    // If we get here, it worked.
+    return { success: true, message: result.message };
 
-        if (appUpdateError) throw appUpdateError;
-        
-        // 2. If APPROVED, officially link the intern's profile to the company (OJT Start)
-if (newStatus === 'approved_by_coordinator') {
-            
-            // a. Get the intern_id and company_id from the application
-            const { data: appData, error: appDataError } = await supabase
-                .from('job_applications')
-                .select('intern_id, job_posts:job_posts(company_id)') // ✅ FIX: Use 'job_posts' table name
-                .eq('id', applicationId)
-                .single();
-            
-            if (appDataError) throw appDataError;
-
-            const internId = appData.intern_id;
-            const companyId = appData.job_posts.company_id; // Accessing the ID from the joined table
-
-            // b. Update the intern's profile (Crucial for OJT start)
-            const { error: profileError } = await supabase
-                .from('profiles')
-                .update({ company_id: companyId }) 
-                .eq('id', internId);
-
-            if (profileError) {
-                console.error("Failed to link intern to company:", profileError);
-                throw profileError; // Halt if profile link fails
-            }
-        }
-
-        return { success: true, message: `Application ${applicationId} finalized to ${newStatus}.` };
-
-    } catch (e) {
-        console.error('Coordinator application finalize error:', e);
-        return { success: false, error: 'An unexpected error occurred during final approval.' };
-    }
+  } catch (e) {
+    console.error('Coordinator application finalize error:', e.message);
+    return { success: false, error: e.message || 'An unexpected error occurred during final approval.' };
+  }
 }
 
 /**
  * Updates the status of a logbook entry (approve/reject/revision).
- * @param {string} logbookId - The ID of the logbooks record.
- * @param {string} newStatus - 'approved' or 'rejected' or 'revision_requested'.
+ * (This function is unchanged and fine as-is)
  */
 export async function updateLogbookStatus(logbookId, newStatus) {
     if (!logbookId || !newStatus) {
@@ -72,7 +63,7 @@ export async function updateLogbookStatus(logbookId, newStatus) {
     
     try {
         const { error } = await supabase
-            .from('logbooks') // Assuming your logbook table is named 'logbooks'
+            .from('logbooks') 
             .update({ status: newStatus, reviewed_at: new Date().toISOString() })
             .eq('id', logbookId);
 

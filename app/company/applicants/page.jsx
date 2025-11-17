@@ -19,6 +19,10 @@ export default function ApplicantsPage() {
       const companyId = userData?.user?.id;
 
       setCompanyId(companyId);
+
+      // --- THIS IS THE FINAL, CORRECTED QUERY ---
+      // We are now using the explicit Foreign Key names that we
+      // know work from your Coordinator pages.
       const { data, error } = await supabase
         .from("job_applications")
         .select(`
@@ -26,16 +30,17 @@ export default function ApplicantsPage() {
           created_at,
           status,
           resume_url,
-          profiles:profiles!fk_job_applications_intern(fullname, email),
-          job_posts:job_posts!fk_job_applications_job(title, company_id)
+          profiles:profiles!fk_job_applications_intern ( fullname, email ),
+          job_posts:job_posts!fk_job_applications_job ( title )
         `)
-        .eq("job_posts.company_id", companyId)
+        .eq("company_id", companyId) // Filter directly on the application's company_id
         .order("created_at", { ascending: false });
 
       if (error) throw error;
+      
       setApplicants(data || []);
     } catch (err) {
-      console.error("❌ Error fetching applicants:", err);
+      console.error("❌ Error fetching applicants:", err.message);
       toast.error("Error fetching applicants: " + err.message);
     } finally {
       setLoading(false);
@@ -46,47 +51,42 @@ export default function ApplicantsPage() {
     fetchApplicants();
   }, []);
 
-// --- Handle Accept / Reject ---
-const handleStatusUpdate = async (applicationId, action) => {
-  console.log('Updating application ID:', applicationId, 'Action:', action, 'Company ID:', companyId);
-  
-  const newStatus =
-    action === 'accept'
-      ? 'Company_Approved_Waiting_Coordinator'
-      : 'Rejected';
-
-  // Optimistic UI update
-  setApplicants(prev =>
-    prev.map(app =>
-      app.id === applicationId ? { ...app, status: newStatus } : app
-    )
-  );
-
-  toast.success(`Status updated to ${action === 'accept' ? 'Company Approved' : 'Rejected'}`);
-  console.log('Toast shown for', action);
-  try {
-    const result = await updateJobApplicationStatus(applicationId, newStatus);
+  // --- This is your existing, correct logic ---
+  const handleStatusUpdate = async (applicationId, action) => {
+    console.log('Updating application ID:', applicationId, 'Action:', action, 'Company ID:', companyId);
     
-    if (!result.success) {
-      // revert on error
-      console.error('Failed to update status:', result.error);
-      setApplicants(prev =>
-        prev.map(app =>
-          app.id === applicationId ? { ...app, status: 'Pending' } : app
-        )
-      );
-      toast.error(`Failed to update status: ${result.error}`);
-    }
-  } catch (err) {
-    console.error('Exception during status update:', err);
+    const newStatus =
+      action === 'accept'
+        ? 'Company_Approved_Waiting_Coordinator'
+        : 'Rejected';
+
+    const previousApplicants = applicants; 
     setApplicants(prev =>
       prev.map(app =>
-        app.id === applicationId ? { ...app, status: 'Pending' } : app
+        app.id === applicationId ? { ...app, status: newStatus } : app
       )
     );
-    toast.error(`Error updating status: ${err.message}`);
-  }
-};
+
+    try {
+      const result = await updateJobApplicationStatus(applicationId, newStatus, companyId);
+      
+      if (result && result.success === false) {
+        console.error('Failed to update status (server responded with error):', result.error);
+        setApplicants(previousApplicants); 
+        toast.error(`Failed to update status: ${result.error}`);
+      } else if (result && result.success === true) {
+        console.log('Status successfully updated.');
+        toast.success(`Status updated to ${action === 'accept' ? 'Company Approved' : 'Rejected'}`);
+      } else {
+        throw new Error('Server action returned an unexpected response.');
+      }
+
+    } catch (err) {
+      console.error('Exception during status update:', err);
+      setApplicants(previousApplicants); 
+      toast.error(`Error updating status: ${err.message}`);
+    }
+  };
 
 
   return (
@@ -106,9 +106,9 @@ const handleStatusUpdate = async (applicationId, action) => {
                 <tr>
                   <th>Full Name</th>
                   <th>Email</th>
+                   <th>Resume</th>
                   <th>Applied For</th>
                   <th>Status</th>
-                  <th>Resume</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -117,19 +117,26 @@ const handleStatusUpdate = async (applicationId, action) => {
                   <tr key={app.id}>
                     <td>{app.profiles?.fullname}</td>
                     <td>{app.profiles?.email || 'N/A'}</td>
-                    <td>{app.job_posts?.title}</td>
+                    <td>
+                      {app.resume_url && (
+                        <a 
+                          href={app.resume_url} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          className="resume-link"
+                        >
+                          View Resume
+                        </a>
+                      )}
+                    </td>
+                    {/* This will now be populated by the corrected query */}
+                    <td>{app.job_posts?.title}</td> 
                     <td>
                       <span className={`status ${app.status.toLowerCase()}`}>
                         {app.status.replace(/_/g, ' ')}
                       </span>
                     </td>
-                    <td>
-                      {app.resume_url && (
-                        <a href={app.resume_url} target="_blank" rel="noopener noreferrer">
-                          View Resume
-                        </a>
-                      )}
-                    </td>
+
                     <td>
                       {app.status.toLowerCase() === 'pending' && (
                         <>
@@ -147,6 +154,9 @@ const handleStatusUpdate = async (applicationId, action) => {
                           </button>
                         </>
                       )}
+                      {app.status.toLowerCase() !== 'pending' && (
+                        <span>{app.status.replace(/_/g, ' ')}</span>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -162,6 +172,7 @@ const handleStatusUpdate = async (applicationId, action) => {
                   <div className="applicant-header">
                     <h3>{app.profiles?.fullname}</h3>
                     <p><strong>Email:</strong> {app.profiles?.email || 'N/A'}</p>
+                    {/* This will now be populated by the corrected query */}
                     <p><strong>Applied for:</strong> {app.job_posts?.title}</p>
                   </div>
 
@@ -193,6 +204,11 @@ const handleStatusUpdate = async (applicationId, action) => {
                       </>
                     )}
                   </div>
+                  {app.status.toLowerCase() !== 'pending' && (
+                    <div style={{textAlign: 'center', marginTop: '1rem', color: '#333'}}>
+                      Status: {app.status.replace(/_/g, ' ')}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

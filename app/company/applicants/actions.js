@@ -3,70 +3,50 @@
 import { supabase } from '../../../lib/supabase';
 
 // 🔑 Update job application status and log history
-export async function updateJobApplicationStatus(applicationId, newStatus) {
+// We pass companyId as the third argument
+export async function updateJobApplicationStatus(applicationId, newStatus, companyId) {
   
-     if (!applicationId || !newStatus) {
-      return { success: false, error: 'Application ID and new status are required.' };
-    }
-    
-    try {
- // 0️⃣ Ensure the ID is a valid UUID (optional, prevents PGRST116)
-    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-    if (!uuidRegex.test(applicationId)) {
-      return { success: false, error: 'Invalid application ID format.' };
-    }
-    console.log('Updating application ID:', applicationId, 'to status:', newStatus);
-    // 1️⃣ Fetch current status safely
-    const { data: currentApp, error: fetchError } = await supabase
-      .from('job_applications')
-      .select('status')
-      .eq('id', applicationId)
-      .maybeSingle();
+  if (!applicationId || !newStatus) {
+    return { success: false, error: 'Application ID and new status are required.' };
+  }
+  
+  if (!companyId) {
+    return { success: false, error: 'Company ID was not provided.' };
+  }
 
-    if (fetchError) {
-      console.error('Error fetching current status:', fetchError);
-      return { success: false, error: fetchError.message };
-    }
-    if (!currentApp) {
-        console.error('Job Application not found for ID:', applicationId);
-        return { success: false, error: ('Job Application not found.', applicationId)};
-    }
-    
-    const oldStatus = currentApp.status;
-    // 2️⃣ Update status in job_applications
-    const { error: updateError } = await supabase
-      .from('job_applications')
-      .update({ status: newStatus })
-      .eq('id', applicationId);
+  try {
+    console.log('Calling RPC update_application_status_as_company for app:', applicationId);
 
-    if (updateError) {
-      console.error('Supabase update error:', updateError);
-      return { success: false, error: updateError.message };
+    // Call the SQL function with all three arguments
+    const { data, error } = await supabase
+      .rpc('update_application_status_as_company', {
+        application_id_in: applicationId,
+        new_status_in: newStatus,
+        company_id_in: companyId // <-- PASSING THE COMPANY ID
+      });
+
+    if (error) {
+      console.error('RPC error:', error.message);
+      return { success: false, error: error.message };
     }
 
-    // 3️⃣ Log status change in application_history
-    const { error: historyError } = await supabase
-      .from('application_history')
-      .insert([
-        {
-          application_id: applicationId,
-          old_status: oldStatus,
-          new_status: newStatus,
-          changed_at: new Date().toISOString()
-        }
-      ]);
+    // The RPC function returns a JSON object: {success: true/false, ...}
+    const result = data; 
 
-    if (historyError) {
-      console.error('Error logging application history:', historyError);
-      // Don't fail the main update if history logging fails
+    if (result.success === false) {
+      // This will catch our manual error: 'Not authorized or application not found'
+      console.error('RPC logical error:', result.error);
+      return { success: false, error: result.error };
     }
-   return {
+
+    // If we get here, it worked.
+    return {
       success: true,
-      message: `Application ${applicationId} status updated from ${oldStatus} to ${newStatus}.`
+      message: result.message
     };
 
   } catch (e) {
     console.error('Server action exception:', e);
-    return { success: false, error: 'An unexpected error occurred during status update.' };
+    return { success: false, error: 'An unexpected server error occurred.' };
   }
 }
