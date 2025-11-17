@@ -163,7 +163,7 @@
 /******/ 		// This function allow to reference async chunks
 /******/ 		__webpack_require__.u = function(chunkId) {
 /******/ 			// return url for filenames based on template
-/******/ 			return undefined;
+/******/ 			return "static/chunks/" + chunkId + ".js";
 /******/ 		};
 /******/ 	}();
 /******/ 	
@@ -192,7 +192,7 @@
 /******/ 	
 /******/ 	/* webpack/runtime/getFullHash */
 /******/ 	!function() {
-/******/ 		__webpack_require__.h = function() { return "46ed34495cf48fb7"; }
+/******/ 		__webpack_require__.h = function() { return "393376d4c5209890"; }
 /******/ 	}();
 /******/ 	
 /******/ 	/* webpack/runtime/global */
@@ -830,20 +830,8 @@
 /******/ 		// [resolve, reject, Promise] = chunk loading, 0 = chunk loaded
 /******/ 		var installedChunks = __webpack_require__.hmrS_jsonp = __webpack_require__.hmrS_jsonp || {
 /******/ 			"webpack": 0,
-/******/ 			"css-app_LandingPage_css": 0,
-/******/ 			"css-app_components_InternNav_css-app_globals_css-app_index_css-app_intern_dashboard_Dashboard_css": 0,
-/******/ 			"css-app_components_AuthPage_module_css": 0,
-/******/ 			"css-app_intern_profile_Profile_css": 0,
-/******/ 			"css-app_company_dashboard_CompanyDashboard_css": 0,
-/******/ 			"css-app_components_CompanyNav_css": 0,
-/******/ 			"css-app_company_profile_profile_css": 0,
-/******/ 			"css-app_company_messages_messages_css": 0,
-/******/ 			"css-app_company_applicants_applicants_css": 0,
-/******/ 			"css-app_company_jobs_new_NewJobPost_css": 0,
-/******/ 			"css-app_intern_messages_messages_css": 0,
-/******/ 			"css-app_intern_history_ApplicationHistory_css": 0,
-/******/ 			"css-app_components_CoordinatorSidebar_css-app_coordinator_approvals_approvals_css-app_coordin-6ddbcc": 0,
-/******/ 			"css-app_coordinator_logbook_logbook_css": 0
+/******/ 			"css-app_components_CoordinatorSidebar_css-app_coordinator_dashboard_dashboard_css-app_coordin-00ec37": 0,
+/******/ 			"css-app_globals_css-app_index_css": 0
 /******/ 		};
 /******/ 		
 /******/ 		__webpack_require__.f.j = function(chunkId, promises) {
@@ -855,7 +843,7 @@
 /******/ 					if(installedChunkData) {
 /******/ 						promises.push(installedChunkData[2]);
 /******/ 					} else {
-/******/ 						if(/^(app(\/(auth\/(co(mpany|ordinator)AuthPage\/page|internAuthPage\/page)|co(mpany\/((applicants|dashboard|jobs\/new|messages|profile)\/page|layout)|ordinator\/(((placem|stud)ent|approval|companie)s|dashboard|logbook)\/page)|intern\/(dashboard|history|messages|profile)\/page|layout|page)|\-pages\-internals)|main(|\-app)|pages\/_(app|error)|\/_error|react\-refresh)$/.test(chunkId)) {
+/******/ 						if(!/^(css\-app_(components_CoordinatorSidebar_css\-app_coordinator_dashboard_dashboard_css\-app_coordin\-00ec37|globals_css\-app_index_css)|webpack)$/.test(chunkId)) {
 /******/ 							// setup Promise in chunk cache
 /******/ 							var promise = new Promise(function(resolve, reject) { installedChunkData = installedChunks[chunkId] = [resolve, reject]; });
 /******/ 							promises.push(installedChunkData[2] = promise);

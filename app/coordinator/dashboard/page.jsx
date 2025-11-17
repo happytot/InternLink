@@ -4,7 +4,8 @@ import React, { useEffect, useState } from "react";
 import { supabase } from "../../../lib/supabaseClient";
 import CoordinatorSidebar from "../../components/CoordinatorSidebar";
 import "./dashboard.css";
-import ApexChart from "react-apexcharts";
+import dynamic from 'next/dynamic';
+const ApexChart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
 export default function CoordinatorDashboard() {
   const [loading, setLoading] = useState(true);

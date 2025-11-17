@@ -1,46 +1,18 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+Next.js build folder
 
-# Dependencies
-# ----------------------------------------------------------------
-# This is the most important one. Never upload this folder.
-/node_modules
-
-# Build & Output
-# ----------------------------------------------------------------
-# These are the folders Next.js creates when it builds your app.
-# Vercel generates these on its own servers, so you don't need them.
 /.next/
-/out/
 
-# Vercel
-# ----------------------------------------------------------------
-# Vercel-specific build output and configuration
-/.vercel/
+Node.js
 
-# Environment Variables
-# ----------------------------------------------------------------
-# CRITICAL: Never push your secret keys, passwords, or API keys to GitHub.
-# .env.local is the default file for all your secrets.
-.env.local
-.env.*.local
+/node_modules/
 
-# You can commit .env.example if you have one, but never the real .env
+Environment variables
+
 .env
-!.env.example
+.env.local
+.env.production.local
+.env.development.local
 
-# Logs
-# ----------------------------------------------------------------
-npm-debug.log*
-yarn-debug.log*
-*.log
+Vercel
 
-# System Files
-# ----------------------------------------------------------------
-# Ignore operating system junk files
-.DS_Store
-Thumbs.db
-
-# IDE / Editor Files
-# ----------------------------------------------------------------
-.vscode/
-.idea/
+.vercel/

@@ -1,7 +1,5 @@
 {
+  "/_not-found/page": "app/_not-found/page.js",
   "/coordinator/students/page": "app/coordinator/students/page.js",
-  "/intern/history/page": "app/intern/history/page.js",
-  "/auth/companyAuthPage/page": "app/auth/companyAuthPage/page.js",
-  "/company/applicants/page": "app/company/applicants/page.js",
-  "/company/dashboard/page": "app/company/dashboard/page.js"
+  "/coordinator/dashboard/page": "app/coordinator/dashboard/page.js"
 }

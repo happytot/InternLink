@@ -1,34 +1,5 @@
 {
-  "node": {
-    "75f387054cc8190513d13afdabf0913276eb8ed5": {
-      "workers": {
-        "app/company/applicants/page": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22C%3A%5C%5CUsers%5C%5Cace%5C%5CDocuments%5C%5Cintern-link-next-complete%5C%5Capp%5C%5Ccompany%5C%5Capplicants%5C%5Cactions.js%22%2C%5B%22updateJobApplicationStatus%22%5D%5D%5D&__client_imported__=true!"
-      },
-      "layer": {
-        "app/company/applicants/page": "action-browser"
-      }
-    },
-    "182c344d792356c883d0dd73c7ebacfa5b40f540": {
-      "workers": {
-        "app/coordinator/logbook/page": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22C%3A%5C%5CUsers%5C%5Cace%5C%5CDocuments%5C%5Cintern-link-next-complete%5C%5Capp%5C%5Ccoordinator%5C%5Cactions.js%22%2C%5B%22updateLogbookStatus%22%2C%22finalizeApplicationStatus%22%5D%5D%5D&__client_imported__=true!",
-        "app/coordinator/approvals/page": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22C%3A%5C%5CUsers%5C%5Cace%5C%5CDocuments%5C%5Cintern-link-next-complete%5C%5Capp%5C%5Ccoordinator%5C%5Cactions.js%22%2C%5B%22updateLogbookStatus%22%2C%22finalizeApplicationStatus%22%5D%5D%5D&__client_imported__=true!"
-      },
-      "layer": {
-        "app/coordinator/logbook/page": "action-browser",
-        "app/coordinator/approvals/page": "action-browser"
-      }
-    },
-    "916e2abcb98e4fb50380b2fd5f168ace2905eab6": {
-      "workers": {
-        "app/coordinator/logbook/page": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22C%3A%5C%5CUsers%5C%5Cace%5C%5CDocuments%5C%5Cintern-link-next-complete%5C%5Capp%5C%5Ccoordinator%5C%5Cactions.js%22%2C%5B%22updateLogbookStatus%22%2C%22finalizeApplicationStatus%22%5D%5D%5D&__client_imported__=true!",
-        "app/coordinator/approvals/page": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22C%3A%5C%5CUsers%5C%5Cace%5C%5CDocuments%5C%5Cintern-link-next-complete%5C%5Capp%5C%5Ccoordinator%5C%5Cactions.js%22%2C%5B%22updateLogbookStatus%22%2C%22finalizeApplicationStatus%22%5D%5D%5D&__client_imported__=true!"
-      },
-      "layer": {
-        "app/coordinator/logbook/page": "action-browser",
-        "app/coordinator/approvals/page": "action-browser"
-      }
-    }
-  },
+  "node": {},
   "edge": {},
-  "encryptionKey": "fhtox/hBOqcvwZI95M3+praES+M9WZnr0kXBdYHR3Qw="
+  "encryptionKey": "QzVGXnPBAe7EnKSibypx05Vhiu9Fu5G6kOgGHQG7fFQ="
 }
