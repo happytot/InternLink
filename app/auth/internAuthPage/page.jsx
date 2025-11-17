@@ -113,120 +113,138 @@ export default function InternAuthPage() {
   };
 
   return (
-    <div className={styles.bodyContainer}>
-      <Toaster richColors position="top-right" />
+  <div className={styles.bodyContainer}>
+  <Toaster richColors position="top-right" />
 
-      <div className={styles.container}>
-        <button className={styles.backButton} onClick={handleGoBack}>
-          &times;
-        </button>
+  <div className={styles.container}>
 
-        {/* LOGIN FORM */}
-        <div className={`${styles.formBox} ${!isLoginView ? styles.hidden : ''}`}>
-          <h2>Intern Login</h2>
-          <form onSubmit={handleLogin}>
-            <div className={styles.inputGroup}>
-              <label htmlFor="email">Email</label>
+    {/* LEFT SIDE IMAGE */}
+    <div className={styles.imageSection}>
+      <img 
+        src="https://t4.ftcdn.net/jpg/08/33/25/31/360_F_833253131_Ndkht9RxSR3EABQtOzdvRkFpAXCpxLzi.jpg"
+        alt="Intern Illustration"
+      />
+    </div>
+
+    {/* RIGHT SIDE FORMS */}
+    <div className={styles.formContainer}>
+      <button className={styles.backButton} onClick={handleGoBack}>
+        &times;
+      </button>
+
+      {/* LOGIN FORM */}
+      <div className={`${styles.formBox} ${!isLoginView ? styles.hidden : ''}`}>
+        <h2>Intern Login</h2>
+        <form onSubmit={handleLogin}>
+          <div className={styles.inputGroup}>
+            <label htmlFor="email">Email</label>
+            <input
+              type="email"
+              id="email"
+              value={loginData.email}
+              onChange={handleLoginChange}
+              required
+            />
+          </div>
+
+          <div className={styles.inputGroup}>
+            <label htmlFor="password">Password</label>
+            <div className={styles.passwordWrapper}>
               <input
-                type="email"
-                id="email"
-                value={loginData.email}
+                type={showPassword ? 'text' : 'password'}
+                id="password"
+                value={loginData.password}
                 onChange={handleLoginChange}
                 required
               />
-            </div>
-            {/* --- Updated Password Input --- */}
-            <div className={styles.inputGroup}>
-              <label htmlFor="password">Password</label>
-              <div className={styles.passwordWrapper}>
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  id="password"
-                  value={loginData.password}
-                  onChange={handleLoginChange}
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className={styles.eyeButton}
-                >
-                  {showPassword ? <FaEyeSlash /> : <FaEye />}
-                </button>
-              </div>
-            </div>
-            <button type="submit">Login as Intern</button>
-            <p>
-              Don't have an account?{' '}
               <button
                 type="button"
-                className={styles.linkButton}
-                onClick={() => setIsLoginView(false)}
+                onClick={() => setShowPassword(!showPassword)}
+                className={styles.eyeButton}
               >
-                Sign up
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
               </button>
-            </p>
-          </form>
-        </div>
+            </div>
+          </div>
 
-        {/* SIGNUP FORM */}
-        <div className={`${styles.formBox} ${isLoginView ? styles.hidden : ''}`}>
-          <h2>Intern Sign Up</h2>
-          <form onSubmit={handleSignup}>
-            <div className={styles.inputGroup}>
-              <label htmlFor="fullname">Full Name</label>
+          <button type="submit">Login as Intern</button>
+          <p>
+            Don't have an account?{' '}
+            <button
+              type="button"
+              className={styles.linkButton}
+              onClick={() => setIsLoginView(false)}
+            >
+              Sign up
+            </button>
+          </p>
+        </form>
+      </div>
+
+      {/* SIGNUP FORM */}
+      <div className={`${styles.formBox} ${isLoginView ? styles.hidden : ''}`}>
+        <h2>Intern Sign Up</h2>
+        <form onSubmit={handleSignup}>
+          <div className={styles.inputGroup}>
+            <label htmlFor="fullname">Full Name</label>
+            <input
+              type="text"
+              id="fullname"
+              value={signupData.fullname}
+              onChange={handleSignupChange}
+              required
+            />
+          </div>
+
+          <div className={styles.inputGroup}>
+            <label htmlFor="email">Email</label>
+            <input
+              type="email"
+              id="email"
+              value={signupData.email}
+              onChange={handleSignupChange}
+              required
+            />
+          </div>
+
+          <div className={styles.inputGroup}>
+            <label htmlFor="password">Password</label>
+            <div className={styles.passwordWrapper}>
               <input
-                type="text"
-                id="fullname"
-                value={signupData.fullname}
+                type={showPassword ? 'text' : 'password'}
+                id="password"
+                value={signupData.password}
                 onChange={handleSignupChange}
                 required
               />
-            </div>
-            <div className={styles.inputGroup}>
-              <label htmlFor="email">Email</label>
-              <input
-                type="email"
-                id="email"
-                value={signupData.email}
-                onChange={handleSignupChange}
-                required
-              />
-            </div>
-            {/* --- Updated Password Input --- */}
-            <div className={styles.inputGroup}>
-              <label htmlFor="password">Password</label>
-              <div className={styles.passwordWrapper}>
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  id="password"
-                  value={signupData.password}
-                  onChange={handleSignupChange}
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className={styles.eyeButton}
-                >
-                  {showPassword ? <FaEyeSlash /> : <FaEye />}
-                </button>
-              </div>
-            </div>
-            <button type="submit">Sign Up as Intern</button>
-            <p>
-              Already have an account?{' '}
               <button
                 type="button"
-                className={styles.linkButton}
-                onClick={() => setIsLoginView(true)}
+                onClick={() => setShowPassword(!showPassword)}
+                className={styles.eyeButton}
               >
-                Login
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
               </button>
-            </p>
-          </form>
-        </div>
+            </div>
+          </div>
+
+          <button type="submit">Sign Up as Intern</button>
+          <p>
+            Already have an account?{' '}
+            <button
+              type="button"
+              className={styles.linkButton}
+              onClick={() => setIsLoginView(true)}
+            >
+              Login
+            </button>
+          </p>
+        </form>
       </div>
-    </div>
+
+    </div> {/* END formContainer */}
+
+  </div> {/* END container */}
+</div>
+
   );
 }

@@ -9,12 +9,13 @@ export default function LayoutWrapper({ children }) {
   const pathname = usePathname();
 
   // Routes where you want to hide header/footer
-  const hiddenRoutes = ['/coordinator/students', 
+  const hiddenRoutes = ['/',
+                        '/coordinator/students', 
                         '/coordinator/dashboard', 
-                       '/coordinator/approvals',
-                       '/coordinator/announcements',
-                       '/coordinator/settings',
-                       '/coordinator/companies'
+                        '/coordinator/approvals',
+                        '/coordinator/announcements',
+                        '/coordinator/settings',
+                        '/coordinator/companies'
                       ];
 
   const shouldHideLayout = hiddenRoutes.some((route) => pathname.startsWith(route));

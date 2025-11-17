@@ -1,22 +1,52 @@
 {
   "pages": {
-    "/coordinator/students/page": [
+    "/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/css/css-app_components_CoordinatorSidebar_css-app_coordinator_dashboard_dashboard_css-app_coordin-00ec37.css",
-      "static/chunks/app/coordinator/students/page.js"
+      "static/css/css-app_LandingPage_css.css",
+      "static/chunks/app/page.js"
     ],
     "/layout": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/css/css-app_globals_css-app_index_css.css",
+      "static/css/css-app_components_InternNav_css-app_globals_css-app_index_css-app_intern_profile_Profile_css.css",
       "static/chunks/app/layout.js"
     ],
-    "/coordinator/dashboard/page": [
+    "/auth/coordinatorAuthPage/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/css/css-app_components_CoordinatorSidebar_css-app_coordinator_dashboard_dashboard_css-app_coordin-00ec37.css",
-      "static/chunks/app/coordinator/dashboard/page.js"
+      "static/css/css-app_components_AuthPage_module_css.css",
+      "static/chunks/app/auth/coordinatorAuthPage/page.js"
+    ],
+    "/intern/profile/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/css-app_components_InternNav_css-app_globals_css-app_index_css-app_intern_profile_Profile_css.css",
+      "static/chunks/app/intern/profile/page.js"
+    ],
+    "/auth/internAuthPage/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/css-app_components_AuthPage_module_css.css",
+      "static/chunks/app/auth/internAuthPage/page.js"
+    ],
+    "/company/messages/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/css-app_company_messages_messages_css.css",
+      "static/chunks/app/company/messages/page.js"
+    ],
+    "/company/layout": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/css-app_components_CompanyNav_css.css",
+      "static/chunks/app/company/layout.js"
+    ],
+    "/company/profile/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/css-app_company_profile_profile_css.css",
+      "static/chunks/app/company/profile/page.js"
     ],
     "/_not-found/page": [
       "static/chunks/webpack.js",
