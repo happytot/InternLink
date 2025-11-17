@@ -1,0 +1,83 @@
+/* --- Re-use your dashboard styles --- */
+
+/* --- Specific styles for this approval page --- */
+
+.approval-groups-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.company-group {
+  /* .panel is from your dashboard.css */
+  padding: 0; 
+  overflow: hidden;
+}
+
+.company-group > h2 {
+  font-size: 1.5rem;
+  background-color: #f9f9f9;
+  padding: 15px 20px;
+  margin: 0;
+  border-bottom: 1px solid #eee;
+}
+
+.department-group {
+  padding: 20px;
+  border-bottom: 1px dashed #ddd;
+}
+.department-group:last-child {
+  border-bottom: none;
+}
+
+.department-group > h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+  margin-top: 0;
+  margin-bottom: 15px;
+}
+
+.student-list {
+  list-style: none;
+  padding-left: 0;
+  margin-bottom: 20px;
+}
+
+.student-list li {
+  padding: 8px 12px;
+  background-color: #fdfdfd;
+  border: 1px solid #eee;
+  border-radius: 6px;
+  margin-bottom: 8px;
+}
+
+.batch-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.batch-actions button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.batch-approve {
+  background-color: #007aff;
+  color: white;
+}
+.batch-approve:hover {
+  background-color: #005fcc;
+}
+
+.batch-reject {
+  background-color: #f0f0f0;
+  color: #333;
+}
+.batch-reject:hover {
+  background-color: #e0e0e0;
+}

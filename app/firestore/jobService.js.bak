@@ -1,0 +1,24 @@
+// src/firestore/jobService.js (Final Correct Version)
+
+import { db } from '../firebase';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+
+export const postNewJob = async (jobData, companyId) => {
+    try {
+        // 1. MUST MATCH COLLECTION NAME IN FIREBASE RULES
+        await addDoc(collection(db, 'listings'), { 
+            ...jobData,
+            
+            // 2. MUST MATCH FIELD NAME IN FIREBASE RULES
+            companyUID: companyId, // <-- CRITICAL FIELD
+            
+            status: 'Active',
+            applicantsCount: 0,
+            createdAt: serverTimestamp(),
+        });
+        console.log("Job posted successfully!");
+    } catch (error) {
+        console.error("Error posting job: ", error);
+        throw new Error('Failed to post job due to a database error.');
+    }
+};

@@ -1,0 +1,47 @@
+/* basic dashboard styles - adjust to your theme/colors */
+.dashboard-root {
+  display: flex;
+  min-height: 100vh;
+  background: #f5f6f8;
+}
+
+
+.dashboard-main {
+  flex: 1;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+section {
+  color: black;
+}
+
+.dashboard-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; padding-bottom: 1px;}
+.overview-cards { display:flex; gap:16px; margin-bottom:20px; }
+.overview-cards .card { background:white; padding:18px; border-radius:8px; flex:1; box-shadow:0 1px 4px rgba(0,0,0,0.05); }
+
+.two-column { display:flex; gap:20px; }
+.left-col { flex: 2; }
+.right-col { flex: 1.1; }
+
+.panel { background:white; padding:12px; border-radius:8px; margin-bottom:16px; box-shadow:0 1px 4px rgba(0,0,0,0.04); }
+.table { width:100%; border-collapse: collapse; }
+.table th, .table td { padding:8px 10px; border-bottom:1px solid #efefef; text-align:left; }
+.table th { background:#fafafa; font-weight:600; }
+
+.announcement-form input, .announcement-form textarea, .announcement-form select {
+  width:100%; margin-bottom:8px; padding:8px; border:1px solid #ddd; border-radius:6px;
+}
+
+.announcement-form button { padding:8px 12px; background:#EE7428; color:white; border:none; border-radius:6px; cursor:pointer; }
+.alert { padding:8px 12px; background:#fff3cd; border:1px solid #ffeeba; border-radius:6px; margin-bottom:12px; }
+.ann-list { list-style:none; padding:0; margin:0; }
+.ann-list li { padding:8px 0; border-bottom:1px dashed #eee; }
+
+.no-data {
+  text-align: center;
+  color: #777;
+  font-style: italic;
+  padding: 10px;
+}
+

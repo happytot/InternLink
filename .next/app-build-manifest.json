@@ -1,0 +1,33 @@
+{
+  "pages": {
+    "/intern/dashboard/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/css-app_components_InternNav_css-app_globals_css-app_index_css-app_intern_dashboard_Dashboard_css.css",
+      "static/chunks/app/intern/dashboard/page.js"
+    ],
+    "/layout": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/css-app_components_InternNav_css-app_globals_css-app_index_css-app_intern_dashboard_Dashboard_css.css",
+      "static/chunks/app/layout.js"
+    ],
+    "/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/css-app_LandingPage_css.css",
+      "static/chunks/app/page.js"
+    ],
+    "/auth/internAuthPage/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/css-app_components_AuthPage_module_css.css",
+      "static/chunks/app/auth/internAuthPage/page.js"
+    ],
+    "/_not-found/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/_not-found/page.js"
+    ]
+  }
+}

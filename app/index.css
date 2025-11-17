@@ -1,0 +1,139 @@
+/* Font Imports */
+@import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Satoshi:wght@700&display=swap');
+
+/* ======================== */
+/* BASE & LAYOUT STYLES     */
+/* ======================== */
+body {
+    font-family: Arial, sans-serif;
+    /* 🌟 CRITICAL FIX 1: Use !important to override stubborn browser padding/margin */
+    margin: 0 !important; 
+    padding: 0 !important; 
+    
+    color: white;
+    box-sizing: border-box;
+    /* Background remains on body */
+    
+    
+    /* 🌟 ADD: Prevent any horizontal overflow */
+    overflow-x: hidden; 
+}
+
+/* 🌟 CRITICAL FIX 2: Correct selector to #app (assuming your root element is <div id="app">) */
+/* 🌟 CRITICAL FIX 3: Apply Sticky Footer Layout to the React Root */
+#app {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Make the root element take up the full viewport height */
+    width: 100%;
+}
+
+/* Wrapper for all content except header and footer */
+.main-content-wrapper {
+    /* This pushes the footer to the bottom of the page content */
+    flex-grow: 1; 
+    
+    width: 100%;
+    padding-top: 80px; /* Space for the fixed header (Mobile) */
+}
+
+.main-container {
+    width: 100%;
+    max-width: 400px;
+    padding: 20px;
+    box-sizing: border-box;
+    margin: 0 auto;
+}
+
+/* ======================== */
+/* HEADER STYLES            */
+/* ======================== */
+header {
+    width: 100%;
+    padding: 15px;
+    box-sizing: border-box;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    background-color: rgb(4, 44, 54);
+    margin: 0; /* Ensures the fixed header doesn't cause margins */
+}
+
+nav {
+    display: flex;
+    justify-content: center;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: white;
+}
+
+.intern-part {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.link-part {
+    font-family: 'Satoshi', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+/* ======================== */
+/* FOOTER STYLES (SCROLLABLE STICKY) */
+/* ======================== */
+footer {
+    width: 100%;
+    /* 🌟 CRITICAL FIX 3: Remove horizontal padding (20px) to make it flush */
+    padding: 15px 0 !important; 
+    
+    margin: 0; /* Ensure no margin is pushing it up or to the sides */
+    box-sizing: border-box;
+    background-color: rgb(4, 44, 54);
+    text-align: center;
+    font-size: 14px;
+    
+    position: static; /* Force default static positioning */
+    bottom: auto; /* Reset */
+    left: auto; /* Reset */
+    
+    /* Helps Flexbox position it correctly at the end of the content */
+    margin-top: auto;
+}
+
+
+/* ======================== */
+/* Desktop Styles (Shared)  */
+/* ======================== */
+@media (min-width: 768px) {
+    /* Header Desktop */
+    header {
+        padding: 20px 50px;
+    }
+
+    nav {
+        justify-content: flex-start;
+    }
+
+    .logo {
+        font-size: 32px;
+    }
+
+    .intern-part, .link-part {
+        font-size: 30px;
+    }
+
+    /* Layout Desktop */
+    .main-content-wrapper {
+        padding-top: 100px;
+    }
+
+    .main-container {
+        max-width: 900px;
+        padding: 40px;
+    }
+}

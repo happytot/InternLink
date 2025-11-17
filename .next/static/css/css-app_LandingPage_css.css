@@ -1,0 +1,402 @@
+/*!*****************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[13].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[13].oneOf[12].use[3]!./app/LandingPage.css ***!
+  \*****************************************************************************************************************************************************************************************************************************************************************/
+/* ✨ --- FONT IMPORTS --- ✨ */
+@import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@700&family=Satoshi:wght@700&display=swap');
+
+/* --- 1. Global & Variables --- */
+:root {
+  --primary-orange: #EE7428;
+  --primary-orange-hover: #e25c09;
+  --text-primary: #1d1d1f;
+  --text-secondary: #6e6e73;
+  --text-inverse: #ffffff; 
+  --bg-light: #f5f5f7;
+  --bg-white: #ffffff;
+  --border-light: #e5e7eb;
+}
+
+/* Base styles */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: var(--text-primary);
+  background-color: #000; /* Fallback */
+  margin: 0;
+  line-height: 1.6;
+}
+
+.landing-page {
+  width: 100%;
+  min-height: 100vh;
+  background-image: url('/assets/desktop-bg.png');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed; 
+  color: var(--text-inverse); 
+}
+
+/* --- 2. ✨ NEW HEADER --- ✨ */
+.landing-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 5%; /* 15px padding from your CSS */
+  max-width: 1400px;
+  margin: 0 auto;
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  
+  /* Your requested styles */
+  background-color: rgb(4, 44, 54);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1); 
+}
+
+.logo {
+  /* Your requested styles */
+  font-size: 24px;
+  font-weight: bold;
+  color: white;
+  text-decoration: none;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+.intern-part {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.link-part {
+  font-family: 'Satoshi', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.main-nav {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.nav-link {
+  /* ✨ Updated color to be visible */
+  color: rgba(255, 255, 255, 0.8); 
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: color 0.2s ease;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+.nav-link:hover {
+  color: var(--text-inverse);
+}
+
+
+/* --- 3. Hero Section --- */
+.hero-section {
+  display: grid;
+  grid-template-columns: 1fr; /* Mobile: 1 column */
+  grid-gap: 2rem;
+  gap: 2rem;
+  align-items: center;
+  /* ✨ Added padding-top to clear the sticky header */
+  padding: 4rem 5% 4rem 5%; 
+  max-width: 1400px;
+  margin: 0 auto;
+  min-height: 90vh;
+}
+
+.hero-content {
+  text-align: center; /* Mobile: Centered */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.hero-content h1 {
+  font-size: 2.5rem; /* 40px */
+  line-height: 1.2;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  margin-top: 0;
+  max-width: 600px;
+  text-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+
+.hero-content .description {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.9); /* White text */
+  max-width: 550px;
+  margin-bottom: 2rem;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+.buttons {
+  display: flex;
+  flex-direction: column; /* Mobile: Stacked */
+  gap: 1rem;
+  width: 100%;
+  max-width: 350px;
+}
+
+.hero-image {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto; /* Center image on mobile */
+  order: -1; /* Show image *above* text on mobile */
+}
+
+.hero-image img {
+  width: 100%;
+  height: auto;
+  border-radius: 20px;
+  object-fit: cover;
+  aspect-ratio: 4/3;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), 0 0 20px rgba(238, 116, 40, 0.2);
+}
+
+/* --- 4. Buttons --- */
+.btn {
+  padding: 0.8rem 1.5rem;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.btn-primary {
+  background-color: var(--primary-orange);
+  color: white;
+}
+.btn-primary:hover {
+  background-color: var(--primary-orange-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(238, 116, 40, 0.2);
+}
+
+.btn-secondary {
+  /* ✨ White/transparent button for dark bg */
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--text-inverse);
+  border-color: rgba(255, 255, 255, 0.3);
+  -webkit-backdrop-filter: blur(5px);
+          backdrop-filter: blur(5px);
+}
+.btn-secondary:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-color: var(--text-inverse);
+  transform: translateY(-2px);
+}
+
+.btn-small {
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+}
+
+
+/* --- 5. Features ("How it works") Section --- */
+.features-section {
+  /* ✨ Use a semi-transparent dark "card" */
+  background-color: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 4rem 5%;
+  text-align: center;
+}
+
+.features-section h2 {
+  font-size: 2rem;
+  margin-top: 0;
+  margin-bottom: 3rem;
+  font-weight: 700;
+  color: var(--text-inverse);
+}
+
+.steps-container {
+  display: grid;
+  grid-template-columns: 1fr; /* Mobile: 1 column */
+  grid-gap: 1.5rem;
+  gap: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.step-card {
+  /* ✨ Dark-themed card */
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 2.5rem 2rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.step-number {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary-orange);
+  background-color: rgba(238, 116, 40, 0.1);
+  border: 1px solid rgba(238, 116, 40, 0.3);
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+/* ✨ --- NEW ICON STYLE --- ✨ */
+.step-icon {
+  font-size: 2.5rem; /* 40px */
+  color: var(--primary-orange);
+  margin-bottom: 1rem;
+}
+
+.step-card h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem 0;
+  color: var(--text-inverse);
+}
+
+.step-card p {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
+}
+
+/* --- 6. Final CTA Section --- */
+.cta-section {
+  background-color: transparent;
+  padding: 5rem 5%;
+  text-align: center;
+}
+.cta-section h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-top: 0;
+  margin-bottom: 1rem;
+  text-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+.cta-section p {
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 2rem;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+.cta-section .buttons {
+  justify-content: center;
+  align-items: center;
+}
+
+
+/* --- 7. Footer --- */
+.landing-footer {
+  text-align: center;
+  padding: 3rem 5%;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+.landing-footer p {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+
+/* --- 8. ANIMATION STYLES --- */
+.fade-in {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.fade-in.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Add delays for a staggered effect */
+.step-card:nth-child(2) {
+  transition-delay: 0.2s;
+}
+.step-card:nth-child(3) {
+  transition-delay: 0.4s;
+}
+
+
+/* ======================== */
+/* Responsive Styles       */
+/* ======================== */
+
+/* --- Tablet (768px) --- */
+@media (min-width: 768px) {
+  .hero-section {
+    grid-template-columns: 1fr 1fr; 
+    padding: 6rem 5% 8rem 5%;
+    gap: 4rem;
+    min-height: 90vh; 
+  }
+
+  .hero-content {
+    text-align: left; /* Align text left */
+    align-items: flex-start;
+  }
+  .hero-content h1 {
+    font-size: 3.25rem; /* 52px */
+  }
+
+  .hero-image {
+    order: 1; /* Move image to the right */
+  }
+
+  .buttons {
+    flex-direction: row; /* Side-by-side buttons */
+    max-width: none;
+    width: auto;
+  }
+
+  .features-section h2 {
+    font-size: 2.5rem;
+  }
+
+  .steps-container {
+    grid-template-columns: repeat(3, 1fr); 
+  }
+
+  .cta-section h2 {
+    font-size: 2.5rem;
+  }
+}
+
+/* --- Small Mobile (400px) --- */
+@media (max-width: 400px) {
+  .hero-content h1 {
+    font-size: 2rem; /* Slightly smaller for very small screens */
+  }
+  .main-nav {
+    gap: 0.5rem;
+  }
+  .nav-link {
+    /* Hide text link on very small screens, just show Sign In */
+    display: none;
+  }
+}

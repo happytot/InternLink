@@ -1,0 +1,221 @@
+/* 🌿 CompanyDashboard.css – Modern Apple/iOS 18 Inspired */
+
+/* Base reset and typography */
+body {
+  background-color: #f5f5f7;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+  color: #1c1c1e;
+  margin: 0;
+  padding: 0 1.5rem;
+}
+
+/* Main dashboard container */
+.company-dashboard {
+  max-width: 1100px;
+  margin: 3rem auto;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(24px);
+  border-radius: 1.5rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  transition: all 0.3s ease;
+}
+
+.company-dashboard:hover {
+  box-shadow: 0 12px 42px rgba(0, 0, 0, 0.1);
+}
+
+/* Header */
+.welcome-header {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #000;
+  letter-spacing: -0.02em;
+  margin-bottom: 2rem;
+  text-align: left;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  padding-bottom: 1rem;
+}
+
+/* Grid layout for content (activity + quick actions) */
+.dashboard-content-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 2rem;
+}
+
+/* Recent Activity Section */
+.recent-activity-feed {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px);
+  border-radius: 1.2rem;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.06);
+  padding: 2rem;
+  transition: all 0.3s ease;
+}
+
+.recent-activity-feed:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.08);
+}
+
+.recent-activity-feed h2 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #007aff;
+  margin-bottom: 1.5rem;
+}
+
+/* Activity Cards */
+.activity-card {
+  background: rgba(245, 245, 247, 0.9);
+  border-radius: 1rem;
+  padding: 1.2rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+.activity-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+}
+
+.activity-card h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #111;
+  margin-bottom: 0.3rem;
+}
+
+.activity-card p {
+  font-size: 0.95rem;
+  color: #555;
+  margin-bottom: 0.5rem;
+}
+
+.activity-card small {
+  font-size: 0.8rem;
+  color: #888;
+}
+
+/* Quick Actions Section */
+.quick-actions {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px);
+  border-radius: 1.2rem;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.06);
+  padding: 2rem;
+  transition: all 0.3s ease;
+}
+
+.quick-actions:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.08);
+}
+
+.quick-actions h2 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #007aff;
+  margin-bottom: 1.5rem;
+}
+
+/* Buttons */
+.full-width-btn {
+  width: 100%;
+  padding: 0.9rem 1.2rem;
+  border: none;
+  border-radius: 0.9rem;
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #007aff, #0a84ff);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(10, 132, 255, 0.3);
+}
+
+.btn-primary:hover {
+  transform: scale(1.03);
+  box-shadow: 0 6px 18px rgba(10, 132, 255, 0.4);
+}
+
+.btn-secondary {
+  background: linear-gradient(135deg, #e0e0e5, #f5f5f7);
+  color: #111;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.btn-secondary:hover {
+  transform: scale(1.02);
+  background: linear-gradient(135deg, #d6d6dc, #efeff2);
+}
+
+/* Loading state */
+.dashboard-loading {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #6e6e73;
+  margin-top: 4rem;
+}
+
+/* Smooth transition for all */
+* {
+  transition: all 0.2s ease-in-out;
+}
+
+/* 📱 Responsive Design */
+
+/* Small phones */
+@media (max-width: 640px) {
+  .company-dashboard {
+    padding: 1.5rem;
+    margin: 1rem;
+  }
+
+  .welcome-header {
+    font-size: 1.5rem;
+    text-align: center;
+  }
+
+  .dashboard-content-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .recent-activity-feed, .quick-actions {
+    padding: 1.5rem;
+  }
+
+  .full-width-btn {
+    font-size: 0.95rem;
+  }
+}
+
+/* Tablets */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .company-dashboard {
+    padding: 2rem;
+  }
+
+  .welcome-header {
+    font-size: 1.7rem;
+  }
+
+  .dashboard-content-grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+}
+
+/* Desktops */
+@media (min-width: 1025px) {
+  .welcome-header {
+    font-size: 1.9rem;
+  }
+}

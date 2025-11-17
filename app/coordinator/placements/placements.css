@@ -1,0 +1,115 @@
+/* Main content area for the placements page */
+.placements-content {
+    padding: 2rem;
+    width: 100%;
+}
+
+/* Page header */
+.header-section {
+    margin-bottom: 1.5rem;
+}
+
+.header-section h2 {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #333;
+}
+
+/* Grid layout for the placement cards */
+.placements-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+/* Individual placement card */
+.placement-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e0e0e0;
+    transition: all 0.3s ease;
+}
+
+.placement-card:hover {
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+}
+
+.placement-card h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #111;
+    margin-bottom: 0.5rem;
+}
+
+.placement-card p {
+    font-size: 0.95rem;
+    color: #555;
+    margin-bottom: 0.25rem;
+    line-height: 1.5;
+}
+
+.placement-card p strong {
+    color: #333;
+    font-weight: 500;
+}
+
+/* Status text */
+.placement-card .status {
+    font-weight: 600;
+    color: #e67e22; /* Orange for pending */
+    margin-top: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    background-color: #fdf3e8;
+    border-radius: 6px;
+    display: inline-block;
+}
+
+/* Action buttons container */
+.action-buttons {
+    margin-top: 1.25rem;
+    display: flex;
+    gap: 0.75rem;
+}
+
+/* Generic button styles (matching your other components) */
+.action-buttons .approve-btn,
+.action-buttons .reject-btn {
+    flex: 1; /* Make buttons share space */
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+/* Approve Button (Green) */
+.action-buttons .approve-btn {
+    background-color: #27ae60;
+    color: white;
+}
+
+.action-buttons .approve-btn:hover {
+    background-color: #2ecc71;
+}
+
+/* Reject Button (Red) */
+.action-buttons .reject-btn {
+    background-color: #c0392b;
+    color: white;
+}
+
+.action-buttons .reject-btn:hover {
+    background-color: #e74c3c;
+}
+
+/* Empty state text */
+.placements-content p {
+    font-size: 1rem;
+    color: #777;
+}

@@ -1,0 +1,111 @@
+/* src/components/JobModal.css */
+
+/* --- Overlay --- */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7); /* Dark semi-transparent background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000; /* Must be high to cover everything */
+    overflow-y: auto; /* Allows scrolling if content is long */
+}
+
+/* --- Modal Content Box --- */
+.modal-content {
+    background: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    max-width: 700px;
+    width: 90%;
+    max-height: 90vh; /* Limit height to 90% of viewport */
+    overflow-y: auto; /* Allows scrolling inside the modal */
+    position: relative;
+    transform: scale(1); /* Initial state for animation */
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+/* --- Close Button --- */
+.modal-close-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 1.5em;
+    cursor: pointer;
+    color: #999;
+}
+
+.modal-close-btn:hover {
+    color: #333;
+}
+
+/* --- Detail Header/Body Styling (Simplified from full page CSS) --- */
+.detail-header-modal {
+    text-align: center;
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.detail-header-modal h1 {
+    font-size: 1.8em;
+    margin-bottom: 5px;
+}
+
+.detail-company-modal {
+    color: #EE7428;
+    font-size: 1.1em;
+    font-weight: 600;
+}
+
+.job-meta-details-modal span {
+    font-size: 0.9em;
+    margin: 0 5px;
+}
+
+.modal-body h2 {
+    color: #333;
+    border-bottom: 1px solid #EE7428;
+    padding-bottom: 5px;
+    margin-top: 20px;
+    margin-bottom: 15px;
+    font-size: 1.4em;
+}
+
+.modal-body ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+.modal-body li {
+    padding: 8px 0;
+    border-bottom: 1px dotted #eee;
+}
+
+.btn-apply-modal {
+    display: inline-block;
+    padding: 10px 25px;
+    background: #EE7428;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 15px;
+}
+
+.btn-apply-modal:hover {
+    background: #e25c09;
+}

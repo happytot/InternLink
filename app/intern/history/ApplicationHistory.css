@@ -1,0 +1,219 @@
+/* src/pages/ApplicationHistory.css */
+
+/* 🌿 Container */
+.history-container {
+    max-width: 1100px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(20px);
+    border-radius: 1.5rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    transition: all 0.3s ease;
+    margin-top: 100px;
+}
+
+/* Page Header */
+.history-container h1 {
+    text-align: center;
+    color: #1c1c1e;
+    margin-bottom: 1.5rem;
+}
+
+/* Summary */
+.history-summary {
+    text-align: center;
+    color: #555;
+    font-size: 1.1em;
+    margin-bottom: 30px;
+}
+
+/* --- Table Styling --- */
+.history-table-wrapper {
+    overflow-x: auto;
+}
+
+/* Desktop Table View */
+.table-view table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-bottom: 20px;
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.05);
+    border-radius: 1rem;
+    overflow: hidden;
+}
+
+.table-view th,
+.table-view td {
+    padding: 1rem 1.2rem;
+    text-align: left;
+    color: #1c1c1e;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.table-view th {
+    background: #f2f2f7;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    font-size: 0.9em;
+}
+
+.table-view tbody tr {
+    transition: background 0.25s ease, transform 0.2s ease;
+}
+
+.table-view tbody tr:hover {
+    background-color: rgba(245, 245, 247, 0.8);
+    transform: scale(1.005);
+}
+
+/* Status Badges */
+.status-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85em;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.status-pending,
+.status-Company_Approved_Waiting_Coordinator,
+.status-Pending_Coordinator_Approval {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status-accepted {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status-rejected {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+/* Links */
+.view-link {
+    color: #007aff;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.view-link:hover {
+    text-decoration: underline;
+}
+
+/* --- Card Layout for Mobile / Tablet --- */
+.card-view {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1.5rem;
+}
+
+.job-card {
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(200, 200, 200, 0.3);
+    border-radius: 20px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: all 0.3s ease;
+}
+
+.job-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.job-header h2 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 0 0 0.5rem 0;
+    color: #111;
+}
+
+.date,
+.location {
+    font-size: 0.9rem;
+    color: #555;
+    margin-bottom: 0.4rem;
+}
+
+/* Button-like links */
+.resume-link {
+    margin-top: 10px;
+    padding: 0.6rem 1rem;
+    background: linear-gradient(135deg, #007aff, #0a84ff);
+    color: white;
+    border-radius: 12px;
+    text-align: center;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.25s ease;
+}
+
+.resume-link:hover {
+    transform: translateY(-1px);
+    opacity: 0.95;
+    box-shadow: 0 4px 12px rgba(10, 132, 255, 0.3);
+}
+
+/* --- Footer Stats --- */
+.history-stats {
+    display: flex;
+    justify-content: flex-end;
+    gap: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+.history-stats p {
+    font-size: 1em;
+    color: #555;
+}
+
+/* --- Skeleton Loading --- */
+.skeleton-table {
+    display: grid;
+    gap: 1rem;
+}
+
+.skeleton-row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1rem;
+}
+
+.skeleton-cell {
+    height: 20px;
+    background: linear-gradient(90deg, #eee, #ddd, #eee);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 6px;
+}
+
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+/* --- Responsive Adjustments --- */
+@media (min-width: 901px) {
+    .table-view { display: block; }
+    .card-view { display: none; }
+}
+
+@media (max-width: 900px) {
+    .table-view { display: none; }
+    .card-view { display: grid; }
+    .history-container { padding: 1rem; }
+    .job-card { padding: 1rem; border-radius: 16px; }
+    .job-header h2 { font-size: 1.1rem; }
+}

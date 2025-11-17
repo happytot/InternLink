@@ -1,0 +1,432 @@
+/* 🌿 Modern Apple-like job listings UI (iOS/macOS aesthetic) */
+
+body {
+  background-color: #f5f5f7;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+  color: #1c1c1e;
+  margin: 0;
+  padding: 0;
+}
+
+/* 🌟 Main container */
+.job-listings-container {
+  max-width: 1100px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  border-radius: 1.5rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  transition: all 0.3s ease;
+}
+
+.job-listings-container:hover {
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+}
+
+/* 🧭 Header */
+.header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.header-bar h1 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #000;
+}
+
+.post-btn {
+  background: linear-gradient(135deg, #007aff, #0a84ff);
+  color: #fff;
+  border: none;
+  padding: 0.6rem 1.4rem;
+  border-radius: 12px;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(10, 132, 255, 0.3);
+  transition: all 0.25s ease;
+}
+
+.post-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 16px rgba(10, 132, 255, 0.4);
+}
+
+/* 📋 Table styling (desktop) */
+.table-view {
+  display: block;
+}
+
+.card-view {
+  display: none;
+}
+
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px);
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.05);
+}
+
+thead {
+  background: #f2f2f7;
+  color: #1c1c1e;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+th,
+td {
+  padding: 1rem 1.2rem;
+  text-align: left;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+tbody tr {
+  transition: background 0.25s ease, transform 0.2s ease;
+}
+
+tbody tr:hover {
+  background-color: rgba(245, 245, 247, 0.8);
+  transform: scale(1.005);
+}
+
+/* ---------------- TABLE & CARD BUTTONS ---------------- */
+td button,
+.job-actions .edit-btn,
+.job-actions .delete-btn {
+  flex: 1;
+  padding: 0.5rem 0.9rem;
+  border-radius: 0.6rem;
+  font-weight: 500;
+  cursor: pointer;
+  margin-right: 0.6rem;
+  text-align: center;
+  color: #fff;
+  border: none;
+  transition: all 0.25s ease;
+  display: inline-block;
+}
+
+/* Table buttons spacing fix */
+.table-btn-group {
+  display: flex;
+  gap: 0.6rem;
+}
+
+/* Edit button - Blue */
+td button.edit-btn,
+.job-actions .edit-btn {
+  background: linear-gradient(135deg, #0a84ff, #007aff);
+}
+
+td button.edit-btn:hover,
+.job-actions .edit-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(10, 132, 255, 0.3);
+}
+
+/* Delete button - Red */
+td button.delete-btn,
+.job-actions .delete-btn {
+  background: linear-gradient(135deg, #ff3b30, #ff453a);
+}
+
+td button.delete-btn:hover,
+.job-actions .delete-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 59, 48, 0.35);
+}
+
+/* 📱 Card layout (mobile/tablet) */
+.job-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.5rem;
+}
+
+.job-card {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(200, 200, 200, 0.3);
+  border-radius: 20px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.job-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.job-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.8rem;
+}
+
+.job-header h2 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #111;
+}
+
+.date {
+  font-size: 0.85rem;
+  color: #888;
+}
+
+.location {
+  color: #444;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.salary {
+  font-weight: 500;
+  color: #007aff;
+  margin-bottom: 1rem;
+}
+
+/* ---------------- CARD VIEW BUTTONS FLEX ---------------- */
+.job-actions {
+  display: flex;
+  gap: 0.6rem;
+}
+
+/* 🧊 Empty state message */
+.empty-text {
+  text-align: center;
+  color: #666;
+  font-size: 1rem;
+  padding: 2rem 0;
+}
+
+/* Navbar slide for modal */
+.navbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  transition: transform 0.3s ease-in-out;
+  z-index: 50; /* Make sure it's above other content */
+}
+
+/* Hidden state: slide down */
+.navbar.hidden {
+  transform: translateY(100%);
+}
+
+/* ---------- MODAL OVERLAY ---------- */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.35);
+  backdrop-filter: blur(6px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.modal-overlay.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* ---------- MODAL BOX ---------- */
+.modal-content {
+  background: #fff;
+  border-radius: 18px;
+  padding: 24px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 35px rgba(0,0,0,0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ---------- MODAL HEADER ---------- */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h2 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin: 0;
+  color: #111;
+}
+
+.close-btn {
+  font-size: 1.5rem;
+  font-weight: bold;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: #555;
+  transition: color 0.2s ease;
+}
+
+.close-btn:hover {
+  color: #000;
+}
+
+/* ---------- MODAL BODY ---------- */
+.modal-body label {
+  font-weight: 600;
+  margin-top: 10px;
+  display: block;
+}
+
+.modal-body input,
+.modal-body textarea {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  margin-top: 4px;
+  font-size: 1rem;
+}
+
+/* ---------- TAG DISPLAY ---------- */
+.tag-input-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.tag-chip {
+  background: #f2f2f7;
+  padding: 5px 10px;
+  border-radius: 14px;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid rgba(0,0,0,0.08);
+}
+
+.tag-chip button {
+  background: #e0e0e5;
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  font-size: 0.85rem;
+  line-height: 16px;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #555;
+  transition: all 0.2s ease;
+}
+
+.tag-chip button:hover {
+  background: #ff3b30;
+  color: #fff;
+  border-color: #ff3b30;
+}
+
+/* ---------- MODAL FOOTER ---------- */
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.cancel-btn {
+  background: #ccc;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.save-btn {
+  background: #007aff;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* Make modal scrollable if too tall */
+.modal-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+  background-color: rgba(0,0,0,0.2);
+  border-radius: 3px;
+}
+
+/* 🌈 Smooth transitions */
+* {
+  transition: all 0.2s ease-in-out;
+}
+
+/* 📱 RESPONSIVE BREAKPOINTS */
+@media (min-width: 901px) {
+  .table-view {
+    display: block;
+  }
+  .card-view {
+    display: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .table-view {
+    display: none;
+  }
+  .card-view {
+    display: block;
+  }
+  .job-listings-container {
+    padding: 1rem;
+  }
+  .header-bar h1 {
+    font-size: 1.5rem;
+  }
+  .post-btn {
+    width: 100%;
+    text-align: center;
+  }
+  .job-grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  }
+  .job-card {
+    padding: 1rem;
+    border-radius: 16px;
+  }
+}

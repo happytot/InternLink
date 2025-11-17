@@ -1,0 +1,174 @@
+/* edit-job.css - shared for EditJobModal & EditJobSheet */
+
+/* Glassy overlay for modal */
+.ej-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10,10,10,0.35);
+  backdrop-filter: blur(6px);
+  z-index: 1200;
+}
+
+/* Centered modal (desktop/tablet) */
+.ej-modal {
+  width: 92%;
+  max-width: 640px;
+  background: rgba(255,255,255,0.86);
+  border-radius: 16px;
+  padding: 22px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.18);
+  border: 1px solid rgba(255,255,255,0.6);
+  position: relative;
+  transform: translateY(0);
+}
+
+/* Modal close button (top-right) */
+.ej-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  border: none;
+  background: transparent;
+  font-size: 22px;
+  cursor: pointer;
+  color: #333;
+}
+
+/* Title */
+.ej-title {
+  margin: 0 0 10px 0;
+  font-size: 1.15rem;
+  text-align: center;
+  font-weight: 700;
+  color: #111;
+}
+
+/* Form layout */
+.ej-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.ej-form label {
+  font-weight: 600;
+  color: #333;
+}
+
+.ej-form input,
+.ej-form textarea,
+.ej-form select {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(0,0,0,0.08);
+  background: rgba(255,255,255,0.95);
+  font-size: 0.95rem;
+}
+
+/* Buttons */
+.ej-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+
+.ej-btn {
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.ej-btn.cancel {
+  background: #eee;
+  color: #111;
+}
+
+.ej-btn.save {
+  background: linear-gradient(135deg,#007aff,#0a84ff);
+  color: #fff;
+}
+
+/* TagInput chip defaults may come from your TagInput component; these are safe fallbacks */
+.tag-list { gap: 8px; }
+.tag-chip { background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.06); border-radius: 999px; padding: 6px 10px; }
+
+/* ---------- Bottom sheet styles ---------- */
+
+/* sheet background: full-screen semi-opaque behind sheet */
+.ej-sheet-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  background: rgba(0,0,0,0.3);
+  display: flex;
+  justify-content: center;
+  align-items: flex-end; /* align to bottom */
+  -webkit-overflow-scrolling: touch;
+}
+
+/* sheet container */
+.ej-sheet {
+  width: 100%;
+  max-width: 900px;
+  height: 65vh; /* medium height (~65%) */
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 -10px 30px rgba(0,0,0,0.12);
+  border: 1px solid rgba(255,255,255,0.5);
+  padding: 14px 16px 18px 16px;
+  transform: translateY(0);
+  transition: transform 220ms ease;
+  overflow-y: auto;
+}
+
+/* handle bar */
+.ej-sheet-handle {
+  width: 56px;
+  height: 6px;
+  background: rgba(0,0,0,0.12);
+  border-radius: 4px;
+  margin: 6px auto;
+}
+
+/* close button on sheet */
+.ej-sheet-close {
+  position: absolute;
+  top: 8px;
+  right: 14px;
+  background: none;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+  color: #333;
+}
+
+/* sheet-specific form tweaks */
+.ej-form-sheet { padding-bottom: 8px; }
+
+/* responsive */
+@media (min-width: 768px) {
+  /* hide bottom sheet styles on desktop (we use centered modal) */
+  .ej-sheet-bg { display: none; }
+}
+@media (max-width: 767px) {
+  /* hide desktop modal overlay on mobile; EditJobModal should not render on mobile */
+  .ej-overlay { display: none; }
+}
+
+/* accessibility focus states */
+.ej-form input:focus, .ej-form textarea:focus, .ej-form select:focus {
+  outline: none;
+  box-shadow: 0 0 0 6px rgba(0,122,255,0.08);
+  border-color: #007aff;
+}

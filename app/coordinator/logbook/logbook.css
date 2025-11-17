@@ -1,0 +1,113 @@
+/* app/coordinator/logbook/logbook.css */
+
+.review-container {
+    padding: 2rem; /* p-8 equivalent */
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.page-title {
+    font-size: 1.875rem; /* text-3xl equivalent */
+    font-weight: 700; /* font-bold equivalent */
+    margin-bottom: 2rem; /* mb-8 equivalent */
+}
+
+.section-title {
+    font-size: 1.5rem; /* text-2xl equivalent */
+    font-weight: 600; /* font-semibold equivalent */
+    border-bottom: 1px solid #e5e7eb; /* border-b pb-2 equivalent */
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem; /* mb-4 equivalent */
+}
+
+/* --- Message Styles --- */
+.message {
+    padding: 0.75rem; /* p-3 equivalent */
+    margin-bottom: 1rem; /* mb-4 equivalent */
+    text-align: center;
+    font-size: 0.875rem; /* text-sm equivalent */
+    border-radius: 0.25rem;
+    font-weight: 500;
+}
+
+.message.error {
+    background-color: #fee2e2; /* bg-red-100 equivalent */
+    color: #b91c1c; /* text-red-700 equivalent */
+}
+
+.message.success {
+    background-color: #d1fae5; /* bg-green-100 equivalent */
+    color: #065f46; /* text-green-700 equivalent */
+}
+
+/* --- General Card/Item Styling --- */
+.card-item {
+    border: 1px solid #e5e7eb; /* border equivalent */
+    padding: 1rem; /* p-4 equivalent */
+    border-radius: 0.5rem; /* rounded-lg equivalent */
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); /* shadow-sm equivalent */
+    margin-bottom: 1rem;
+}
+
+/* Application Specific Card */
+.app-card {
+    background-color: #ffffff; /* bg-white equivalent */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Logbook Specific Card */
+.log-card {
+    background-color: #f9fafb; /* bg-gray-50 equivalent */
+}
+
+/* --- Button Styles --- */
+.button-group {
+    display: flex;
+    gap: 0.5rem; /* space-x-2 equivalent */
+}
+
+.action-btn {
+    padding: 0.25rem 0.75rem; /* px-3 py-1 equivalent */
+    border-radius: 0.25rem; /* rounded equivalent */
+    color: white;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+}
+
+/* Application Approval Buttons */
+.btn-approve-app {
+    background-color: #10b981; /* bg-green-500 equivalent */
+}
+.btn-approve-app:hover {
+    background-color: #059669; /* hover:bg-green-600 equivalent */
+}
+.btn-reject-app {
+    background-color: #ef4444; /* bg-red-500 equivalent */
+}
+.btn-reject-app:hover {
+    background-color: #dc2626; /* hover:bg-red-600 equivalent */
+}
+
+/* Logbook Review Buttons */
+.btn-approve-log {
+    background-color: #3b82f6; /* bg-blue-500 equivalent */
+}
+.btn-approve-log:hover {
+    background-color: #2563eb; /* hover:bg-blue-600 equivalent */
+}
+.btn-reject-log {
+    background-color: #f59e0b; /* bg-yellow-500 equivalent */
+}
+.btn-reject-log:hover {
+    background-color: #d97706; /* hover:bg-yellow-600 equivalent */
+}
+
+/* Separator */
+.separator {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    border: 0;
+    border-top: 1px solid #e5e7eb;
+}

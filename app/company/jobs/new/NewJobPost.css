@@ -1,0 +1,128 @@
+/* 🌿 Modern Apple-like job post form */
+
+/* --- Base container (from listings.css) --- */
+.new-job-post-container {
+  max-width: 900px; /* Forms are better a bit narrower */
+  margin: 2rem auto;
+  padding: 2rem 2.5rem;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  border-radius: 1.5rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+/* --- Header (from listings.css) --- */
+.header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.header-bar h1 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #000;
+  margin: 0;
+}
+
+.head {
+  color: #1c1c1e;
+}
+
+/* --- Form Specific Styles --- */
+.job-post-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #1c1c1e;
+}
+
+.form-group input,
+.form-group textarea {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 1rem;
+  border: 1px solid #d1d1d6;
+  border-radius: 10px;
+  background: #fdfdfd;
+  transition: all 0.2s ease;
+  box-sizing: border-box; /* Important */
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #007aff;
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.2);
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+/* Row for side-by-side inputs */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+/* --- Primary Button (from listings.css) --- */
+.btn-primary {
+  background: linear-gradient(135deg, #007aff, #0a84ff);
+  color: #fff;
+  border: none;
+  padding: 0.8rem 1.4rem;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(10, 132, 255, 0.3);
+  transition: all 0.25s ease;
+  margin-top: 1rem;
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: scale(1.03);
+  box-shadow: 0 4px 16px rgba(10, 132, 255, 0.4);
+}
+
+.btn-primary:disabled {
+  background: #d1d1d6;
+  color: #8e8e93;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.post-job {
+  margin-bottom: 2.8rem;
+  margin-top: 05.5em;
+}
+
+/* --- Responsive --- */
+@media (max-width: 600px) {
+  .form-row {
+    grid-template-columns: 1fr; /* Stack on mobile */
+  }
+  .new-job-post-container {
+    padding: 1.5rem;
+    margin: 1rem;
+  }
+}

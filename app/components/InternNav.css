@@ -1,0 +1,166 @@
+/* ================================ 
+   🌟 Apple-Inspired Intern Nav (Mobile Dock Version)
+   ================================ */
+
+/* Reset safe padding for fixed nav */
+body {
+  padding-bottom: 90px;
+}
+
+/* Main Navigation Bar (Glass Dock Style) */
+.intern-nav {
+  position: fixed;
+  bottom: 25px;
+  left: 50%;
+  transform: translateX(-50%) translateY(0); /* default visible */
+  width: calc(100% - 40px);
+  max-width: 820px;
+  height: 64px;
+
+  /* Glassy look */
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 40px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  box-shadow:
+    0 8px 30px rgba(0, 0, 0, 0.15),
+    inset 0 0 0.5px rgba(255, 255, 255, 0.4);
+
+  z-index: 1000;
+
+  /* Smooth sliding effect */
+  transition: transform 0.20s ease-in-out, opacity 0.20s ease-in-out;
+}
+
+/* Hidden state: slides down like macOS dock */
+.intern-nav.hidden {
+  transform: translateX(-50%) translateY(120%);
+  opacity: 0;
+  pointer-events: none; /* prevent clicks when hidden */
+}
+
+/* Nav links inside the dock */
+.nav-links-container {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  padding: 0 15px;
+}
+
+/* Individual link styling */
+.nav-link {
+  text-decoration: none;
+  color: rgba(0, 0, 0, 0.85);
+  font-weight: 500;
+  font-size: 0.95rem;
+  padding: 10px 20px;
+  border-radius: 25px;
+  transition: all 0.25s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Active state */
+.nav-link.active {
+  background: linear-gradient(135deg, #007aff, #005de6);
+  color: #fff;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.35);
+  transform: translateY(-3px);
+}
+
+/* Nav icon */
+.nav-icon {
+  display: inline-block;
+  font-size: 1.2rem;
+  /* Aligns react-icons better */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Nav label (text) */
+.nav-label {
+  display: inline-block;
+}
+
+/* Hover effect (desktop only) */
+.nav-link:not(.active):hover {
+  background: rgba(255, 255, 255, 0.4);
+  color: #1c1c1e;
+  transform: translateY(-2px);
+}
+
+/* ================================
+   💻 Responsive Design
+   ================================ */
+
+/* Tablets */
+@media (max-width: 900px) {
+  .intern-nav {
+    height: 58px;
+    width: calc(100% - 30px);
+    bottom: 18px;
+  }
+
+  .nav-link {
+    font-size: 0.9rem;
+    padding: 8px 16px;
+  }
+}
+
+/* Phones (≤600px) */
+@media (max-width: 600px) {
+  .intern-nav {
+    height: 60px; /* slightly taller for mobile dock */
+    border-radius: 36px;
+    width: calc(100% - 20px);
+    bottom: 12px;
+    backdrop-filter: blur(18px) saturate(180%);
+  }
+
+  .nav-links-container {
+    gap: 20px;
+    padding: 0 12px;
+  }
+
+  .nav-link {
+    font-size: 0; /* hide text entirely */
+    padding: 5px 10px 5px 10px;
+    flex-direction: column;
+    border-radius: 20px;
+    gap: 0; /* Remove gap when stacked */
+  }
+
+  .nav-link.active {
+    box-shadow: 0 2px 8px rgba(0, 122, 255, 0.45);;
+  }
+
+  .nav-label {
+    display: none; /* hide text on mobile */
+  }
+
+  .nav-icon {
+    font-size: 1.5rem; /* bigger icons for tapping */
+  }
+}
+
+/* Very small phones (≤400px) */
+@media (max-width: 400px) {
+  .intern-nav {
+    height: 64px;
+  }
+
+  .nav-icon {
+    font-size: 1.6rem;
+  }
+}
