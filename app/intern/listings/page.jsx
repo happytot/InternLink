@@ -1,12 +1,21 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { supabase } from '../../../lib/supabaseClient';
+// 1. ⛔️ REMOVED your old supabase import
+// import { supabase } from '../../../lib/supabaseClient';
+
+// 2. ✅ ADDED this import instead
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+
 import './Listings.css';
+import Header from '../../components/Header';
 import InternNav from '../../components/InternNav';
 import { toast } from 'sonner';
 
 export default function Listings() {
+  // 3. ✅ INITIALIZED the client *inside* the component
+  const supabase = createClientComponentClient();
+
   const [user, setUser] = useState(null); // Logged-in intern
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedJob, setSelectedJob] = useState(null);
@@ -14,14 +23,15 @@ export default function Listings() {
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // --- Fetch Logged-in Intern ---
+  // --- Fetch Logged-in Intern (This will now work) ---
   useEffect(() => {
     const getUser = async () => {
+      // This 'supabase' variable is now the cookie-aware one
       const { data } = await supabase.auth.getUser();
       if (data?.user) setUser(data.user);
     };
     getUser();
-  }, []);
+  }, [supabase]); // Added supabase to dependency array
 
   // --- Fetch job listings from Supabase ---
   useEffect(() => {
@@ -65,9 +75,9 @@ export default function Listings() {
     };
 
     fetchListings();
-  }, []);
+  }, [supabase]); // Added supabase to dependency array
 
-  // --- Apply to Job Function ---
+  // --- Apply to Job Function (This will now work) ---
   const applyToJob = async (jobId, companyId) => {
     if (!user) {
       toast.error("Please login first.");
@@ -129,6 +139,7 @@ export default function Listings() {
 
   return (
     <>
+      <Header />
       <div className="listings-container">
         <h1>Browse Internship Opportunities</h1>
         <div className="search-filter-bar">

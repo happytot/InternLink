@@ -2,9 +2,16 @@
 
 import Link from 'next/link';
 import './ApplicationHistory.css';
+import Header from '../../components/Header'
 import InternNav from '../../components/InternNav';
-import { useState, useEffect } from 'react';
-import { supabase } from '../../../lib/supabaseClient';
+// 1. ✅ Import 'useCallback'
+import { useState, useEffect, useCallback } from 'react';
+
+// 2. ⛔️ REMOVED your old supabase import
+// import { supabase } from '../../../lib/supabaseClient';
+
+// 3. ✅ ADDED this import instead
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 
 // ✅ Helper function to format the status text
 const formatStatusText = (status) => {
@@ -41,49 +48,54 @@ const getStatusClass = (status) => {
 };
 
 export default function ApplicationHistory() {
+  // 4. ✅ INITIALIZED the client *inside* the component
+  const supabase = createClientComponentClient();
+
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
 
+  // 5. ✅ Wrapped fetchApplications in useCallback
+  const fetchApplications = useCallback(async () => {
+    setLoading(true);
+
+    // 1️⃣ Get logged-in user (This will now work)
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      setMessage('You must be logged in to view this page.');
+      setLoading(false);
+      return;
+    }
+
+    // 2️⃣ Fetch applications for this intern
+    try {
+      const { data, error } = await supabase
+        .from('job_applications')
+        .select(`
+          id,
+          created_at,
+          status,
+          job_posts:job_posts!fk_job_applications_job ( title ),
+          companies:companies!fk_job_applications_company ( name )
+        `)
+        .eq('intern_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      setApplications(data || []);
+    } catch (error) {
+      console.error('Error fetching applications:', error);
+      setMessage('Could not fetch application history.');
+    } finally {
+      setLoading(false);
+    }
+  }, [supabase]); // 6. ✅ Added supabase dependency
+
+  // 7. ✅ Updated useEffect to use the new function
   useEffect(() => {
-    const fetchApplications = async () => {
-      setLoading(true);
-
-      // 1️⃣ Get logged-in user
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        setMessage('You must be logged in to view this page.');
-        setLoading(false);
-        return;
-      }
-
-      // 2️⃣ Fetch applications for this intern
-      try {
-        const { data, error } = await supabase
-          .from('job_applications')
-          .select(`
-            id,
-            created_at,
-            status,
-            job_posts:job_posts!fk_job_applications_job ( title ),
-            companies:companies!fk_job_applications_company ( name )
-          `)
-          .eq('intern_id', user.id)
-          .order('created_at', { ascending: false });
-
-        if (error) throw error;
-
-        setApplications(data || []);
-      } catch (error) {
-        console.error('Error fetching applications:', error);
-        setMessage('Could not fetch application history.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchApplications();
-  }, []);
+  }, [fetchApplications]);
 
   if (loading) {
     // ✅ Skeleton / loading animation placeholder
@@ -110,6 +122,7 @@ export default function ApplicationHistory() {
 
   return (
     <>
+      <Header />
       <div className="history-container">
         <h1>📜 Your Application History</h1>
 

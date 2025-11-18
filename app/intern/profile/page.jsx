@@ -2,9 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Toaster, toast } from 'sonner'; // ✨ 1. Import Sonner
+import { Toaster, toast } from 'sonner';
 
-import { supabase } from '../../../lib/supabaseClient'; 
+// 1. ⛔️ REMOVED your old supabase import
+// import { supabase } from '../../../lib/supabaseClient'; 
+
+// 2. ✅ ADDED this import instead
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+
 import './Profile.css';
 import Header from '../../components/Header';
 import InternNav from '../../components/InternNav';
@@ -27,25 +32,28 @@ const INITIAL_STATE = {
 };
 
 export default function Profile() {
+    // 3. ✅ INITIALIZED the client *inside* the component
+    const supabase = createClientComponentClient();
+
     const [profileData, setProfileData] = useState(INITIAL_STATE);
     const [loading, setLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    // const [message, setMessage] = useState(''); // ✨ 2. Removed message state
     const [userId, setUserId] = useState(null);
     const [isResumeModalOpen, setIsResumeModalOpen] = useState(false);
     const router = useRouter();
 
-    // --- Data Fetching Effect (SUPABASE) ---
+    // --- Data Fetching Effect (This will now work) ---
     useEffect(() => {
         const fetchProfile = async () => {
             setLoading(true);
 
+            // This 'supabase' variable is now the cookie-aware one
             const { data: { user }, error: userError } = await supabase.auth.getUser();
 
             if (userError || !user) {
                 setLoading(false);
                 toast.error("You must be logged in to view this page.");
-                router.push('/auth/internAuthPage'); // ✨ This is the redirect
+                router.push('/auth/internAuthPage'); // This is the redirect
                 return; // Stop the rest of the function
             }
 
@@ -82,23 +90,23 @@ export default function Profile() {
                     }));
                 } else {
                     setProfileData(prev => ({ ...prev, email: user.email }));
-                    toast.info("Profile not found. Start building it!"); // ✨ 3. Use Sonner
+                    toast.info("Profile not found. Start building it!");
                 }
             } catch (err) {
                 console.error("Error fetching profile:", err);
-                toast.error("Failed to load profile data."); // ✨ 3. Use Sonner
+                toast.error("Failed to load profile data.");
             } finally {
                 setLoading(false);
             }
         };
 
         fetchProfile();
-    }, []);
+    }, [supabase, router]); // Added supabase/router to dependency array
 
-    // --- Logout Function ---
+    // --- Logout Function (No changes needed) ---
     const handleLogout = async () => {
         setIsSubmitting(true);
-        const logoutToast = toast.loading('Logging out...'); // ✨ 3. Use Sonner
+        const logoutToast = toast.loading('Logging out...');
         try {
             const { error } = await supabase.auth.signOut();
             if (error) throw error;
@@ -106,21 +114,21 @@ export default function Profile() {
             router.push('/auth/internAuthPage');
         } catch (error) {
             console.error('Error logging out:', error.message);
-            toast.error('Error logging out. Please try again.', { id: logoutToast }); // ✨ 3. Use Sonner
+            toast.error('Error logging out. Please try again.', { id: logoutToast });
             setIsSubmitting(false);
         }
     };
     
-    // --- File Handling (Profile Picture) ---
+    // --- File Handling (Profile Picture) (No changes needed) ---
     const handleProfilePicChange = async (e) => {
         const file = e.target.files[0];
         if (!file || !userId) {
-            toast.error("Please select a file to upload."); // ✨ 3. Use Sonner
+            toast.error("Please select a file to upload.");
             return;
         }
 
         setIsSubmitting(true);
-        const uploadToast = toast.loading('Uploading profile picture...'); // ✨ 3. Use Sonner
+        const uploadToast = toast.loading('Uploading profile picture...');
 
         const fileExt = file.name.split('.').pop();
         const filePath = `${userId}/avatar.${fileExt}`;
@@ -137,26 +145,26 @@ export default function Profile() {
                 .getPublicUrl(filePath);
             
             setProfileData(prev => ({ ...prev, profilePicURL: urlData.publicUrl }));
-            toast.success('Picture uploaded! Click "Save Profile" to keep it.', { id: uploadToast }); // ✨ 3. Use Sonner
+            toast.success('Picture uploaded! Click "Save Profile" to keep it.', { id: uploadToast });
 
         } catch (error) {
             console.error('Error uploading profile picture:', error);
-            toast.error(`Failed to upload picture: ${error.message}`, { id: uploadToast }); // ✨ 3. Use Sonner
+            toast.error(`Failed to upload picture: ${error.message}`, { id: uploadToast });
         } finally {
             setIsSubmitting(false);
         }
     };
     
-    // --- File Handling (Resume) ---
+    // --- File Handling (Resume) (No changes needed) ---
     const handleResumeFileChange = async (e) => {
         const file = e.target.files[0];
         if (!file || !userId) {
-            toast.error("Please select a file to upload."); // ✨ 3. Use Sonner
+            toast.error("Please select a file to upload.");
             return;
         }
 
         setIsSubmitting(true);
-        const uploadToast = toast.loading('Uploading resume...'); // ✨ 3. Use Sonner
+        const uploadToast = toast.loading('Uploading resume...');
 
         const filePath = `${userId}/${file.name}`;
 
@@ -176,11 +184,11 @@ export default function Profile() {
                 resumeURL: urlData.publicUrl,
                 resumeFileName: file.name
             }));
-            toast.success('Resume uploaded! Click "Save Profile" to keep it.', { id: uploadToast }); // ✨ 3. Use Sonner
+            toast.success('Resume uploaded! Click "Save Profile" to keep it.', { id: uploadToast });
 
         } catch (error) {
             console.error('Error uploading resume:', error);
-            toast.error(`Failed to upload resume: ${error.message}`, { id: uploadToast }); // ✨ 3. Use Sonner
+            toast.error(`Failed to upload resume: ${error.message}`, { id: uploadToast });
         } finally {
             setIsSubmitting(false);
         }
@@ -189,11 +197,11 @@ export default function Profile() {
     const handleRemoveResume = () => {
         if (window.confirm("Are you sure you want to remove your uploaded resume?")) {
             setProfileData(prev => ({ ...prev, resumeURL: '', resumeFileName: '' }));
-            toast.info("Resume removed. Click 'Save Profile' to confirm the deletion."); // ✨ 3. Use Sonner
+            toast.info("Resume removed. Click 'Save Profile' to confirm the deletion.");
         }
     };
 
-    // --- Generic Form Handlers ---
+    // --- Generic Form Handlers (No changes needed) ---
     const handleFieldChange = (e) => {
         const { name, value } = e.target;
         setProfileData(prev => ({ ...prev, [name]: value }));
@@ -232,78 +240,80 @@ export default function Profile() {
         }));
     };
 
-    // --- Submit Handler (SUPABASE) ---
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        if (!userId) {
-            toast.error("Cannot save: User not authenticated."); // ✨ 3. Use Sonner
-            return;
-        }
+// --- Submit Handler (FIXED) ---
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!userId) {
+      toast.error("Cannot save: User not authenticated.");
+      return;
+    }
 
-        setIsSubmitting(true);
-        const saveToast = toast.loading('Saving profile...'); // ✨ 3. Use Sonner
+    setIsSubmitting(true);
+    const saveToast = toast.loading('Saving profile...');
 
-        const finalDepartment = profileData.department === 'Other' 
-            ? profileData.customDepartment 
-            : profileData.department;
+    const finalDepartment = profileData.department === 'Other' 
+      ? profileData.customDepartment 
+      : profileData.department;
 
-        const dataToSave = {
-            fullname: profileData.fullName,
-            email: profileData.email,
-            phone: profileData.phone,
-            summary: profileData.summary,
-            department: finalDepartment,
-            education: profileData.education,
-            skills: profileData.skills,
-            profile_pic_url: profileData.profilePicURL,
-            resume_url: profileData.resumeURL,
-            resume_file_name: profileData.resumeFileName,
-            updated_at: new Date().toISOString(),
-        };
-
-        try {
-            // --- STEP 1: Save the profile data ---
-            const { data: existingProfile } = await supabase
-                .from('profiles')
-                .select('id')
-                .eq('id', userId)
-                .single();
-
-            let error;
-            if (existingProfile) {
-                ({ error } = await supabase
-                    .from('profiles')
-                    .update(dataToSave)
-                    .eq('id', userId));
-            } else {
-                ({ error } = await supabase
-                    .from('profiles')
-                    .insert([{ id: userId, ...dataToSave }]));
-            }
-
-            if (error) throw error;
-
-            // --- STEP 2: Update the embedding ---
-            toast.loading('Profile saved! Updating AI matches...', { id: saveToast }); // ✨ 3. Use Sonner
-            
-            try {
-                await fetch(`/api/embedding/intern`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ intern_id: userId })
-                });
-                toast.success('Profile saved & AI matches updated! 🎉', { id: saveToast }); // ✨ 3. Use Sonner
-            } catch (embedError) {
-                console.error("Embedding update failed:", embedError);
-                toast.warning('Profile saved, but failed to update AI matches.', { id: saveToast }); // ✨ 3. Use Sonner
-            }
-        } catch (err) {
-            console.error("Error saving profile:", err);
-            toast.error(`Failed to save profile: ${err.message}`, { id: saveToast }); // ✨ 3. Use Sonner
-        }
-        
-        setIsSubmitting(false); 
+    const dataToSave = {
+      fullname: profileData.fullName,
+      // ⬇️ THIS LINE IS REMOVED ⬇️
+      // email: profileData.email,
+      // ⬆️ THIS LINE IS REMOVED ⬆️
+      phone: profileData.phone,
+      summary: profileData.summary,
+      department: finalDepartment,
+      education: profileData.education,
+      skills: profileData.skills,
+      profile_pic_url: profileData.profilePicURL,
+      resume_url: profileData.resumeURL,
+      resume_file_name: profileData.resumeFileName,
+      updated_at: new Date().toISOString(),
     };
+
+    try {
+      // --- STEP 1: Save the profile data ---
+      const { data: existingProfile } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', userId)
+        .single();
+
+      let error;
+      if (existingProfile) {
+        ({ error } = await supabase
+          .from('profiles')
+          .update(dataToSave)
+          .eq('id', userId));
+      } else {
+        ({ error } = await supabase
+          .from('profiles')
+          .insert([{ id: userId, ...dataToSave }]));
+      }
+
+      if (error) throw error;
+
+      // --- STEP 2: Update the embedding ---
+      toast.loading('Profile saved! Updating AI matches...', { id: saveToast });
+      
+      try {
+        await fetch(`/api/embedding/intern`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ intern_id: userId })
+        });
+        toast.success('Profile saved & AI matches updated! 🎉', { id: saveToast });
+      } catch (embedError) {
+        console.error("Embedding update failed:", embedError);
+        toast.warning('Profile saved, but failed to update AI matches.', { id: saveToast });
+      }
+    } catch (err) {
+      console.error("Error saving profile:", err);
+      toast.error(`Failed to save profile: ${err.message}`, { id: saveToast });
+    }
+    
+    setIsSubmitting(false); 
+  };
 
     if (loading) {
         return <div className="profile-page-container">Loading profile editor...</div>;
@@ -316,7 +326,7 @@ return (
         <div className="profile-content-area">
             
             {/* ========================================
-            ✨ 1. MAIN COLUMN (NOW SIMPLIFIED)
+             ✨ 1. MAIN COLUMN (NOW SIMPLIFIED)
             This *only* contains the Page Title, Header Card, and Save Bar.
             ========================================
             */}
@@ -450,7 +460,7 @@ return (
             </main>
 
             {/* ========================================
-            ✨ 2. SIDEBAR (NOW A STACK OF CARDS)
+             ✨ 2. SIDEBAR (NOW A STACK OF CARDS)
             This now holds Resume, Skills, Education, and Account.
             ========================================
             */}

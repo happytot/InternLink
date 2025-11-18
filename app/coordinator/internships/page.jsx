@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../../../lib/supabaseClient'; // Adjust this path if needed
 import CoordinatorSidebar from '../../components/CoordinatorSidebar'; // Adjust this path
 import { toast } from 'sonner';
-import './placements.css'; // We'll keep using this CSS
+import './internships.css'; // We'll keep using this CSS
 
 export default function CoordinatorPlacements() {
     const [placements, setPlacements] = useState([]);

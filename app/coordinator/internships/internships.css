@@ -1,0 +1,146 @@
+.coordinator-page {
+  display: flex;
+  min-height: 100vh; /* Make full height */
+  background-color: #f5f5f5;
+}
+
+.placements-content {
+  flex: 1;              /* Take remaining space next to sidebar */
+  padding: 2rem;
+  display: flex;
+  flex-direction: column; /* Stack header + cards vertically */
+}
+
+
+/* --- Page Header --- */
+.header-section {
+  margin-bottom: 1.5rem;
+}
+
+.header-section h2 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+/* --- Placements Grid --- */
+.placements-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+ 
+}
+
+/* --- Individual Placement Card --- */
+.placement-card {
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e0e0e0;
+  transition: all 0.3s ease;
+}
+
+.placement-card:hover {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+.placement-card h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #111;
+  margin-bottom: 0.5rem;
+}
+
+.placement-card p {
+  font-size: 0.95rem;
+  color: #555;
+  margin-bottom: 0.25rem;
+  line-height: 1.5;
+}
+
+.placement-card p strong {
+  color: #333;
+  font-weight: 500;
+}
+
+/* --- Status Badge --- */
+.placement-card .status {
+  font-weight: 600;
+  color: #e67e22; /* Orange */
+  margin-top: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  background-color: #fdf3e8;
+  border-radius: 6px;
+  display: inline-block;
+}
+
+/* --- Action Buttons Container --- */
+.action-buttons {
+  margin-top: 1.25rem;
+  display: flex;
+  gap: 0.75rem;
+}
+
+/* --- Generic Button Styles --- */
+.action-buttons button {
+  flex: 1;
+  padding: 0.6rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+/* --- Approve Button (Green) --- */
+.action-buttons .approve-btn {
+  background-color: #27ae60;
+  color: white;
+}
+
+.action-buttons .approve-btn:hover {
+  background-color: #2ecc71;
+}
+
+/* --- Reject Button (Red) --- */
+.action-buttons .reject-btn {
+  background-color: #c0392b;
+  color: white;
+}
+
+.action-buttons .reject-btn:hover {
+  background-color: #e74c3c;
+}
+
+/* --- Empty State Text --- */
+.placements-content p {
+  font-size: 1rem;
+  color: #777;
+  margin: 1rem 0;
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 768px) {
+  .placements-list {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  }
+
+  .placement-card {
+    padding: 1.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .placement-card h3 {
+    font-size: 1.1rem;
+  }
+
+  .placement-card p {
+    font-size: 0.9rem;
+  }
+}

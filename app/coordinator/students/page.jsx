@@ -1,21 +1,22 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { supabase } from "../../../lib/supabaseClient";
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import CoordinatorSidebar from "../../components/CoordinatorSidebar";
 import "./students.css";
 
-// Import icons
 import {
   FaInfoCircle,
   FaCalendarAlt,
   FaBuilding,
   FaEnvelope,
   FaPhone,
-    FaThList,
+  FaThList,
   FaThLarge,
   FaSearch
 } from "react-icons/fa";
+
+const supabase = createClientComponentClient(); // ✅ FIXED
 
 export default function CoordinatorStudents() {
   const [students, setStudents] = useState([]);
@@ -30,17 +31,28 @@ export default function CoordinatorStudents() {
 
   const fetchStudents = async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from("profiles")
-      .select(
-        "id, fullname, email, phone, created_at, skills, education, summary, department, resume_url, profile_pic_url"
-      )
-      .eq("user_type", "student")
-      .order("created_at", { ascending: false });
+    try {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select(
+          "id, fullname, email, phone, created_at, skills, education, summary, department, resume_url, profile_pic_url"
+        )
+        .eq("user_type", "student")
+        .order("created_at", { ascending: false });
 
-    if (error) console.error("Supabase error:", error);
-    setStudents(data || []);
-    setLoading(false);
+      if (error) {
+        console.error("Supabase error:", error);
+        alert("Error fetching students: " + error.message); // Added alert for visibility
+      } else {
+        console.log("Fetched students:", data); // Added console log to debug
+        setStudents(data || []);
+      }
+    } catch (err) {
+      console.error("Unexpected error:", err);
+      alert("Unexpected error: " + err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const filteredStudents = students.filter((s) =>
@@ -63,16 +75,16 @@ export default function CoordinatorStudents() {
           <h2>Students</h2>
 
           <div className="actions">
-               <div style={{ position: "relative" }}>
+            <div style={{ position: "relative" }}>
               <FaSearch className="search-icon" />
-            <input
-              type="text"
-              placeholder="Search by name..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="search-bar"
-            />
-          </div>
+              <input
+                type="text"
+                placeholder="Search by name..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="search-bar"
+              />
+            </div>
             <div className="view-toggle">
               <label className="switch">
                 <input
@@ -91,6 +103,8 @@ export default function CoordinatorStudents() {
 
         {loading ? (
           <p>Loading students...</p>
+        ) : filteredStudents.length === 0 ? (
+          <p>No students found. Check if user_type is set to "student" in the profiles table.</p> // Added message for empty list
         ) : viewMode === "table" ? (
           <table className="students-table">
             <thead>
@@ -121,30 +135,19 @@ export default function CoordinatorStudents() {
                 <tr key={s.id}>
                   <td>{index + 1}</td>
                   <td>
-                    
                     {s.created_at
                       ? new Date(s.created_at).toLocaleDateString()
                       : "N/A"}
                   </td>
-                  <td>
-                   
-                    {s.department || "N/A"}
-                  </td>
+                  <td>{s.department || "N/A"}</td>
                   <td>{s.fullname || "N/A"}</td>
-                  <td>
-                  
-                    {s.email || "N/A"}
-                  </td>
-                  <td>
-                 
-                    {s.phone || "N/A"}
-                  </td>
+                  <td>{s.email || "N/A"}</td>
+                  <td>{s.phone || "N/A"}</td>
                   <td>
                     <button
                       className="info-btn"
                       onClick={() => setSelectedStudent(s)}
                     >
-                   
                       Full Info
                     </button>
                   </td>
@@ -165,16 +168,13 @@ export default function CoordinatorStudents() {
                   {index + 1}. {s.fullname || "N/A"}
                 </h3>
                 <p>
-                
-                 <strong>Department:</strong> {s.department || "N/A"}
+                  <strong>Department:</strong> {s.department || "N/A"}
                 </p>
                 <p>
-                 
-                 <strong>Email:</strong> {s.email || "N/A"}
+                  <strong>Email:</strong> {s.email || "N/A"}
                 </p>
                 <p>
-                  
-                 <strong>Phone:</strong> {s.phone || "N/A"}
+                  <strong>Phone:</strong> {s.phone || "N/A"}
                 </p>
                 <div className="card-actions">
                   <button

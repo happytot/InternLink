@@ -1,0 +1,213 @@
+/* /app/intern/logbook/logbook.css */
+
+.logbook-container {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+.page-header {
+    font-size: 2em;
+    color: #333;
+    margin-bottom: 30px;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+}
+
+.section-header {
+    font-size: 1.5em;
+    color: #555;
+    margin-top: 30px;
+    margin-bottom: 20px;
+}
+
+/* Hours Tracking Card */
+.hours-tracking-card {
+    background-color: #f7f7f7;
+    border: 1px solid #ddd;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.hours-tracking-card h2 {
+    margin-top: 0;
+    color: #333;
+}
+
+.progress-bar-container {
+    background-color: #e0e0e0;
+    border-radius: 10px;
+    overflow: hidden;
+    height: 20px;
+    margin: 10px 0;
+}
+
+.progress-bar {
+    height: 100%;
+    background-color: #007bff; /* Blue progress bar */
+    transition: width 0.5s ease-in-out;
+}
+
+.hours-text {
+    font-size: 1.1em;
+    color: #555;
+}
+
+.current-hours {
+    font-weight: bold;
+    color: #007bff;
+    font-size: 1.2em;
+}
+
+.progress-percent {
+    font-size: 0.9em;
+    color: #888;
+}
+
+/* Form Styles */
+.logbook-form {
+    background-color: #fff;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.form-header {
+    color: #007bff;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #333;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+}
+
+.submit-btn {
+    background-color: #28a745; /* Green for submission */
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s;
+    width: 100%;
+}
+
+.submit-btn:hover:not(:disabled) {
+    background-color: #218838;
+}
+
+.submit-btn:disabled {
+    background-color: #a0a0a0;
+    cursor: not-allowed;
+}
+
+/* Log History List */
+.log-history-list {
+    display: grid;
+    gap: 15px;
+}
+
+.log-entry-card {
+    background-color: #fff;
+    padding: 20px;
+    border-left: 5px solid #007bff;
+    border-radius: 6px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s;
+}
+
+.log-entry-card:hover {
+    transform: translateY(-2px);
+}
+
+.log-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+    border-bottom: 1px dotted #eee;
+}
+
+.log-date {
+    font-weight: bold;
+    color: #333;
+}
+
+.log-status {
+    padding: 4px 10px;
+    border-radius: 15px;
+    font-size: 0.8em;
+    font-weight: bold;
+    color: white;
+}
+
+.status-pending {
+    background-color: #ffc107; /* Yellow */
+    color: #333;
+}
+
+.status-approved {
+    background-color: #28a745; /* Green */
+}
+
+.status-rejected {
+    background-color: #dc3545; /* Red */
+}
+
+.supervisor-feedback {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed #ddd;
+    font-style: italic;
+    color: #555;
+}
+
+.divider {
+    border: 0;
+    height: 1px;
+    background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0));
+    margin: 30px 0;
+}
+
+.message {
+    padding: 15px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+.message.success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.message.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}

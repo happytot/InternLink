@@ -1,11 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { supabase } from '../../../lib/supabase'; // <-- Corrected path
-import styles from '../../components/AuthPage.module.css'; // <-- Corrected path
+// 1. ✅ CORRECT: Using createClientComponentClient
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import styles from '../../components/AuthPage.module.css';
 import { useRouter } from 'next/navigation';
 import { Toaster, toast } from 'sonner';
-import { FaEye, FaEyeSlash } from 'react-icons/fa'; // <-- Added icons
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 // Helper function to translate errors for the toast
 const translateSupabaseError = (error) => {
@@ -23,6 +24,9 @@ const translateSupabaseError = (error) => {
 export default function InternAuthPage() {
   const router = useRouter();
 
+  // 2. ✅ CORRECT: Initializing client inside the component
+  const supabase = createClientComponentClient();
+
   const [isLoginView, setIsLoginView] = useState(true);
   const [loginData, setLoginData] = useState({ email: '', password: '' });
   const [signupData, setSignupData] = useState({
@@ -34,7 +38,7 @@ export default function InternAuthPage() {
 
   const handleGoBack = () => router.push('/');
 
-  // ✅ --- UPDATED LOGIN HANDLER ---
+// --- UPDATED LOGIN HANDLER (FIX) ---
   const handleLogin = async (e) => {
     e.preventDefault();
     const { email, password } = loginData;
@@ -50,24 +54,26 @@ export default function InternAuthPage() {
     }
 
     if (data.user) {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('user_type')
-        .eq('id', data.user.id)
-        .single();
+      // 1. Get the user_type from the metadata returned by auth.
+      //    This avoids the RLS query problem.
+      const userType = data.user.user_metadata?.user_type;
 
-      if (profile && profile.user_type === 'student') {
+      // 2. Check the userType from the metadata
+      if (userType === 'student') {
+        // We add a router.refresh() to ensure the root layout re-fetches the session
+        router.refresh();
         router.push('/intern/dashboard');
       } else {
+        // This will run if user_type is missing or not 'student'
         await supabase.auth.signOut();
-        toast.error('Access Denied. This is not an intern account.');
+        toast.error('Access Denied. This is not a student account.');
       }
     } else {
       toast.error('Login failed.');
     }
   };
 
-  // --- UPDATED SIGNUP HANDLER ---
+  // --- 3. ✅ UPDATED SIGNUP HANDLER (Uses Trigger) ---
   const handleSignup = async (e) => {
     e.preventDefault();
     const { fullname, email, password } = signupData;
@@ -75,6 +81,13 @@ export default function InternAuthPage() {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
+      // Pass data to the SQL trigger
+      options: {
+        data: {
+          fullname: fullname,
+          user_type: 'student',
+        },
+      },
     });
 
     if (error) {
@@ -82,26 +95,11 @@ export default function InternAuthPage() {
       return;
     }
 
-    if (data.user) {
-      const { error: profileError } = await supabase.from('profiles').insert([
-        {
-          id: data.user.id,
-          fullname: fullname,
-          email: email,
-          user_type: 'student',
-          created_at: new Date().toISOString(),
-        },
-      ]);
-
-      if (profileError) {
-        toast.error(`Error creating profile: ${profileError.message}`);
-        return;
-      }
-
-      toast.success('Signup successful! Please log in.');
-      setSignupData({ fullname: '', email: '', password: '' });
-      setIsLoginView(true);
-    }
+    // We no longer need to .insert() into profiles!
+    // The trigger handles it.
+    toast.success('Signup successful! Please check your email to verify and then log in.');
+    setSignupData({ fullname: '', email: '', password: '' });
+    setIsLoginView(true);
   };
 
   const handleLoginChange = (e) => {
@@ -112,139 +110,131 @@ export default function InternAuthPage() {
     setSignupData({ ...signupData, [e.target.id]: e.target.value });
   };
 
+  // --- JSX (No changes needed) ---
   return (
-  <div className={styles.bodyContainer}>
-  <Toaster richColors position="top-right" />
+    <div className={styles.bodyContainer}>
+      <Toaster richColors position="top-right" />
 
-  <div className={styles.container}>
+      {/* CONTAINER REVERTED TO BE JUST THE FORM WRAPPER */}
+      <div className={styles.container}>
+        {/* RIGHT SIDE FORMS (Now centered and full width of container) */}
+        <div className={styles.formContainer}>
+          <button className={styles.backButton} onClick={handleGoBack}>
+            &times;
+          </button>
 
-    {/* LEFT SIDE IMAGE */}
-    <div className={styles.imageSection}>
-      <img 
-        src="https://t4.ftcdn.net/jpg/08/33/25/31/360_F_833253131_Ndkht9RxSR3EABQtOzdvRkFpAXCpxLzi.jpg"
-        alt="Intern Illustration"
-      />
+          {/* LOGIN FORM */}
+          <div className={`${styles.formBox} ${!isLoginView ? styles.hidden : ''}`}>
+            <h2>Intern Login</h2>
+            <form onSubmit={handleLogin}>
+              <div className={styles.inputGroup}>
+                <label htmlFor="email">Email</label>
+                <input
+                  type="email"
+                  id="email"
+                  value={loginData.email}
+                  onChange={handleLoginChange}
+                  required
+                />
+              </div>
+
+              <div className={styles.inputGroup}>
+                <label htmlFor="password">Password</label>
+                <div className={styles.passwordWrapper}>
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    id="password"
+                    value={loginData.password}
+                    onChange={handleLoginChange}
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className={styles.eyeButton}
+                  >
+                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                  </button>
+                </div>
+              </div>
+
+              <button type="submit">Login as Intern</button>
+              <p>
+                Don't have an account?{' '}
+                <button
+                  type="button"
+                  className={styles.linkButton}
+                  onClick={() => setIsLoginView(false)}
+                >
+                  Sign up
+                </button>
+              </p>
+            </form>
+          </div>
+
+          {/* SIGNUP FORM */}
+          <div className={`${styles.formBox} ${isLoginView ? styles.hidden : ''}`}>
+            <h2>Intern Sign Up</h2>
+            <form onSubmit={handleSignup}>
+              <div className={styles.inputGroup}>
+                <label htmlFor="fullname">Full Name</label>
+                <input
+                  type="text"
+                  id="fullname"
+                  value={signupData.fullname}
+                  onChange={handleSignupChange}
+                  required
+                />
+              </div>
+
+              <div className={styles.inputGroup}>
+                <label htmlFor="email">Email</label>
+                <input
+                  type="email"
+                  id="email"
+                  value={signupData.email}
+                  onChange={handleSignupChange}
+                  required
+                />
+              </div>
+
+              <div className={styles.inputGroup}>
+                <label htmlFor="password">Password</label>
+                <div className={styles.passwordWrapper}>
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    id="password"
+                    value={signupData.password}
+                    onChange={handleSignupChange}
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className={styles.eyeButton}
+                  >
+                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                  </button>
+                </div>
+              </div>
+
+              <button type="submit">Sign Up as Intern</button>
+              <p>
+                Already have an account?{' '}
+                <button
+                  type="button"
+                  className={styles.linkButton}
+                  onClick={() => setIsLoginView(true)}
+                >
+                  Login
+                </button>
+              </p>
+            </form>
+          </div>
+        </div>{' '}
+        {/* END formContainer */}
+      </div>{' '}
+      {/* END container */}
     </div>
-
-    {/* RIGHT SIDE FORMS */}
-    <div className={styles.formContainer}>
-      <button className={styles.backButton} onClick={handleGoBack}>
-        &times;
-      </button>
-
-      {/* LOGIN FORM */}
-      <div className={`${styles.formBox} ${!isLoginView ? styles.hidden : ''}`}>
-        <h2>Intern Login</h2>
-        <form onSubmit={handleLogin}>
-          <div className={styles.inputGroup}>
-            <label htmlFor="email">Email</label>
-            <input
-              type="email"
-              id="email"
-              value={loginData.email}
-              onChange={handleLoginChange}
-              required
-            />
-          </div>
-
-          <div className={styles.inputGroup}>
-            <label htmlFor="password">Password</label>
-            <div className={styles.passwordWrapper}>
-              <input
-                type={showPassword ? 'text' : 'password'}
-                id="password"
-                value={loginData.password}
-                onChange={handleLoginChange}
-                required
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className={styles.eyeButton}
-              >
-                {showPassword ? <FaEyeSlash /> : <FaEye />}
-              </button>
-            </div>
-          </div>
-
-          <button type="submit">Login as Intern</button>
-          <p>
-            Don't have an account?{' '}
-            <button
-              type="button"
-              className={styles.linkButton}
-              onClick={() => setIsLoginView(false)}
-            >
-              Sign up
-            </button>
-          </p>
-        </form>
-      </div>
-
-      {/* SIGNUP FORM */}
-      <div className={`${styles.formBox} ${isLoginView ? styles.hidden : ''}`}>
-        <h2>Intern Sign Up</h2>
-        <form onSubmit={handleSignup}>
-          <div className={styles.inputGroup}>
-            <label htmlFor="fullname">Full Name</label>
-            <input
-              type="text"
-              id="fullname"
-              value={signupData.fullname}
-              onChange={handleSignupChange}
-              required
-            />
-          </div>
-
-          <div className={styles.inputGroup}>
-            <label htmlFor="email">Email</label>
-            <input
-              type="email"
-              id="email"
-              value={signupData.email}
-              onChange={handleSignupChange}
-              required
-            />
-          </div>
-
-          <div className={styles.inputGroup}>
-            <label htmlFor="password">Password</label>
-            <div className={styles.passwordWrapper}>
-              <input
-                type={showPassword ? 'text' : 'password'}
-                id="password"
-                value={signupData.password}
-                onChange={handleSignupChange}
-                required
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className={styles.eyeButton}
-              >
-                {showPassword ? <FaEyeSlash /> : <FaEye />}
-              </button>
-            </div>
-          </div>
-
-          <button type="submit">Sign Up as Intern</button>
-          <p>
-            Already have an account?{' '}
-            <button
-              type="button"
-              className={styles.linkButton}
-              onClick={() => setIsLoginView(true)}
-            >
-              Login
-            </button>
-          </p>
-        </form>
-      </div>
-
-    </div> {/* END formContainer */}
-
-  </div> {/* END container */}
-</div>
-
   );
 }

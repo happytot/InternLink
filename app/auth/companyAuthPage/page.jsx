@@ -1,11 +1,16 @@
 'use client';
 
 import { useState } from 'react';
-import { supabase } from '../../../lib/supabase'; // <-- Corrected path
-import styles from '../../components/AuthPage.module.css'; // <-- Corrected path
+// 1. ⛔️ REMOVED your old supabase import
+// import { supabase } from '../../../lib/supabase';
+
+// 2. ✅ ADDED this import instead
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+
+import styles from '../../components/AuthPage.module.css';
 import { useRouter } from 'next/navigation';
 import { Toaster, toast } from 'sonner';
-import { FaEye, FaEyeSlash } from 'react-icons/fa'; // <-- Added icons
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 const translateSupabaseError = (error) => {
   if (!error) return 'An unknown error occurred.';
@@ -22,6 +27,9 @@ const translateSupabaseError = (error) => {
 export default function CompanyAuthPage() {
   const router = useRouter();
 
+  // 3. ✅ INITIALIZED the client *inside* the component
+  const supabase = createClientComponentClient();
+
   const [isLoginView, setIsLoginView] = useState(true);
   const [loginData, setLoginData] = useState({ email: '', password: '' });
   const [signupData, setSignupData] = useState({
@@ -33,10 +41,10 @@ export default function CompanyAuthPage() {
 
   const handleGoBack = () => router.push('/');
 
-  // LOGIN
+// --- UPDATED LOGIN HANDLER (Checks 'profiles' table) ---
+// --- UPDATED LOGIN HANDLER (Checks metadata) ---
   const handleLogin = async (e) => {
     e.preventDefault();
-
     const { email, password } = loginData;
 
     const { data, error } = await supabase.auth.signInWithPassword({
@@ -49,41 +57,51 @@ export default function CompanyAuthPage() {
       return;
     }
 
-    if (!data.user) {
+    if (data.user) {
+      // 1. Get the user_type from the metadata returned by auth.
+      //    This is the most reliable check.
+      const userType = data.user.user_metadata?.user_type;
+
+      // 2. Check the userType
+      if (userType === 'company') {
+        router.refresh(); // Refresh the cookie session
+        router.push('/company/dashboard');
+      } else {
+        // This will run if user_type is missing (like your account) or not 'company'
+        await supabase.auth.signOut();
+        toast.error('Access Denied. This is not a company account.');
+      }
+    } else {
       toast.error('Login failed.');
-      return;
     }
-    router.push('/company/dashboard');
   };
 
-  // SIGNUP
+  // --- 5. ✅ UPDATED SIGNUP HANDLER (Uses Trigger) ---
   const handleSignup = async (e) => {
     e.preventDefault();
-
     const { companyName, email, password } = signupData;
 
-    const { data, error } = await supabase.auth.signUp({ email, password });
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      // Pass data to the SQL trigger
+      options: {
+        data: {
+          company_name: companyName, // Matches our new SQL trigger
+          user_type: 'company',
+        },
+      },
+    });
 
     if (error) {
       toast.error(translateSupabaseError(error));
       return;
     }
 
-    if (data.user) {
-      await supabase.from('profiles').insert([
-        {
-          id: data.user.id,
-          company_name: companyName,
-          email,
-          user_type: 'company',
-          created_at: new Date().toISOString(),
-        },
-      ]);
-
-      toast.success(`Signup successful for ${companyName}! Please log in.`);
-      setSignupData({ companyName: '', email: '', password: '' });
-      setIsLoginView(true);
-    }
+    // We no longer need to .insert() into profiles!
+    toast.success(`Signup successful for ${companyName}! Please log in.`);
+    setSignupData({ companyName: '', email: '', password: '' });
+    setIsLoginView(true);
   };
 
   const handleLoginChange = (e) => {
@@ -94,11 +112,13 @@ export default function CompanyAuthPage() {
     setSignupData({ ...signupData, [e.target.id]: e.target.value });
   };
 
+  // --- JSX (No changes) ---
   return (
-    <div className={styles.bodyContainer}>
-      <Toaster richColors position="top-right" />
-
-      <div className={styles.container}>
+   <div className={styles.bodyContainer}>
+    <Toaster richColors position="top-right" />
+    <div className={styles.container}>
+      {/* RIGHT FORM SIDE */}
+      <div className={styles.formContainer}>
         <button className={styles.backButton} onClick={handleGoBack}>
           &times;
         </button>
@@ -118,12 +138,11 @@ export default function CompanyAuthPage() {
               />
             </div>
 
-            {/* --- Updated Password Input --- */}
             <div className={styles.inputGroup}>
               <label htmlFor="password">Password</label>
               <div className={styles.passwordWrapper}>
                 <input
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? "text" : "password"}
                   id="password"
                   value={loginData.password}
                   onChange={handleLoginChange}
@@ -142,7 +161,7 @@ export default function CompanyAuthPage() {
             <button type="submit">Login as Company</button>
 
             <p>
-              Don't have an account?{' '}
+              Don't have an account?{" "}
               <button
                 type="button"
                 className={styles.linkButton}
@@ -180,15 +199,14 @@ export default function CompanyAuthPage() {
               />
             </div>
 
-            {/* --- Updated Password Input --- */}
             <div className={styles.inputGroup}>
               <label htmlFor="password">Password</label>
               <div className={styles.passwordWrapper}>
                 <input
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? "text" : "password"}
                   id="password"
                   value={signupData.password}
-                  onChange={handleSignupChange}
+                 onChange={handleSignupChange}
                   required
                 />
                 <button
@@ -204,7 +222,7 @@ export default function CompanyAuthPage() {
             <button type="submit">Sign Up as Company</button>
 
             <p>
-              Already have an account?{' '}
+              Already have an account?{" "}
               <button
                 type="button"
                 className={styles.linkButton}
@@ -217,5 +235,6 @@ export default function CompanyAuthPage() {
         </div>
       </div>
     </div>
+  </div>
   );
 }

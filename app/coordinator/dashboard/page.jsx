@@ -85,21 +85,22 @@ export default function CoordinatorDashboard() {
         studentMonthly[month]++;
       });
 
-      // --- MONTHLY COMPANY GROWTH (NOW USING companies TABLE) --- (This is correct)
-      const { data: companyData } = await supabase
-        .from("companies")
-        .select("created_at");
+    // --- MONTHLY COMPANY GROWTH ---
+const { data: companyData } = await supabase
+  .from("companies")
+  .select("updated_at"); // <-- use the correct column
 
-      const companyMonthly = Array(12).fill(0);
-      companyData?.forEach((c) => {
-        const month = new Date(c.created_at).getMonth();
-        companyMonthly[month]++;
-      });
+const companyMonthly = Array(12).fill(0);
+companyData?.forEach((c) => {
+  const month = new Date(c.updated_at).getMonth(); // <-- updated field
+  companyMonthly[month]++;
+});
 
-      setGrowthData({
-        monthlyStudents: studentMonthly,
-        monthlyCompanies: companyMonthly,
-      });
+setGrowthData({
+  monthlyStudents: studentMonthly,
+  monthlyCompanies: companyMonthly,
+});
+
 
       setLoading(false);
     };

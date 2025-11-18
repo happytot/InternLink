@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
 import React, { useEffect, useState } from "react";
 import { supabase } from "../../../lib/supabaseClient";
 import CoordinatorSidebar from "../../components/CoordinatorSidebar";
 import "./companies.css";
 
-// Import icons
+// Icons
 import {
   FaInfoCircle,
   FaMapMarkerAlt,
@@ -13,7 +13,8 @@ import {
   FaBuilding,
   FaSearch,
   FaThList,
-  FaThLarge
+  FaThLarge,
+  FaStar
 } from "react-icons/fa";
 
 export default function CoordinatorCompanies() {
@@ -22,6 +23,11 @@ export default function CoordinatorCompanies() {
   const [viewMode, setViewMode] = useState("table");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCompany, setSelectedCompany] = useState(null);
+
+  // Modal sub-states
+  const [comments, setComments] = useState([]);
+  const [jobs, setJobs] = useState([]);
+  const [message, setMessage] = useState("");
 
   useEffect(() => {
     fetchCompanies();
@@ -36,6 +42,46 @@ export default function CoordinatorCompanies() {
     if (error) console.error("Supabase error:", error);
     setCompanies(data || []);
     setLoading(false);
+  };
+
+  // Fetch comments & job posts dynamically for modal
+  const fetchModalData = async (companyId) => {
+    // Comments
+    const { data: commentData } = await supabase
+      .from("company_reviews")
+      .select("id, comment, rating, profiles:student_id(fullname)")
+      .eq("company_id", companyId)
+      .order("created_at", { ascending: false });
+    setComments(commentData || []);
+
+    // Job posts
+   // Job posts
+const { data: jobData } = await supabase
+  .from("job_posts")
+  .select("id, title, description, salary, responsibilities, created_at")
+  .eq("company_id", companyId)
+  .order("created_at", { ascending: false });
+setJobs(jobData || []);
+
+  };
+
+  const openModal = (company) => {
+    setSelectedCompany(company);
+    fetchModalData(company.id);
+  };
+
+  const handleSendMessage = async () => {
+    if (!message) return alert("Type a message first!");
+    const { error } = await supabase.from("coordinator_messages").insert({
+      company_id: selectedCompany.id,
+      message,
+      created_at: new Date()
+    });
+    if (error) alert("Error sending message: " + error.message);
+    else {
+      setMessage("");
+      alert("Message sent successfully!");
+    }
   };
 
   const filteredCompanies = companies.filter((c) =>
@@ -101,25 +147,17 @@ export default function CoordinatorCompanies() {
                 <tr key={c.id}>
                   <td>{index + 1}</td>
                   <td>
-                   
                     {c.updated_at
                       ? new Date(c.updated_at).toLocaleDateString()
                       : "N/A"}
                   </td>
-                  <td>
-                   
-                    {c.name || "N/A"}
-                  </td>
-                  <td>
-                    
-                    {c.location || "N/A"}
-                  </td>
+                  <td>{c.name || "N/A"}</td>
+                  <td>{c.location || "N/A"}</td>
                   <td>
                     <button
                       className="info-btn"
-                      onClick={() => setSelectedCompany(c)}
+                      onClick={() => openModal(c)}
                     >
-                      
                       Full Info
                     </button>
                   </td>
@@ -146,7 +184,7 @@ export default function CoordinatorCompanies() {
                 <div className="card-actions">
                   <button
                     className="info-btn"
-                    onClick={() => setSelectedCompany(c)}
+                    onClick={() => openModal(c)}
                   >
                     <FaInfoCircle style={{ marginRight: "5px" }} />
                     Full Info
@@ -202,6 +240,94 @@ export default function CoordinatorCompanies() {
             <div className="profile-section">
               <h3>Description</h3>
               <p>{selectedCompany.description || "No description provided."}</p>
+            </div>
+
+
+{comments.length > 0 && (
+  <div className="profile-section">
+    <h3>Average Rating</h3>
+    <div className="average-rating">
+      {Array.from({ length: 5 }, (_, i) => (
+        <FaStar
+          key={i}
+          color={i < Math.round(
+            comments.reduce((acc, c) => acc + c.rating, 0) / comments.length
+          ) ? "#FFD700" : "#ccc"}
+        />
+      ))}
+      <span style={{ marginLeft: "8px", fontWeight: "500" }}>
+        ({comments.length} reviews)
+      </span>
+    </div>
+  </div>
+)}
+
+{/* ================= Student Reviews with Star Rating ================= */}
+<div className="profile-section">
+
+  
+  <h3>Student Reviews</h3>
+  {comments.length === 0 && <p>No reviews yet.</p>}
+  {comments.length > 0 && (
+    <div>
+      {comments.map((c) => (
+        <div key={c.id} className="comment-card">
+          <div className="comment-header">
+            <strong>{c.profiles?.fullname || "Student"}</strong>
+            <div className="star-rating">
+              {Array.from({ length: 5 }, (_, i) => (
+                <FaStar
+                  key={i}
+                  color={i < c.rating ? "#FFD700" : "#ccc"}
+                />
+              ))}
+            </div>
+          </div>
+          <p>{c.comment}</p>
+        </div>
+      ))}
+    </div>
+  )}
+</div>
+
+
+{/* Job posts in two columns */}
+{/* Job posts in two columns */}
+<div className="profile-section">
+  <h3>Job Posts</h3>
+  {jobs.length === 0 && <p>No job posts available.</p>}
+  <div className="job-grid">
+    {jobs.map((j) => (
+      <div key={j.id} className="job-card">
+        <strong style={{ color: "#000", fontSize: "1.05rem" }}>{j.title}</strong>
+        {j.salary && <p style={{ color: "#000", margin: "5px 0" }}><strong>Salary:</strong> {j.salary}</p>}
+        {j.responsibilities && (
+          <p style={{ color: "#000", margin: "5px 0" }}>
+            <strong>Responsibilities:</strong> {j.responsibilities}
+          </p>
+        )}
+
+        
+        <p style={{ color: "#000", margin: "5px 0" }}> <strong>Description: </strong>{j.description || "No description"}</p>
+        <small style={{ color: "#000" }}>Posted on: {new Date(j.created_at).toLocaleDateString()}</small>
+      </div>
+    ))}
+  </div>
+</div>
+
+
+            {/* Message Coordinator */}
+            <div className="profile-section">
+              <h3>Send Message to Coordinator</h3>
+              <textarea
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                placeholder="Type your message..."
+                style={{ width: "100%", padding: "10px", borderRadius: "6px" }}
+              />
+              <button onClick={handleSendMessage} className="resume-btn" style={{ marginTop: "10px" }}>
+                Send
+              </button>
             </div>
 
             <button

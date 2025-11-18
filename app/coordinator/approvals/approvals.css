@@ -52,6 +52,7 @@
 .applications-table td {
   padding: 12px 15px;
   text-align: left;
+  color: black;
 }
 
 .applications-table th {
@@ -93,11 +94,11 @@
 
 /* Style for the 'View' resume link to look like a button */
 .resume-link-btn {
+  color: black;
   display: inline-block;
   padding: 6px 12px;
   font-size: 0.875rem;
   font-weight: 500;
-  color: #fff;
   background-color: #007aff; /* Blue */
   border: none;
   border-radius: 8px;

@@ -1,15 +1,20 @@
 'use client';
 
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { supabase } from '../../../lib/supabaseClient';
+// 1. ⛔️ REMOVED your old supabase import
+// import { supabase } from '../../../lib/supabaseClient';
+
+// 2. ✅ ADDED this import instead
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+
 import Link from 'next/link';
 import './Dashboard.css';
 import Header from '../../components/Header';
 import InternNav from '../../components/InternNav';
 import { toast } from 'sonner';
-import { useMediaQuery } from '../../hooks/useMediaQuery'; // We need this hook
+import { useMediaQuery } from '../../hooks/useMediaQuery';
 
-// --- 1. NEW: Stats Summary Component ---
+// --- 1. NEW: Stats Summary Component (No changes) ---
 const StatsSummary = ({ applications }) => (
   <section className="stats-summary-bar">
     <div className="stat-card">
@@ -31,7 +36,7 @@ const StatsSummary = ({ applications }) => (
   </section>
 );
 
-// --- 2. Reusable Slider Component ---
+// --- 2. Reusable Slider Component (No changes) ---
 const HorizontalSlider = ({ title, viewAllLink, children, pageCount }) => {
   const [currentPage, setCurrentPage] = useState(0);
   const sliderRef = useRef(null);
@@ -118,10 +123,10 @@ const HorizontalSlider = ({ title, viewAllLink, children, pageCount }) => {
   );
 };
 
-// --- 3. Application Slider ---
+// --- 3. Application Slider (No changes) ---
 const ApplicationSlider = ({ applications }) => {
   const isMobile = useMediaQuery('(max-width: 600px)');
-  const pageSize = isMobile ? 2 : 4; // 1x2 on mobile, 2x2 on desktop
+  const pageSize = isMobile ? 2 : 4;
 
   const pages = applications.reduce((acc, _, i) => {
     if (i % pageSize === 0) {
@@ -168,13 +173,14 @@ const ApplicationSlider = ({ applications }) => {
   );
 };
 
-// --- 4. Recommended Matches Slider ---
+// --- 4. Recommended Matches Slider (No changes) ---
+// (This component was already using fetch() so it's fine)
 const RecommendedMatches = ({ user, openModal }) => {
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const isMobile = useMediaQuery('(max-width: 600px)');
-  const pageSize = isMobile ? 2 : 4; // 1x2 on mobile, 2x2 on desktop
+  const pageSize = isMobile ? 2 : 4;
 
   useEffect(() => {
     if (!user?.id) return;
@@ -230,16 +236,17 @@ const RecommendedMatches = ({ user, openModal }) => {
   );
 };
 
-// --- 5. Announcements ---
-// --- 5. Announcements ---
+// --- 5. Announcements (FIXED) ---
 const Announcements = () => {
+  // 3. ✅ INITIALIZED the client *inside* this component
+  const supabase = createClientComponentClient();
+
   const [announcements, setAnnouncements] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchAnnouncements = async () => {
       try {
-        // Fetch announcements
         const { data: annData, error: annError } = await supabase
           .from('announcements')
           .select('*')
@@ -247,13 +254,13 @@ const Announcements = () => {
           .limit(5);
         if (annError) throw annError;
 
-        // Fetch all profiles
+        // This N+1 query is slow. We fixed this in the server-side
+        // refactor, but for now this will at least *work*.
         const { data: profiles, error: profilesError } = await supabase
           .from('profiles')
           .select('id, fullname');
         if (profilesError) throw profilesError;
 
-        // Map announcements to include profile info
         const combined = annData.map(a => ({
           ...a,
           created_by_profile: profiles.find(p => p.id === a.created_by),
@@ -267,7 +274,7 @@ const Announcements = () => {
       }
     };
     fetchAnnouncements();
-  }, []);
+  }, [supabase]); // 4. ✅ Added supabase dependency
 
   return (
     <section className="card dashboard-announcements">
@@ -296,7 +303,7 @@ const Announcements = () => {
 };
 
 
-// --- 6. Sidebar Widget ---
+// --- 6. Sidebar Widget (No changes) ---
 const ProfileWidget = () => (
   <section className="card profile-card">
     <h3>👤 Your Profile</h3>
@@ -305,8 +312,11 @@ const ProfileWidget = () => (
   </section>
 );
 
-// --- 7. Main Dashboard Component ---
+// --- 7. Main Dashboard Component (FIXED) ---
 export default function InternDashboard() {
+  // 3. ✅ INITIALIZED the client *inside* this component
+  const supabase = createClientComponentClient();
+
   const [user, setUser] = useState(null);
   const [userName, setUserName] = useState('');
   const [loading, setLoading] = useState(true);
@@ -315,8 +325,38 @@ export default function InternDashboard() {
   const [selectedJob, setSelectedJob] = useState(null);
   const [animateClose, setAnimateClose] = useState(false);
 
+  // 4. ✅ Wrapped data-fetching functions in useCallback
+  const fetchProfile = useCallback(async (userId) => {
+    const { data } = await supabase
+      .from('profiles')
+      .select('fullname')
+      .eq('id', userId)
+      .single();
+    setUserName(data?.fullname || '');
+  }, [supabase]); // 5. ✅ Added supabase dependency
+
+  const fetchApplications = useCallback(async (userId) => {
+    try {
+      const { data, error } = await supabase
+        .from('job_applications')
+        .select(`
+          id, created_at, status,
+          job_posts:job_posts!fk_job_applications_job ( title ),
+          companies:companies!fk_job_applications_company ( name )
+        `)
+        .eq('intern_id', userId)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      setApplications(data || []);
+    } catch (err) {
+      console.error('Error fetching applications:', err.message);
+    }
+  }, [supabase]); // 5. ✅ Added supabase dependency
+
+  // 6. ✅ Main fetchUser effect, now with correct dependencies
   useEffect(() => {
     const fetchUser = async () => {
+      // This 'supabase' variable is now the cookie-aware one
       const { data: { user: currentUser } } = await supabase.auth.getUser();
       if (currentUser) {
         setUser(currentUser);
@@ -325,41 +365,24 @@ export default function InternDashboard() {
       }
       setLoading(false);
     };
-
-    const fetchProfile = async (userId) => {
-      const { data } = await supabase
-        .from('profiles')
-        .select('fullname')
-        .eq('id', userId)
-        .single();
-      setUserName(data?.fullname || '');
-    };
-
-    const fetchApplications = async (userId) => {
-      try {
-        const { data, error } = await supabase
-          .from('job_applications')
-          .select(`
-            id, created_at, status,
-            job_posts:job_posts!fk_job_applications_job ( title ),
-            companies:companies!fk_job_applications_company ( name )
-          `)
-          .eq('intern_id', userId)
-          .order('created_at', { ascending: false });
-        if (error) throw error;
-        setApplications(data || []);
-      } catch (err) {
-        console.error('Error fetching applications:', err.message);
-      }
-    };
     
     fetchUser();
-  }, []);
+  }, [supabase, fetchProfile, fetchApplications]); // 7. ✅ Added all dependencies
 
-  // --- Modal handlers ---
-  const openJobDetailModal = (jobData) => {
+
+  // --- Modal handlers (Wrapped in useCallback) ---
+  const closeModal = useCallback(() => {
+    setAnimateClose(true);
+    setTimeout(() => {
+      setSelectedJob(null);
+      setAnimateClose(false);
+      document.body.classList.remove('modal-open');
+    }, 300);
+  }, []); // This one has no dependencies
+
+  const openJobDetailModal = useCallback((jobData) => {
     const fetchFullJob = async (job) => {
-       try {
+      try {
         const { data, error } = await supabase
           .from('job_posts')
           .select(`
@@ -387,19 +410,10 @@ export default function InternDashboard() {
       }
     };
     fetchFullJob(jobData);
-  };
+  }, [supabase]); // 8. ✅ Added supabase dependency
 
-  const closeModal = () => {
-    setAnimateClose(true);
-    setTimeout(() => {
-      setSelectedJob(null);
-      setAnimateClose(false);
-      document.body.classList.remove('modal-open');
-    }, 300);
-  };
-
-  // --- Apply to Job Function ---
-  const applyToJob = async (jobId, companyId) => {
+  // --- Apply to Job Function (Wrapped in useCallback) ---
+  const applyToJob = useCallback(async (jobId, companyId) => {
     if (!user) {
       toast.error("Please login first.");
       return;
@@ -432,9 +446,14 @@ export default function InternDashboard() {
       }
       return;
     }
+    
+    // After applying, refetch applications to update the UI
+    await fetchApplications(user.id);
+    
     closeModal();
     toast.success("Application submitted successfully!");
-  };
+  }, [supabase, user, closeModal, fetchApplications]); // 9. ✅ Added all dependencies
+
 
   if (loading) {
     return (
@@ -453,22 +472,19 @@ export default function InternDashboard() {
       <Header />
       <div className="dashboard-container">
         <div className="dashboard-header">
-          <h1>Welcome Back, {userName.split(' ')[0]}!</h1>
+          <h1>Welcome Back, {userName.split(' ')[0] || 'Intern'}!</h1>
           <p>Ready to manage your journey and find your next role?</p>
         </div>
 
-        {/* ✨ STATS SUMMARY IS NOW AT THE TOP */}
         <StatsSummary applications={applications} />
 
         <div className="dashboard-grid">
           <main className="dashboard-main">
-            {/* Sliders are back */}
             <ApplicationSlider applications={applications} />
             <RecommendedMatches user={user} openModal={openJobDetailModal} />
           </main>
 
           <aside className="dashboard-sidebar">
-            {/* StatsWidget is removed, Announcements is added */}
             <ProfileWidget />
             <Announcements />
           </aside>

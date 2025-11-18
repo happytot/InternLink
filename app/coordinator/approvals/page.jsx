@@ -26,7 +26,7 @@ export default function CoordinatorInternships() {
             title, 
             location,
             company:companies ( name ) 
-          )
+          ) 
         `)
         .eq("status", "Company_Approved_Waiting_Coordinator");
 

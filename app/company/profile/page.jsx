@@ -1,12 +1,21 @@
 'use client';
 
-// 1. Added 'useRef' to the import
-import { useEffect, useState, useRef } from 'react';
-import { supabase } from '../../../lib/supabaseClient';
+// 1. ✅ Added 'useCallback'
+import { useEffect, useState, useRef, useCallback } from 'react';
+
+// 2. ⛔️ REMOVED your old supabase import
+// import { supabase } from '../../../lib/supabaseClient';
+
+// 3. ✅ ADDED this import instead
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+
 import { useRouter } from 'next/navigation';
 import './profile.css';
 
 export default function CompanyProfile() {
+  // 4. ✅ INITIALIZED the client *inside* the component
+  const supabase = createClientComponentClient();
+
   const [profile, setProfile] = useState({
     name: '',
     description: '',
@@ -19,41 +28,35 @@ export default function CompanyProfile() {
   const [toastType, setToastType] = useState('success'); // 'success' or 'error'
   const router = useRouter();
   
-  // 2. Added a ref to manage the toast timeout
   const toastTimeoutRef = useRef(null);
 
+  // NOTE: You need to set your Cloudinary preset!
   const CLOUDINARY_URL = `https://api.cloudinary.com/v1_1/db8ee6vbj/image/upload`;
-  const UPLOAD_PRESET = 'YOUR_UPLOAD_PRESET'; // Remember to change this!
+  const UPLOAD_PRESET = 'YOUR_UPLOAD_PRESET'; 
 
-  // 3. Replaced with the improved showToast function
   const showToast = (message, type = 'success', callback) => {
-    // Clear any existing toast so they don't overlap
     if (toastTimeoutRef.current) {
       clearTimeout(toastTimeoutRef.current);
     }
-
     setToastMessage(message);
     setToastType(type);
-
-    // Set a new timeout and store its ID
     toastTimeoutRef.current = setTimeout(() => {
       setToastMessage('');
-      toastTimeoutRef.current = null; // Clear the ref
-      if (callback) callback(); // callback after toast disappears
-    }, 3000); // toast visible for 3s
+      toastTimeoutRef.current = null;
+      if (callback) callback();
+    }, 3000);
   };
 
-  useEffect(() => {
-    fetchProfile();
-  }, []);
-
-  const fetchProfile = async () => {
+  // 5. ✅ Wrapped fetchProfile in useCallback
+  const fetchProfile = useCallback(async () => {
     setLoading(true);
+    
+    // This 'supabase' variable is now the cookie-aware one
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
       alert('Please log in to view your profile.');
-      router.push('/login');
+      router.push('/auth/companyAuthPage'); // Corrected login path
       setLoading(false);
       return;
     }
@@ -68,13 +71,23 @@ export default function CompanyProfile() {
     else if (data) setProfile(data);
 
     setLoading(false);
-  };
+  }, [supabase, router]); // 6. ✅ Added supabase and router dependencies
+
+  // 7. ✅ Added fetchProfile to the dependency array
+  useEffect(() => {
+    fetchProfile();
+  }, [fetchProfile]);
 
   const handleChange = (e) => setProfile({ ...profile, [e.target.name]: e.target.value });
 
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
+
+    if (UPLOAD_PRESET === 'YOUR_UPLOAD_PRESET') {
+      alert('Error: Cloudinary UPLOAD_PRESET is not set in your code.');
+      return;
+    }
 
     setUploading(true);
 
@@ -94,11 +107,18 @@ export default function CompanyProfile() {
     }
   };
 
+  // This will now work correctly
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+       showToast('❌ Session expired. Please log in again.', 'error');
+       setLoading(false);
+       return;
+    }
+
     const updates = { id: user.id, ...profile, updated_at: new Date() };
 
     const { error } = await supabase.from('companies').upsert(updates);
@@ -108,13 +128,12 @@ export default function CompanyProfile() {
     setLoading(false);
   };
 
-  // ===== Logout handler =====
+  // This will also work correctly
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
       showToast('❌ Error logging out: ' + error.message, 'error');
     } else {
-      // Show toast first, then redirect after 3s
       showToast('Logged out successfully!', 'success', () => {
         router.push('/auth/companyAuthPage');
       });
@@ -130,8 +149,6 @@ export default function CompanyProfile() {
         </button>
       </div>
 
-      {/* Toast Notification */}
-      {/* This part is controlled by the CSS and state */}
       {toastMessage && (
         <div className={`toast ${toastType}`}>
           {toastMessage}

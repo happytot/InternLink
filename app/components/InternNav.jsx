@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation'; 
 import './InternNav.css'; 
-import { LuLayoutDashboard, LuClipboardList, LuUser, LuHistory, LuMessageCircle } from "react-icons/lu"; // added chat icon
+import { LuLayoutDashboard, LuClipboardList, LuUser, LuHistory, LuMessageCircle, LuBuilding } from "react-icons/lu"; // added building icon
 
 export default function InternNav({ className }) {
     const pathname = usePathname();
@@ -49,7 +49,21 @@ export default function InternNav({ className }) {
                     </span>
                 </Link>
                 
-                <Link 
+                
+
+                {/* New Companies link */}
+                <Link
+                    href="/intern/companies"
+                    className={pathname.startsWith('/intern/companies') ? 'nav-link active' : 'nav-link'}
+                >
+                    <span className="nav-icon">
+                        <LuBuilding />
+                    </span>
+                    <span className="nav-label">
+                        Companies
+                    </span>
+                </Link>
+<Link 
                     href="/intern/profile"
                     className={pathname.startsWith('/intern/profile') ? 'nav-link active' : 'nav-link'}
                 >
@@ -60,20 +74,6 @@ export default function InternNav({ className }) {
                         Profile
                     </span>
                 </Link>
-
-                {/* --- New Chat Link --- */}
-                <Link 
-                    href="/intern/messages"
-                    className={pathname.startsWith('/intern/messages') ? 'nav-link active' : 'nav-link'}
-                >
-                    <span className="nav-icon">
-                        <LuMessageCircle />
-                    </span>
-                    <span className="nav-label">
-                        Messages
-                    </span>
-                </Link>
-
             </div>
         </nav>
     );

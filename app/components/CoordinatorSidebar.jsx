@@ -68,20 +68,17 @@ export default function CoordinatorSidebar() {
           <span>Approvals</span>
         </Link>
 
-        <Link href="/coordinator/placements">
-          <CheckSquare size={18} />
-          <span>Placements</span>
+         <Link href="/coordinator/internships">
+          <Briefcase size={18} />
+          <span>Internships</span>
         </Link>
+
         <Link href="/coordinator/companies">
           <Building2 size={18} />
           <span>Companies</span>
         </Link>
 
-        <Link href="/coordinator/dashboard#internships">
-          <Briefcase size={18} />
-          <span>Internships</span>
-        </Link>
-
+      
         <Link href="/coordinator/announcements">
           <Megaphone size={18} />
           <span>Announcements</span>

@@ -1,128 +1,127 @@
-/* 🌿 Modern Apple-like job post form */
+/* 🌿 Modern Apple-like job post form - Symmetrical & Clean */
 
-/* --- Base container (from listings.css) --- */
+/* --- Base container --- */
 .new-job-post-container {
-  max-width: 900px; /* Forms are better a bit narrower */
-  margin: 2rem auto;
-  padding: 2rem 2.5rem;
+  max-width: 1000px; /* Slightly narrower for better form readability */
+  margin-top: 500px;    
+  margin-bottom: 100px; 
+  margin-left: auto;
+  margin-right: auto;  padding: 3rem; /* Symmetrical padding on all 4 sides */
+  
   background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(20px);
   border-radius: 1.5rem;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.4);
 }
 
-/* --- Header (from listings.css) --- */
-.header-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-}
-
-.header-bar h1 {
-  font-size: 1.8rem;
-  font-weight: 600;
-  color: #000;
-  margin: 0;
-}
-
+/* --- Header --- */
 .head {
+  font-size: 2rem;
+  font-weight: 700;
   color: #1c1c1e;
+  margin-top: 0;
+  margin-bottom: 2.5rem; /* Generous space below title */
+  text-align: center; /* Centered for symmetry */
+  letter-spacing: -0.5px;
 }
 
-/* --- Form Specific Styles --- */
+/* --- Form Layout --- */
 .job-post-form {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1.5rem; /* Uniform 24px spacing between every field */
 }
 
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+/* Input Labels */
+label {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #3a3a3c;
+  margin-bottom: 0.5rem; /* Consistent space between label and input */
 }
 
-.form-group label {
-  font-size: 1rem;
-  font-weight: 500;
-  color: #1c1c1e;
-}
-
-.form-group input,
-.form-group textarea {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+/* Inputs, Textareas, Selects */
+input, 
+textarea, 
+select {
   width: 100%;
-  padding: 12px 14px;
+  padding: 0.85rem 1rem; /* Symmetrical internal padding (13.6px 16px) */
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
   font-size: 1rem;
+  
   border: 1px solid #d1d1d6;
-  border-radius: 10px;
-  background: #fdfdfd;
+  border-radius: 12px; /* Smoother corners */
+  background: #ffffff;
+  color: #1c1c1e;
+  
   transition: all 0.2s ease;
-  box-sizing: border-box; /* Important */
+  box-sizing: border-box;
 }
 
-.form-group input:focus,
-.form-group textarea:focus {
+input:focus, 
+textarea:focus, 
+select:focus {
   outline: none;
   border-color: #007aff;
-  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.2);
+  box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.15); /* Softer focus ring */
+  background-color: #fff;
 }
 
-.form-group textarea {
+textarea {
   resize: vertical;
-  min-height: 120px;
+  min-height: 140px;
+  line-height: 1.5;
 }
 
-/* Row for side-by-side inputs */
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-}
-
-/* --- Primary Button (from listings.css) --- */
-.btn-primary {
+/* --- Submit Button --- */
+.post-job {
+  width: 100%; /* Full width to match input fields */
+  padding: 1rem; /* Larger click area */
+  margin-top: 1rem; /* Separate slightly from the last input */
+  margin-bottom: 0;
+  
   background: linear-gradient(135deg, #007aff, #0a84ff);
-  color: #fff;
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 600;
   border: none;
-  padding: 0.8rem 1.4rem;
   border-radius: 12px;
-  font-size: 1rem;
-  font-weight: 500;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(10, 132, 255, 0.3);
-  transition: all 0.25s ease;
-  margin-top: 1rem;
+  
+  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.25);
+  transition: all 0.2s ease;
 }
 
-.btn-primary:hover:not(:disabled) {
-  transform: scale(1.03);
-  box-shadow: 0 4px 16px rgba(10, 132, 255, 0.4);
+.post-job:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(0, 122, 255, 0.35);
 }
 
-.btn-primary:disabled {
-  background: #d1d1d6;
-  color: #8e8e93;
+.post-job:active:not(:disabled) {
+  transform: translateY(1px);
+  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.25);
+}
+
+.post-job:disabled {
+  background: #e5e5ea;
+  color: #aeaeb2;
   cursor: not-allowed;
   box-shadow: none;
+  transform: none;
 }
 
-.post-job {
-  margin-bottom: 2.8rem;
-  margin-top: 05.5em;
-}
-
-/* --- Responsive --- */
-@media (max-width: 600px) {
-  .form-row {
-    grid-template-columns: 1fr; /* Stack on mobile */
-  }
+/* --- Responsive Adjustments --- */
+@media (max-width: 768px) {
   .new-job-post-container {
-    padding: 1.5rem;
-    margin: 1rem;
+    width: 90%; /* Add breathing room on sides */
+    margin: 2rem auto;
+    padding: 1.5rem; /* Reduce padding on mobile */
+  }
+
+  .head {
+    font-size: 1.75rem;
+    margin-bottom: 2rem;
   }
 }

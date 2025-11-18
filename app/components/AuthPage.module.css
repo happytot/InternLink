@@ -1,49 +1,64 @@
 /* src/components/AuthPage.module.css */
 
-/* Wrapper to hold body styles */
+/* --- GLOBAL & BODY STYLES --- */
 .bodyContainer {
-    font-family: Arial, sans-serif;
-    background: #f2f2f2;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    width: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    
+    /* RESTORED: Your original background image properties */
     background-image: url("/assets/desktop-bg.png");
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
-}
-
-/* Container */
-.container {
-    width: 350px;
-    background: rgba(255, 255, 255, 0.5);
-    /* ✅ FIX: Reduced padding from 30px to 20px */
-    padding: 20px 30px;
-    border-radius: 10px;
-    box-shadow: 0px 5px 20px rgba(0,0,0,0.1);
-    box-sizing: border-box;
-    margin: 15px;
-    margin-top: 70px;
-    position: relative;
-    padding-top: 40px;
     
-    /* 💥 FINAL FIX: Force container to shrink-wrap its content vertically */
-    height: max-content;
-    display: flex; /* Helps containment of children */
-    flex-direction: column; /* Stacks children vertically */
+    display: flex;
+    justify-content: center;
+    align-items: center; 
+    min-height: 100vh;
+    width: 100%;
 }
 
-/* Back Button Style */
+/* --- CONTAINER (The Form Card) --- */
+.container {
+    /* Fixed size for desktop, but responsive on mobile */
+    width: 90%;
+    max-width: 420px; /* Standard size for a centered auth form */
+    height: auto;
+    
+    /* Sequoia/iOS card design */
+    background: rgba(255, 255, 255, 0.7); /* Slightly transparent white */
+    border-radius: 20px; /* Highly rounded corners */
+    border: 1px solid rgba(255, 255, 255, 0.3); /* Subtle light border */
+    
+    /* Frosted glass effect - KEY for modern macOS/iOS look */
+    backdrop-filter: blur(20px); 
+    -webkit-backdrop-filter: blur(20px);
+    
+    /* Multi-layer shadow for depth and elevation */
+    box-shadow: 
+        0 4px 6px rgba(0, 0, 0, 0.05), /* Inner subtle shadow */
+        0 20px 30px rgba(0, 0, 0, 0.1); /* Outer main elevation shadow */
+}
+
+/* --- FORM CONTENT WRAPPER --- */
+.formContainer {
+    /* Since we removed the image, formContainer is now the only content */
+    display: flex;
+    flex-direction: column;
+    justify-content: center; 
+    padding: 35px;
+    position: relative;
+    /* Removed flex properties that were only needed for the side-by-side layout */
+}
+
+/* Back Button Style (Retained) */
 .backButton {
     position: absolute;
-    top: 10px;
-    right: 10px;
+    top: 15px;
+    right: 15px;
     background: none;
     border: none;
     font-size: 24px;
-    color: #333;
+    color: #555;
     cursor: pointer;
     padding: 5px;
     line-height: 1;
@@ -54,79 +69,95 @@
     color: #EE7428;
 }
 
-
-/* Form box */
+/* Form box & Header */
 .formBox {
     text-align: center;
-    margin: 0;
-    /* 💥 FINAL FIX: Ensure form box also shrinks to content height */
     height: max-content;
 }
 
 .formBox h2 {
-    margin: 0 0 20px 0;
+    margin: 0 0 30px 0;
     color: #333;
+    font-size: 28px;
+    font-weight: 600; 
 }
 
-/* Input fields */
+/* --- INPUT FIELDS --- */
 .inputGroup {
-    /* ✅ FIX: Reduced vertical margin to 15px */
-    margin-bottom: 15px;
+    margin-bottom: 20px;
     text-align: left;
 }
 
 .inputGroup label {
     display: block;
-    font-size: 14px;
-    /* ✅ FIX: Reduced label-to-input space to 4px */
-    margin-bottom: 4px;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 6px;
     color: #555;
 }
 
 .inputGroup input {
     width: 100%;
-    padding: 10px 12px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 14px;
+    padding: 12px 15px;
+    border: none; 
+    background: #f8f8fa; 
+    border-radius: 10px; 
+    font-size: 15px;
     box-sizing: border-box;
+    transition: box-shadow 0.3s, background 0.3s;
 }
 
-/* Button */
-.formBox button {
+.inputGroup input:focus {
+    outline: none;
+    background: #ffffff; 
+    box-shadow: inset 0 0 0 1px #EE7428; 
+}
+
+/* --- BUTTONS --- */
+.formBox button[type="submit"] {
     width: 100%;
-    padding: 12px;
+    padding: 14px;
     border: none;
-    background: #EE7428;
+    background: #EE7428; 
     color: white;
     font-size: 16px;
-    border-radius: 6px;
+    font-weight: 600;
+    border-radius: 12px;
     cursor: pointer;
-    transition: background 0.3s;
-    margin-top: 10px;
+    transition: background 0.3s, transform 0.1s, box-shadow 0.3s;
+    margin-top: 20px;
+    box-shadow: 0 4px 10px rgba(238, 116, 40, 0.4); 
 }
 
-.formBox button:hover {
+.formBox button[type="submit"]:hover {
     background: #e25c09;
+    box-shadow: 0 6px 12px rgba(238, 116, 40, 0.5);
+    transform: translateY(-1px);
 }
 
-/* Links */
+/* Links and Secondary Actions */
 .formBox p {
-    /* ✅ FIX: Controlled margins to ensure link spacing is compact */
-    margin: 15px 0 10px 0;
+    margin: 20px 0 10px 0;
     font-size: 14px;
-    color: black;
+    color: #666;
 }
 
-.formBox a {
-    font-size: 15px;
-    font-weight: bolder;
-    color: #000000;
+/* Link Button style for changing views (Login/Sign Up) */
+.linkButton {
+    background: none !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: auto !important;
+    font-size: 15px !important;
+    font-weight: 600; 
+    color: #EE7428 !important; 
     text-decoration: none;
     cursor: pointer;
 }
 
-.formBox a:hover {
+.linkButton:hover {
+    background: none !important;
     text-decoration: underline;
 }
 
@@ -135,95 +166,39 @@
     display: none;
 }
 
-/* --- Password Toggle Styles (FIXED) --- */
-
-/* Wrapper for password input and eye icon */
+/* --- Password Toggle Styles --- */
 .passwordWrapper {
-  position: relative;
-  width: 100%;
+    position: relative;
+    width: 100%;
 }
 
-/* Make the input inside the wrapper take full width
-   AND add space on the right for the button */
 .passwordWrapper input {
-  /* This selector is more specific than just .inputGroup input */
-  width: 100%;
-  padding-right: 45px !important; /* Use !important to override existing .inputGroup input padding */
-  box-sizing: border-box;
+    padding-right: 45px !important; 
 }
 
-/* Style for the eye button 
-  This selector is now more specific than '.formBox button'
-*/
 .formBox .passwordWrapper .eyeButton {
-  position: absolute;
-  right: 0px;
-  top: 50%;
-  transform: translateY(-50%);
+    position: absolute;
+    right: 0px;
+    top: 50%;
+    transform: translateY(-50%);
 
-  /* --- Resets for .formBox button styles --- */
-  background: none;
-  border: none;
-  color: #555;
-  width: 40px; /* Clickable area */
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  font-size: 20px; /* Emoji size */
-  /* --- End Resets --- */
-
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: color 0.2s;
+    /* Resets */
+    background: none;
+    border: none;
+    color: #999; 
+    width: 40px; 
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-size: 18px; 
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
 }
 
-/* Make eye button hover more specific too */
 .formBox .passwordWrapper .eyeButton:hover {
-  background: transparent; /* Ensure no hover bg */
-  color: #ee7428;
-}
-
-
-/* FIX: Ensure side-by-side layout stays horizontal */
-.container {
-  display: flex;
-  flex-direction: row; /* <-- forces horizontal layout */
-  align-items: stretch; /* match heights */
-  justify-content: center;
-
-  width: 1200px;
-  height: 550px;
-
-  background: #ffffff;
-  border-radius: 18px;
-  overflow: hidden;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-}
-
-/* LEFT IMAGE SIDE */
-.imageSection {
-  flex: 1; /* share space equally */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: #e9eef3;
-}
-
-.imageSection img {
-  width: 700px;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 18px;
-}
-
-/* RIGHT FORM SIDE */
-.formContainer {
-  flex: 1; /* share space equally */
-  display: flex;
-  flex-direction: column;
-  justify-content: center; /* center vertically */
-  padding: 40px;
-  position: relative;
+    background: transparent; 
+    color: #ee7428;
 }
