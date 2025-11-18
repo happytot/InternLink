@@ -1,221 +1,367 @@
-/* 🌿 CompanyDashboard.css – Modern Apple/iOS 18 Inspired */
+/* 🌿 iOS 18 / Sequoia "Bento" Design System */
 
-/* Base reset and typography */
+:root {
+  --ios-bg: #F2F2F7;
+  --ios-card-bg: #FFFFFF;
+  --ios-text-primary: #1D1D1F;
+  --ios-text-secondary: #86868B;
+  --ios-blue: #007AFF;
+  --ios-blue-hover: #0062cc;
+  --ios-radius: 24px;
+  --ios-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+  --ios-shadow-hover: 0 8px 32px rgba(0, 0, 0, 0.08);
+  --ios-border: 1px solid rgba(0, 0, 0, 0.03);
+}
+
 body {
-  background-color: #f5f5f7;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
-  color: #1c1c1e;
+  background-color: var(--ios-bg);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", sans-serif;
   margin: 0;
-  padding: 0 1.5rem;
+  color: var(--ios-text-primary);
+  -webkit-font-smoothing: antialiased;
 }
 
-/* Main dashboard container */
-.company-dashboard {
-  max-width: 1100px;
-  margin: 3rem auto;
-  padding: 2rem;
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(24px);
-  border-radius: 1.5rem;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  transition: all 0.3s ease;
+/* --- Layout Grid --- */
+.dashboard-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  margin-bottom: 3rem;
+  
+  /* ✅ Adjusted Padding: Clear the Header, but no floating text */
+  padding: 100px 24px 60px;
+  
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.company-dashboard:hover {
-  box-shadow: 0 12px 42px rgba(0, 0, 0, 0.1);
-}
-
-/* Header */
-.welcome-header {
-  font-size: 1.8rem;
-  font-weight: 700;
-  color: #000;
-  letter-spacing: -0.02em;
-  margin-bottom: 2rem;
-  text-align: left;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-  padding-bottom: 1rem;
-}
-
-/* Grid layout for content (activity + quick actions) */
-.dashboard-content-grid {
+/* --- Stats Grid (Top Section) --- */
+.stats-grid {
   display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 2rem;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
 }
 
-/* Recent Activity Section */
-.recent-activity-feed {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(20px);
-  border-radius: 1.2rem;
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.06);
-  padding: 2rem;
-  transition: all 0.3s ease;
+/* ✅ NEW: The Horizontal Welcome Widget */
+.welcome-widget {
+  grid-column: 1 / -1; /* Spans all 4 columns */
+  background: var(--ios-card-bg);
+  padding: 32px;
+  border-radius: var(--ios-radius);
+  box-shadow: var(--ios-shadow);
+  border: var(--ios-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.recent-activity-feed:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.08);
+.welcome-content h1 {
+  font-size: 32px;
+  font-weight: 700;
+  margin: 0;
+  color: var(--ios-text-primary);
+  letter-spacing: -0.5px;
 }
 
-.recent-activity-feed h2 {
-  font-size: 1.4rem;
+.welcome-content p {
+  margin: 6px 0 0 0;
+  font-size: 16px;
+  color: var(--ios-text-secondary);
+}
+
+.welcome-date {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #F2F2F7;
+  padding: 10px 16px;
+  border-radius: 50px;
   font-weight: 600;
-  color: #007aff;
-  margin-bottom: 1.5rem;
+  color: var(--ios-text-secondary);
+  font-size: 14px;
 }
 
-/* Activity Cards */
-.activity-card {
-  background: rgba(245, 245, 247, 0.9);
-  border-radius: 1rem;
-  padding: 1.2rem;
-  margin-bottom: 1rem;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-  transition: transform 0.2s ease, box-shadow 0.3s ease;
+.date-icon {
+  color: var(--ios-blue);
 }
 
-.activity-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+/* Standard Stat Widgets */
+.stat-widget {
+  background: var(--ios-card-bg);
+  padding: 24px;
+  border-radius: var(--ios-radius);
+  box-shadow: var(--ios-shadow);
+  border: var(--ios-border);
+  
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 140px;
+  
+  transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
+  position: relative;
+  overflow: hidden;
 }
 
-.activity-card h3 {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #111;
-  margin-bottom: 0.3rem;
-}
-
-.activity-card p {
-  font-size: 0.95rem;
-  color: #555;
-  margin-bottom: 0.5rem;
-}
-
-.activity-card small {
-  font-size: 0.8rem;
-  color: #888;
-}
-
-/* Quick Actions Section */
-.quick-actions {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(20px);
-  border-radius: 1.2rem;
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.06);
-  padding: 2rem;
-  transition: all 0.3s ease;
-}
-
-.quick-actions:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.08);
-}
-
-.quick-actions h2 {
-  font-size: 1.4rem;
-  font-weight: 600;
-  color: #007aff;
-  margin-bottom: 1.5rem;
-}
-
-/* Buttons */
-.full-width-btn {
-  width: 100%;
-  padding: 0.9rem 1.2rem;
-  border: none;
-  border-radius: 0.9rem;
-  font-weight: 600;
-  font-size: 1rem;
-  margin-bottom: 1rem;
+.clickable-widget {
   cursor: pointer;
-  transition: all 0.25s ease;
+}
+
+.clickable-widget:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--ios-shadow-hover);
+  border-color: rgba(0, 122, 255, 0.2);
+}
+
+.stat-icon-bg {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+/* Widget Colors */
+.stat-widget:nth-child(2) .stat-icon-bg { background: #EDF4FF; color: #007AFF; } /* Active Jobs */
+.stat-widget:nth-child(3) .stat-icon-bg { background: #FFF4E5; color: #FF9500; } /* Applicants */
+.stat-widget:nth-child(4) .stat-icon-bg { background: #F2F2F7; color: #8E8E93; } /* Review */
+.stat-widget:nth-child(5) .stat-icon-bg { background: #E6F9EE; color: #34C759; } /* Hired */
+/* Note: nth-child indices shifted by 1 because welcome-widget is now child #1 */
+
+.stat-value {
+  font-size: 38px;
+  font-weight: 700;
+  line-height: 1;
+  margin: 0;
+  letter-spacing: -1px;
+  color: var(--ios-text-primary);
+}
+
+.stat-label {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ios-text-secondary);
+  margin-top: 8px;
+}
+
+/* --- Content Grid (Bottom Section) --- */
+.content-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr; 
+  gap: 20px;
+}
+
+.widget-card {
+  background: var(--ios-card-bg);
+  border-radius: var(--ios-radius);
+  box-shadow: var(--ios-shadow);
+  padding: 28px;
+  border: var(--ios-border);
+  display: flex;
+  flex-direction: column;
+}
+
+.widget-title {
+  font-size: 19px;
+  font-weight: 700;
+  margin: 0 0 20px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--ios-text-primary);
+}
+
+.widget-icon-header {
+  color: var(--ios-text-secondary);
+}
+
+.activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.activity-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 16px;
+  border-radius: 16px;
+  transition: background-color 0.2s ease;
+  border-bottom: 1px solid #f5f5f7;
+}
+
+.activity-item:last-child {
+  border-bottom: none;
+}
+
+.clickable-activity {
+  cursor: pointer;
+}
+
+.clickable-activity:hover {
+  background-color: #F5F5F7;
+}
+
+.activity-dot {
+  width: 10px;
+  height: 10px;
+  background: var(--ios-blue);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.activity-details {
+  flex: 1;
+}
+
+.activity-details h4 {
+  margin: 0 0 4px 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ios-text-primary);
+}
+
+.activity-details p {
+  margin: 0 0 4px 0;
+  font-size: 14px;
+  color: #636366;
+  line-height: 1.4;
+}
+
+.activity-time {
+  font-size: 12px;
+  color: #AEAEB2;
+  font-weight: 500;
+}
+
+.activity-arrow {
+  color: #C7C7CC;
+  opacity: 0;
+  transition: all 0.2s ease;
+}
+
+.clickable-activity:hover .activity-arrow {
+  opacity: 1;
+  transform: translateX(4px);
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 0;
+  color: var(--ios-text-secondary);
+  gap: 10px;
+}
+
+/* Action Buttons */
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ios-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 18px 20px;
+  border: none;
+  border-radius: 18px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  font-family: inherit;
+}
+
+.btn-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn-arrow {
+  opacity: 0.5;
+  transition: transform 0.2s ease;
+}
+
+.ios-btn:hover .btn-arrow {
+  transform: translateX(4px);
+  opacity: 1;
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #007aff, #0a84ff);
-  color: #fff;
-  box-shadow: 0 4px 14px rgba(10, 132, 255, 0.3);
+  background: var(--ios-blue);
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
 }
 
 .btn-primary:hover {
-  transform: scale(1.03);
-  box-shadow: 0 6px 18px rgba(10, 132, 255, 0.4);
+  background: var(--ios-blue-hover);
+  transform: scale(1.02);
 }
 
 .btn-secondary {
-  background: linear-gradient(135deg, #e0e0e5, #f5f5f7);
-  color: #111;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  background: #F2F2F7;
+  color: var(--ios-text-primary);
 }
 
 .btn-secondary:hover {
+  background: #E5E5EA;
   transform: scale(1.02);
-  background: linear-gradient(135deg, #d6d6dc, #efeff2);
 }
 
-/* Loading state */
-.dashboard-loading {
-  text-align: center;
-  font-size: 1.2rem;
-  color: #6e6e73;
-  margin-top: 4rem;
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80vh;
+  color: var(--ios-text-secondary);
 }
 
-/* Smooth transition for all */
-* {
-  transition: all 0.2s ease-in-out;
+.spin-icon {
+  animation: spin 1.2s linear infinite;
+  color: var(--ios-blue);
+  opacity: 0.8;
 }
 
-/* 📱 Responsive Design */
+@keyframes spin { 100% { transform: rotate(360deg); } }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-/* Small phones */
-@media (max-width: 640px) {
-  .company-dashboard {
-    padding: 1.5rem;
-    margin: 1rem;
-  }
-
-  .welcome-header {
-    font-size: 1.5rem;
-    text-align: center;
-  }
-
-  .dashboard-content-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .recent-activity-feed, .quick-actions {
-    padding: 1.5rem;
-  }
-
-  .full-width-btn {
-    font-size: 0.95rem;
-  }
+/* --- Responsive --- */
+@media (max-width: 1024px) {
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  /* On tablet, welcome still spans top */
+  .welcome-widget { grid-column: 1 / -1; }
 }
 
-/* Tablets */
-@media (min-width: 641px) and (max-width: 1024px) {
-  .company-dashboard {
-    padding: 2rem;
-  }
+@media (max-width: 768px) {
+  .dashboard-container { padding: 90px 16px 40px; }
+  
+  .stats-grid { grid-template-columns: 1fr; }
+  .content-grid { grid-template-columns: 1fr; }
 
-  .welcome-header {
-    font-size: 1.7rem;
+  /* On Mobile, let welcome widget stack naturally */
+  .welcome-widget { 
+    flex-direction: column; 
+    align-items: flex-start; 
+    gap: 16px;
   }
-
-  .dashboard-content-grid {
-    grid-template-columns: 1fr;
-    gap: 2rem;
+  
+  .stat-widget { 
+    flex-direction: row; 
+    align-items: center; 
+    height: auto; 
+    padding: 20px; 
   }
-}
-
-/* Desktops */
-@media (min-width: 1025px) {
-  .welcome-header {
-    font-size: 1.9rem;
-  }
+  
+  .stat-icon-bg { margin-bottom: 0; margin-right: 16px; }
 }

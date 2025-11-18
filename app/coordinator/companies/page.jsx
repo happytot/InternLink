@@ -255,7 +255,7 @@ setJobs(jobData || []);
           ) ? "#FFD700" : "#ccc"}
         />
       ))}
-      <span style={{ marginLeft: "8px", fontWeight: "500" }}>
+      <span style={{ marginLeft: "8px", fontWeight: "500", color: "black" }}>
         ({comments.length} reviews)
       </span>
     </div>
@@ -273,7 +273,7 @@ setJobs(jobData || []);
       {comments.map((c) => (
         <div key={c.id} className="comment-card">
           <div className="comment-header">
-            <strong>{c.profiles?.fullname || "Student"}</strong>
+            <strong style={{ color: "black" }}>{c.profiles?.fullname || "Student"}</strong>
             <div className="star-rating">
               {Array.from({ length: 5 }, (_, i) => (
                 <FaStar

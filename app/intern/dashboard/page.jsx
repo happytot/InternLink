@@ -1,12 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef, useCallback } from 'react';
-// 1. ⛔️ REMOVED your old supabase import
-// import { supabase } from '../../../lib/supabaseClient';
-
-// 2. ✅ ADDED this import instead
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-
 import Link from 'next/link';
 import './Dashboard.css';
 import Header from '../../components/Header';
@@ -14,29 +9,150 @@ import InternNav from '../../components/InternNav';
 import { toast } from 'sonner';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 
-// --- 1. NEW: Stats Summary Component (No changes) ---
-const StatsSummary = ({ applications }) => (
-  <section className="stats-summary-bar">
-    <div className="stat-card">
-      <span className="stat-value">{applications.length}</span>
-      <span className="stat-label">Total Applied</span>
-    </div>
-    <div className="stat-card">
-      <span className="stat-value">
-        {applications.filter(a => a.status.toLowerCase().includes('interview')).length}
-      </span>
-      <span className="stat-label">Interviews</span>
-    </div>
-    <div className="stat-card">
-      <span className="stat-value">
-        {applications.filter(a => a.status.toLowerCase() === 'accepted').length}
-      </span>
-      <span className="stat-label">Offers</span>
-    </div>
+import { 
+  Users, 
+  Briefcase, 
+  CheckCircle, 
+  Calendar, 
+  Star, 
+  MessageSquare,
+  ClipboardList,
+  User,
+  ExternalLink,
+  ChevronRight,
+  Loader2
+} from 'lucide-react';
+
+// --- Helper: Get Date for Welcome Box ---
+const getCurrentDate = () => {
+  const date = new Date();
+  return {
+    day: date.toLocaleDateString('en-US', { weekday: 'long' }),
+    dateStr: date.toLocaleDateString('en-US', { month: 'long', day: 'numeric' })
+  };
+};
+
+// --- SKELETON COMPONENTS ---
+
+const SkeletonBox = ({ width = '100%', height = '20px', className = '' }) => (
+  <div className={`skeleton-box ${className}`} style={{ width, height }}></div>
+);
+
+const StatsSkeleton = () => (
+  <section className="bento-grid-stats">
+    {[...Array(4)].map((_, i) => (
+      <div key={i} className={`stat-card stat-skeleton`}>
+        <SkeletonBox width="48px" height="48px" className="rounded-full" />
+        <div className="stat-content">
+          <SkeletonBox width="60px" height="24px" className="mb-1" />
+          <SkeletonBox width="80px" height="16px" />
+        </div>
+      </div>
+    ))}
   </section>
 );
 
-// --- 2. Reusable Slider Component (No changes) ---
+const SliderSkeleton = () => {
+  const isMobile = useMediaQuery('(max-width: 600px)');
+  const pageSize = isMobile ? 1 : 2;
+
+  return (
+    <section className="card dashboard-slider-card">
+      <div className="slider-header">
+        <SkeletonBox width="180px" height="26px" />
+      </div>
+      <div className="slider-container">
+        <div className="slider-track">
+          <div className="slider-page">
+            {[...Array(pageSize)].map((_, i) => (
+              <div key={i} className="app-card skeleton-card">
+                <SkeletonBox width="80px" height="20px" className="mb-3" />
+                <div className="flex-grow">
+                  <SkeletonBox width="90%" height="22px" className="mb-2" />
+                  <SkeletonBox width="60%" height="18px" />
+                </div>
+                <SkeletonBox width="100px" height="14px" className="self-end" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+      <SkeletonBox width="100px" height="16px" className="view-all-link-skeleton" />
+    </section>
+  );
+};
+
+const WidgetSkeleton = () => (
+  <div className="dashboard-sidebar">
+    {/* Profile Widget Skeleton */}
+    <section className="card profile-card skeleton-widget">
+      <SkeletonBox width="150px" height="24px" className="mx-auto mb-3" />
+      <SkeletonBox width="80%" height="16px" className="mx-auto mb-5" />
+      <SkeletonBox width="120px" height="38px" className="mx-auto" />
+    </section>
+
+    {/* Announcements Skeleton */}
+    <section className="card dashboard-announcements skeleton-widget">
+      <SkeletonBox width="180px" height="26px" className="mb-3" />
+      <div className="announcement-list">
+        {[...Array(3)].map((_, i) => (
+          <div key={i} className="announcement-card">
+            <SkeletonBox width="60px" height="60px" className="rounded-sm" />
+            <div className="announcement-content">
+              <SkeletonBox width="80%" height="18px" className="mb-1" />
+              <SkeletonBox width="95%" height="14px" className="mb-1" />
+              <SkeletonBox width="70%" height="14px" />
+            </div>
+          </div>
+        ))}
+      </div>
+      <SkeletonBox width="100px" height="16px" className="view-all-link-skeleton mt-3 ml-auto" />
+    </section>
+  </div>
+);
+
+// --- 1. Stats Summary (Unchanged) ---
+const StatsSummary = ({ applications }) => {
+  const totalApplied = applications.length;
+  const interviews = applications.filter(a => a.status && a.status.toLowerCase().includes('interview')).length;
+  const offers = applications.filter(a => a.status && a.status.toLowerCase() === 'accepted').length;
+
+  return (
+    <section className="bento-grid-stats">
+      {/* Links and Stat Content (unchanged) */}
+      <Link href="/intern/history" className="stat-card stat-total-applied">
+        <div className="stat-icon-bg"><ClipboardList size={20} strokeWidth={2.5} /></div>
+        <div className="stat-content">
+          <span className="stat-value">{totalApplied}</span>
+          <span className="stat-label">Applied</span>
+        </div>
+      </Link>
+      <Link href="/intern/history?status=Interview" className="stat-card stat-interviews">
+        <div className="stat-icon-bg"><Users size={20} strokeWidth={2.5} /></div>
+        <div className="stat-content">
+          <span className="stat-value">{interviews}</span>
+          <span className="stat-label">Interviews</span>
+        </div>
+      </Link>
+      <Link href="/intern/history?status=Accepted" className="stat-card stat-offers">
+        <div className="stat-icon-bg"><CheckCircle size={20} strokeWidth={2.5} /></div>
+        <div className="stat-content">
+          <span className="stat-value">{offers}</span>
+          <span className="stat-label">Offers</span>
+        </div>
+      </Link>
+      <Link href="/intern/listings" className="stat-card stat-find-jobs">
+        <div className="stat-icon-bg"><Briefcase size={20} strokeWidth={2.5} /></div>
+        <div className="stat-content">
+          <span className="stat-value">Find</span>
+          <span className="stat-label">New Jobs</span>
+        </div>
+      </Link>
+    </section>
+  );
+};
+
+// --- 2. Reusable Slider (Unchanged) ---
 const HorizontalSlider = ({ title, viewAllLink, children, pageCount }) => {
   const [currentPage, setCurrentPage] = useState(0);
   const sliderRef = useRef(null);
@@ -45,101 +161,62 @@ const HorizontalSlider = ({ title, viewAllLink, children, pageCount }) => {
     if (sliderRef.current) {
       const { scrollLeft, clientWidth } = sliderRef.current;
       const newPage = Math.round(scrollLeft / clientWidth);
-      if (newPage !== currentPage) {
-        setCurrentPage(newPage);
-      }
-    }
-  };
-
-  const slideTo = (pageIndex) => {
-    if (sliderRef.current) {
-      const { clientWidth } = sliderRef.current;
-      sliderRef.current.scrollTo({
-        left: clientWidth * pageIndex,
-        behavior: 'smooth',
-      });
+      if (newPage !== currentPage) setCurrentPage(newPage);
     }
   };
 
   const slideBy = (direction) => {
     if (sliderRef.current) {
       const { clientWidth } = sliderRef.current;
-      sliderRef.current.scrollBy({
-        left: clientWidth * direction,
-        behavior: 'smooth',
-      });
+      sliderRef.current.scrollBy({ left: clientWidth * direction, behavior: 'smooth' });
     }
   };
 
-  useEffect(() => {
-    slideTo(0);
-  }, [pageCount]);
+  const slideTo = (i) => {
+    if (sliderRef.current) {
+      const { clientWidth } = sliderRef.current;
+      sliderRef.current.scrollTo({ left: clientWidth * i, behavior: 'smooth' });
+    }
+  }
+
+  useEffect(() => { slideTo(0); }, [pageCount]);
 
   return (
     <section className="card dashboard-slider-card">
       <div className="slider-header">
         <h2>{title}</h2>
         <div className="slider-controls">
-          <button
-            onClick={() => slideBy(-1)}
-            disabled={pageCount <= 1}
-            aria-label="Previous slide"
-          >
-            ‹
-          </button>
-          <button
-            onClick={() => slideBy(1)}
-            disabled={pageCount <= 1}
-            aria-label="Next slide"
-          >
-            ›
-          </button>
+          <button onClick={() => slideBy(-1)} disabled={pageCount <= 1}>‹</button>
+          <button onClick={() => slideBy(1)} disabled={pageCount <= 1}>›</button>
         </div>
       </div>
-
-      <div 
-        className="slider-container" 
-        ref={sliderRef} 
-        onScroll={handleScroll}
-      >
-        <div className="slider-track">
-          {children}
-        </div>
+      <div className="slider-container" ref={sliderRef} onScroll={handleScroll}>
+        <div className="slider-track">{children}</div>
       </div>
-      
       <div className="slider-dots">
         {Array.from({ length: pageCount }).map((_, i) => (
-          <button
-            key={i}
-            className={`dot ${i === currentPage ? 'active' : ''}`}
-            onClick={() => slideTo(i)}
-            aria-label={`Go to slide ${i + 1}`}
-          />
+          <button key={i} className={`dot ${i === currentPage ? 'active' : ''}`} onClick={() => slideTo(i)} />
         ))}
       </div>
-
-      <Link href={viewAllLink} className="view-all-link">View All →</Link>
+      <Link href={viewAllLink} className="view-all-link">View All <ChevronRight size={16} /></Link>
     </section>
   );
 };
 
-// --- 3. Application Slider (No changes) ---
+// --- 3. Application Slider (Unchanged) ---
 const ApplicationSlider = ({ applications }) => {
   const isMobile = useMediaQuery('(max-width: 600px)');
-  const pageSize = isMobile ? 2 : 4;
+  const pageSize = isMobile ? 1 : 2;
 
   const pages = applications.reduce((acc, _, i) => {
-    if (i % pageSize === 0) {
-      acc.push(applications.slice(i, i + pageSize));
-    }
+    if (i % pageSize === 0) acc.push(applications.slice(i, i + pageSize));
     return acc;
   }, []);
-  const pageCount = pages.length;
 
-  if (applications.length === 0) {
+  if (!applications || applications.length === 0) {
     return (
       <section className="card dashboard-applications">
-        <h2>🗓️ Application History</h2>
+        <h2><Calendar size={20} className="card-title-icon"/> Application History</h2>
         <div className="no-applications">
           <p>No applications yet.</p>
           <Link href="/intern/listings" className="btn-primary">Find an Internship</Link>
@@ -149,332 +226,359 @@ const ApplicationSlider = ({ applications }) => {
   }
 
   return (
-    <HorizontalSlider title="🗓️ Application History" viewAllLink="/intern/history" pageCount={pageCount}>
+    <HorizontalSlider 
+      title={<><Calendar size={20} className="card-title-icon"/> Application History</>} 
+      viewAllLink="/intern/history" 
+      pageCount={pages.length}
+    >
       {pages.map((page, pageIndex) => (
         <div className="slider-page" key={pageIndex}>
           {page.map(app => (
             <div key={app.id} className="app-card">
-              <span className={`status-badge status-${app.status.toLowerCase().replace(/\s/g, '-')}`}>
-                {app.status}
+              <span className={`status-badge status-${(app.status || 'pending').toLowerCase().replace(/\s/g, '-')}`}>
+                {app.status || 'Pending'}
               </span>
-              <h3 className="app-card-title">{app.job_posts?.title || 'Unknown Job'}</h3>
-              <p className="app-card-company">{app.companies?.name || 'Unknown Company'}</p>
-              <small className="app-card-date">
-                Applied: {new Date(app.created_at).toLocaleDateString()}
-              </small>
+              <div>
+                <h3 className="app-card-title">{app.job_posts?.title || 'Unknown Job'}</h3>
+                <p className="app-card-company">{app.companies?.name || 'Unknown Company'}</p>
+              </div>
+              <small className="app-card-date">Applied: {new Date(app.created_at).toLocaleDateString()}</small>
             </div>
           ))}
-          {page.length < pageSize && Array.from({ length: pageSize - page.length }).map((_, i) => (
-            <div key={`fill-${i}`} className="app-card-empty" />
-          ))}
+          {page.length < pageSize && <div className="app-card-empty" />}
         </div>
       ))}
     </HorizontalSlider>
   );
 };
 
-// --- 4. Recommended Matches Slider (No changes) ---
-// (This component was already using fetch() so it's fine)
+// --- 4. Recommended Matches (Updated to handle its own loading, but kept the loading check for the skeleton) ---
 const RecommendedMatches = ({ user, openModal }) => {
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
-
   const isMobile = useMediaQuery('(max-width: 600px)');
-  const pageSize = isMobile ? 2 : 4;
+  const pageSize = isMobile ? 1 : 2;
 
   useEffect(() => {
     if (!user?.id) return;
     const fetchMatches = async () => {
       try {
         const res = await fetch(`/api/match/${user.id}`);
-        if (!res.ok) throw new Error("Failed to fetch matches");
-        const data = await res.json();
-        setMatches(data);
-      } catch (err) {
-        console.error("Error fetching matches:", err.message);
-      } finally {
-        setLoading(false);
-      }
+        if (res.ok) {
+          const data = await res.json();
+          setMatches(data);
+        }
+      } catch (err) { console.error(err); } 
+      finally { setLoading(false); }
     };
     fetchMatches();
   }, [user]);
 
+  // If the dashboard component is loading, this component shouldn't run its fetch, 
+  // but if it is running its own fetch, we can show a lighter skeleton state here.
+  // For simplicity, we assume the main dashboard loader covers the initial fetch, 
+  // but we handle the component's internal loading too.
+  if (loading) {
+     return (
+        <section className="card dashboard-slider-card">
+            <div className="slider-header">
+                <h2><Star size={20} className="card-title-icon"/> Recommended for You</h2>
+            </div>
+            <div className="slider-container">
+                <div className="slider-page">
+                    {[...Array(pageSize)].map((_, i) => (
+                      <div key={i} className="job-card skeleton-card">
+                        <div className="flex-grow">
+                          <SkeletonBox width="90%" height="22px" className="mb-2" />
+                          <SkeletonBox width="60%" height="18px" />
+                        </div>
+                        <SkeletonBox width="100px" height="38px" className="self-end" />
+                      </div>
+                    ))}
+                </div>
+            </div>
+        </section>
+     );
+  }
+
   const pages = matches.reduce((acc, _, i) => {
-    if (i % pageSize === 0) {
-      acc.push(matches.slice(i, i + pageSize));
-    }
+    if (i % pageSize === 0) acc.push(matches.slice(i, i + pageSize));
     return acc;
   }, []);
-  const pageCount = pages.length;
 
   return (
-    <HorizontalSlider title="🌟 Your AI Matches" viewAllLink="/intern/matches" pageCount={pageCount}>
-      {loading && (
-        <div className="slider-page"><p>Finding your recommendations...</p></div>
-      )}
-      {!loading && matches.length === 0 && (
-          <div className="slider-page"><p>No matches found yet. <Link href="/intern/profile">Update your profile</Link> to get matches.</p></div>
-      )}
-      {pages.map((page, pageIndex) => (
-        <div className="slider-page" key={pageIndex}>
+    <HorizontalSlider 
+      title={<><Star size={20} className="card-title-icon"/> Recommended for You</>} 
+      viewAllLink="/intern/matches" 
+      pageCount={pages.length}
+    >
+      {!loading && matches.length === 0 && <div className="slider-page"><p>No matches found yet.</p></div>}
+      {pages.map((page, idx) => (
+        <div className="slider-page" key={idx}>
           {page.map(job => (
-            <div key={job.id} className="job-card">
-              <h3>{job.title}</h3>
-              <p className="job-location">{job.company}</p>
-              <span className="match-score">{(job.similarity * 100).toFixed(0)}% Match</span>
-              <button onClick={() => openModal(job)} className="btn-primary">
-                View Details
-              </button>
+            <div key={job.id} className="job-card" onClick={() => openModal(job)}>
+              <div>
+                <h3>{job.title}</h3>
+                <p className="job-location">{job.company}</p>
+                <span className="match-score">{(job.similarity * 100).toFixed(0)}% Match</span>
+              </div>
+              <button className="btn-primary">View Details</button>
             </div>
           ))}
-          {page.length < pageSize && Array.from({ length: pageSize - page.length }).map((_, i) => (
-            <div key={`fill-job-${i}`} className="app-card-empty" />
-          ))}
+           {page.length < pageSize && <div className="app-card-empty" />}
         </div>
       ))}
     </HorizontalSlider>
   );
 };
 
-// --- 5. Announcements (FIXED) ---
+// --- 5. Announcements (Updated to handle its own loading) ---
 const Announcements = () => {
-  // 3. ✅ INITIALIZED the client *inside* this component
   const supabase = createClientComponentClient();
-
   const [announcements, setAnnouncements] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchAnnouncements = async () => {
       try {
-        const { data: annData, error: annError } = await supabase
+        const { data } = await supabase
           .from('announcements')
           .select('*')
           .order('created_at', { ascending: false })
           .limit(5);
-        if (annError) throw annError;
-
-        // This N+1 query is slow. We fixed this in the server-side
-        // refactor, but for now this will at least *work*.
-        const { data: profiles, error: profilesError } = await supabase
-          .from('profiles')
-          .select('id, fullname');
-        if (profilesError) throw profilesError;
-
-        const combined = annData.map(a => ({
-          ...a,
-          created_by_profile: profiles.find(p => p.id === a.created_by),
-        }));
-
-        setAnnouncements(combined);
-      } catch (err) {
-        console.error("Error fetching announcements:", err.message);
-      } finally {
-        setLoading(false);
-      }
+        setAnnouncements(data || []);
+      } catch (err) { console.error(err); } 
+      finally { setLoading(false); }
     };
     fetchAnnouncements();
-  }, [supabase]); // 4. ✅ Added supabase dependency
+  }, [supabase]);
+
+  if (loading) {
+    return (
+      <section className="card dashboard-announcements skeleton-widget">
+        <SkeletonBox width="180px" height="26px" className="mb-3" />
+        <div className="announcement-list">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="announcement-card">
+              <SkeletonBox width="60px" height="60px" className="rounded-sm" />
+              <div className="announcement-content">
+                <SkeletonBox width="80%" height="18px" className="mb-1" />
+                <SkeletonBox width="95%" height="14px" className="mb-1" />
+                <SkeletonBox width="70%" height="14px" />
+              </div>
+            </div>
+          ))}
+        </div>
+        <SkeletonBox width="100px" height="16px" className="view-all-link-skeleton mt-3 ml-auto" />
+      </section>
+    );
+  }
 
   return (
     <section className="card dashboard-announcements">
-      <h2>📢 Announcements</h2>
-      {loading && <p>Loading announcements...</p>}
-      {!loading && announcements.length === 0 && <p>No announcements yet.</p>}
+      <h2><MessageSquare size={20} className="card-title-icon"/> Announcements</h2>
       <div className="announcement-list">
-        {announcements.map(ann => (
+        {announcements.length === 0 ? <p>No announcements.</p> : announcements.map(ann => (
           <div key={ann.id} className="announcement-card">
-            {ann.image_url && (
-              <img src={ann.image_url} alt={ann.title} className="announcement-image" />
-            )}
+            {ann.image_url && <img src={ann.image_url} alt={ann.title} className="announcement-image" />}
             <div className="announcement-content">
               <h3>{ann.title}</h3>
               <p>{ann.content}</p>
-              <small>
-                By {ann.created_by_profile?.fullname || 'Admin'} •{' '}
-                {new Date(ann.created_at).toLocaleDateString()}
-              </small>
+              <small>{new Date(ann.created_at).toLocaleDateString()}</small>
             </div>
           </div>
         ))}
       </div>
+      <Link href="/intern/announcements" className="view-all-link">View All <ChevronRight size={16}/></Link>
     </section>
   );
 };
 
-
-// --- 6. Sidebar Widget (No changes) ---
-const ProfileWidget = () => (
+// --- 6. Profile Widget (Updated to handle its own loading) ---
+const ProfileWidget = ({ loading }) => (
   <section className="card profile-card">
-    <h3>👤 Your Profile</h3>
-    <p>Keep your profile up-to-date to attract recruiters.</p>
-    <Link href="/intern/profile" className="btn-secondary">Manage Profile & Resume</Link>
+    <h3><User size={20} className="card-title-icon"/> Your Profile</h3>
+    {loading ? (
+      <>
+        <SkeletonBox width="80%" height="16px" className="mx-auto mb-5" />
+        <SkeletonBox width="120px" height="38px" className="mx-auto" />
+      </>
+    ) : (
+      <>
+        <p>Keep your profile up-to-date to attract recruiters.</p>
+        <Link href="/intern/profile" className="btn-secondary">
+          Manage Profile <ExternalLink size={16}/>
+        </Link>
+      </>
+    )}
   </section>
 );
 
-// --- 7. Main Dashboard Component (FIXED) ---
-export default function InternDashboard() {
-  // 3. ✅ INITIALIZED the client *inside* this component
-  const supabase = createClientComponentClient();
 
+// --- 7. Main Component ---
+export default function InternDashboard() {
+  const supabase = createClientComponentClient();
   const [user, setUser] = useState(null);
   const [userName, setUserName] = useState('');
   const [loading, setLoading] = useState(true);
   const [applications, setApplications] = useState([]);
-
   const [selectedJob, setSelectedJob] = useState(null);
   const [animateClose, setAnimateClose] = useState(false);
+  
+  const dateInfo = getCurrentDate();
 
-  // 4. ✅ Wrapped data-fetching functions in useCallback
   const fetchProfile = useCallback(async (userId) => {
-    const { data } = await supabase
-      .from('profiles')
-      .select('fullname')
-      .eq('id', userId)
-      .single();
+    const { data } = await supabase.from('profiles').select('fullname').eq('id', userId).single();
     setUserName(data?.fullname || '');
-  }, [supabase]); // 5. ✅ Added supabase dependency
+  }, [supabase]);
 
   const fetchApplications = useCallback(async (userId) => {
     try {
       const { data, error } = await supabase
         .from('job_applications')
         .select(`
-          id, created_at, status,
-          job_posts:job_posts!fk_job_applications_job ( title ),
+          id, 
+          created_at, 
+          status, 
+          job_posts:job_posts!fk_job_applications_job ( title ), 
           companies:companies!fk_job_applications_company ( name )
         `)
         .eq('intern_id', userId)
         .order('created_at', { ascending: false });
+
       if (error) throw error;
       setApplications(data || []);
+      
     } catch (err) {
-      console.error('Error fetching applications:', err.message);
+      console.error('Supabase Error fetching applications:', err.message);
     }
-  }, [supabase]); // 5. ✅ Added supabase dependency
+  }, [supabase]);
 
-  // 6. ✅ Main fetchUser effect, now with correct dependencies
   useEffect(() => {
-    const fetchUser = async () => {
-      // This 'supabase' variable is now the cookie-aware one
+    const init = async () => {
       const { data: { user: currentUser } } = await supabase.auth.getUser();
       if (currentUser) {
         setUser(currentUser);
-        await fetchProfile(currentUser.id);
-        await fetchApplications(currentUser.id);
+        // We handle loading at the dashboard level initially
+        await Promise.all([fetchProfile(currentUser.id), fetchApplications(currentUser.id)]);
       }
       setLoading(false);
     };
-    
-    fetchUser();
-  }, [supabase, fetchProfile, fetchApplications]); // 7. ✅ Added all dependencies
+    init();
+  }, [supabase, fetchProfile, fetchApplications]);
 
-
-  // --- Modal handlers (Wrapped in useCallback) ---
-  const closeModal = useCallback(() => {
+  const closeModal = () => {
     setAnimateClose(true);
     setTimeout(() => {
       setSelectedJob(null);
       setAnimateClose(false);
       document.body.classList.remove('modal-open');
     }, 300);
-  }, []); // This one has no dependencies
+  };
 
-  const openJobDetailModal = useCallback((jobData) => {
-    const fetchFullJob = async (job) => {
-      try {
-        const { data, error } = await supabase
-          .from('job_posts')
-          .select(`
-            *,
-            companies (name),
-            job_applications:job_applications!fk_job_applications_job (intern_id)
-          `)
-          .eq('id', job.id)
-          .single();
-        if (error) throw error;
+  const openJobDetailModal = async (job) => {
+    try {
+      const { data, error } = await supabase
+        .from('job_posts')
+        .select('*, companies (name)')
+        .eq('id', job.id)
+        .single();
         
-        const fullJobData = {
-          ...data,
-          company: data.companies ? data.companies.name : 'Unknown Company',
-          companies: undefined,
-          similarity: job.similarity
-        };
-        
-        setSelectedJob(fullJobData);
-        document.body.classList.add('modal-open');
+      if (error) throw error;
 
-      } catch (err) {
-        toast.error("Failed to load job details.");
-        console.error('Error fetching job details:', err.message);
-      }
-    };
-    fetchFullJob(jobData);
-  }, [supabase]); // 8. ✅ Added supabase dependency
+      setSelectedJob({
+        ...data,
+        company: data.companies?.name || 'Unknown',
+        similarity: job.similarity
+      });
+      document.body.classList.add('modal-open');
+    } catch (err) {
+      console.error("Error opening job:", err);
+      toast.error("Could not load details");
+    }
+  };
 
-  // --- Apply to Job Function (Wrapped in useCallback) ---
-  const applyToJob = useCallback(async (jobId, companyId) => {
-    if (!user) {
-      toast.error("Please login first.");
+  const applyToJob = async (jobId) => {
+    if (!user) return;
+    
+    const { data: profile } = await supabase.from('profiles').select('resume_url').eq('id', user.id).single();
+    if (!profile?.resume_url) {
+      toast.error("Please upload a resume first.");
       return;
     }
-    const { data: profile, error: profileError } = await supabase
-      .from("profiles")
-      .select("resume_url")
-      .eq("id", user.id)
-      .single();
-    if (profileError || !profile?.resume_url) {
-      toast.error("Please upload your resume in your profile before applying.");
-      return;
-    }
+
     const { error } = await supabase
-      .from("job_applications")
-      .insert([
-        {
-          job_id: jobId,
-          intern_id: user.id,
-          company_id: companyId,
-          resume_url: profile.resume_url,
-          status: "Pending",
-        },
-      ]);
-    if (error) {
-      if (error.code === "23505") {
-        toast("You already applied for this job.");
-      } else {
-        toast.error("Failed to apply. Try again.");
-      }
-      return;
-    }
-    
-    // After applying, refetch applications to update the UI
-    await fetchApplications(user.id);
-    
-    closeModal();
-    toast.success("Application submitted successfully!");
-  }, [supabase, user, closeModal, fetchApplications]); // 9. ✅ Added all dependencies
+      .from('job_applications')
+      .insert({
+        job_id: jobId,
+        intern_id: user.id,
+        company_id: selectedJob.company_id,
+        resume_url: profile.resume_url,
+        status: 'Pending'
+      });
 
+    if (error) {
+      if(error.code === "23505") toast.info("You already applied here.");
+      else toast.error("Failed to apply.");
+    } else {
+      toast.success("Applied successfully!");
+      fetchApplications(user.id);
+      closeModal();
+    }
+  };
 
   if (loading) {
     return (
       <>
         <Header />
         <div className="dashboard-container">
-          <div className="dashboard-loading">Loading Dashboard...</div>
+          {/* Welcome Banner Skeleton */}
+          <section className="welcome-banner skeleton-banner">
+            <div className="welcome-text">
+              <SkeletonBox width="250px" height="30px" className="mb-2" />
+              <SkeletonBox width="400px" height="20px" />
+            </div>
+            <div className="welcome-date">
+              <SkeletonBox width="80px" height="20px" className="mb-1 ml-auto" />
+              <SkeletonBox width="100px" height="24px" />
+            </div>
+          </section>
+
+          {/* Stats Grid Skeleton */}
+          <StatsSkeleton />
+
+          <div className="dashboard-grid">
+            <main className="dashboard-main">
+              {/* Application History Skeleton */}
+              <SliderSkeleton />
+              {/* Recommended Matches Skeleton (using the same slider skeleton) */}
+              <SliderSkeleton />
+            </main>
+
+            {/* Sidebar Skeletons */}
+            <WidgetSkeleton />
+          </div>
         </div>
         <InternNav />
       </>
     );
   }
 
+  // --- Normal Render State (Unchanged) ---
   return (
     <>
       <Header />
       <div className="dashboard-container">
-        <div className="dashboard-header">
-          <h1>Welcome Back, {userName.split(' ')[0] || 'Intern'}!</h1>
-          <p>Ready to manage your journey and find your next role?</p>
-        </div>
+        <section className="welcome-banner">
+          <div className="welcome-text">
+            <h1>Welcome Back, {userName.split(' ')[0] || 'Ace'}!</h1>
+            <p>Ready to manage your journey and find your next role?</p>
+          </div>
+          <div className="welcome-date">
+            <span className="date-day">{dateInfo.day}</span>
+            <span className="date-full">{dateInfo.dateStr}</span>
+          </div>
+        </section>
 
         <StatsSummary applications={applications} />
 
@@ -485,7 +589,7 @@ export default function InternDashboard() {
           </main>
 
           <aside className="dashboard-sidebar">
-            <ProfileWidget />
+            <ProfileWidget loading={false} /> {/* Explicitly set loading to false for Profile Widget */}
             <Announcements />
           </aside>
         </div>
@@ -493,95 +597,26 @@ export default function InternDashboard() {
       
       <InternNav className={selectedJob ? 'hidden' : ''} />
 
-      {/* --- Advanced Modal --- */}
       {selectedJob && (
-        <div
-          className={`modal-overlay active ${animateClose ? 'modal-closing-overlay' : ''}`}
-          onClick={closeModal}
-        >
-          <div
-            className={`modal-content ${animateClose ? 'modal-closing' : ''}`}
-            onClick={(e) => e.stopPropagation()}
-          >
+        <div className={`modal-overlay active ${animateClose ? 'modal-closing-overlay' : ''}`} onClick={closeModal}>
+          <div className={`modal-content ${animateClose ? 'modal-closing' : ''}`} onClick={e => e.stopPropagation()}>
             <div className="modal-header">
-              <h2>Job Details</h2>
-              {selectedJob.similarity && (
-                <span className="modal-match-score">
-                  {(selectedJob.similarity * 100).toFixed(0)}% Match
-                </span>
-              )}
+              <h2>{selectedJob.title}</h2>
               <button className="close-btn" onClick={closeModal}>×</button>
             </div>
-
             <div className="modal-body">
-              {/* ... modal content ... */}
               <div className="job-detail-group">
                 <h3 className="job-detail-title">{selectedJob.title}</h3>
-                <p className="job-detail-company">{selectedJob.company || 'Unknown Company'}</p>
+                <p className="job-detail-company">{selectedJob.company}</p>
               </div>
-
               <div className="job-detail-group">
-                <div className="job-detail-item">
-                  <span className="job-detail-label">Location</span>
-                  <span className="job-detail-value">{selectedJob.location}</span>
-                </div>
-                {selectedJob.work_setup && (
-                  <div className="job-detail-item">
-                    <span className="job-detail-label">Work Setup</span>
-                    <span className="job-detail-value">{selectedJob.work_setup}</span>
-                  </div>
-                )}
-                {selectedJob.work_schedule && (
-                  <div className="job-detail-item">
-                    <span className="job-detail-label">Work Schedule</span>
-                    <span className="job-detail-value">{selectedJob.work_schedule}</span>
-                  </div>
-                )}
-                {selectedJob.salary != null && (
-                  <div className="job-detail-item">
-                    <span className="job-detail-label">Salary</span>
-                    <span className="job-detail-value">{selectedJob.salary}</span>
-                  </div>
-                )}
+                 <span className="job-detail-label">Description</span>
+                 <p className="job-detail-description">{selectedJob.description}</p>
               </div>
-
-              <div className="job-detail-group">
-                <span className="job-detail-label">Description</span>
-                <p className="job-detail-description">{selectedJob.description}</p>
-              </div>
-
-              {selectedJob.responsibilities && selectedJob.responsibilities.length > 0 && (
-                <div className="job-detail-group">
-                  <span className="job-detail-label">Responsibilities</span>
-                  <ul className="job-detail-list">
-                    {selectedJob.responsibilities.map((item, index) => (
-                      <li key={index}>{item}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {selectedJob.requirements && selectedJob.requirements.length > 0 && (
-                <div className="job-detail-group">
-                  <span className="job-detail-label">Requirements</span>
-                  <ul className="job-detail-list">
-                    {selectedJob.requirements.map((item, index) => (
-                      <li key={index}>{item}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
             </div>
-
             <div className="modal-footer">
               <button className="secondary-btn" onClick={closeModal}>Close</button>
-              <button
-                className="primary-btn"
-                onClick={() => applyToJob(selectedJob.id, selectedJob.company_id)}
-                disabled={selectedJob.job_applications?.some(app => app.intern_id === user?.id)}
-              >
-                {selectedJob.job_applications?.some(app => app.intern_id === user?.id) ? "Applied ✔️" : "Apply Now"}
-              </button>
+              <button className="primary-btn" onClick={() => applyToJob(selectedJob.id)}>Apply Now</button>
             </div>
           </div>
         </div>

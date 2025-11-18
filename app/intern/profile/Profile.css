@@ -7,6 +7,9 @@
     --background-light: #f2f2f7; /* iOS-style light grey */
     --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     --primary-dark: #333;
+    /* NEW: Skeleton and iOS/Mac Theme Colors */
+    --skeleton-light: #e5e5ea; 
+    --skeleton-dark: #d4d4d8;
 }
 
 /* --- Layout & Structure --- */
@@ -19,7 +22,7 @@
 
 .profile-content-area {
     display: grid;
-    grid-template-columns: 2fr 1fr; /* 66% / 33% split */
+    grid-template-columns: 2fr 1fr; /* 66% / 33% split (Bento-lite) */
     align-items: flex-start;
     max-width: 1400px;
     margin: 40px auto; 
@@ -32,6 +35,8 @@
     font-weight: 800;
     color: var(--primary-dark);
     margin-bottom: 30px;
+    display: flex; /* Added for Lucide icon alignment */
+    align-items: center; 
 }
 
 .editor-main-form {
@@ -41,7 +46,7 @@
     gap: 20px; /* Space between main card and save bar */
 }
 
-/* Modern Card Style */
+/* Modern Card Style (Bento Box Aesthetic) */
 .profile-card {
     background: #fff;
     padding: 30px;
@@ -78,6 +83,9 @@
     margin-bottom: 8px;
     color: #555;
     font-size: 0.95em;
+    display: flex; /* For Lucide icon alignment */
+    align-items: center;
+    gap: 5px;
 }
 
 .form-group input,
@@ -99,6 +107,7 @@
 }
 
 .form-group select {
+    /* Using SVG dropdown icon for a modern look */
     background-image: url('data:image/svg+xml;utf8,<svg fill="black" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
     background-repeat: no-repeat;
     background-position: right 14px center;
@@ -146,7 +155,9 @@
     border: none;
     text-align: center;
     text-decoration: none;
-    display: inline-block;
+    display: inline-flex; /* Changed to flex for icon alignment */
+    align-items: center;
+    justify-content: center;
     font-size: 0.95em;
 }
 
@@ -176,21 +187,44 @@
 }
 
 .btn-danger {
-  padding: 12px 22px;
-  border-radius: 10px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.3s, transform 0.1s;
-  text-align: center;
-  background-color: #f44336;
-  color: white;
-  border: none;
+    padding: 12px 22px;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.1s;
+    text-align: center;
+    background-color: #f44336;
+    color: white;
+    border: none;
+    display: inline-flex; /* Added for icon alignment */
+    align-items: center;
+    justify-content: center;
 }
 
 .btn-danger:hover:not(:disabled) {
-  background-color: #d32f2f;
-  transform: translateY(-1px);
+    background-color: #d32f2f;
+    transform: translateY(-1px);
 }
+
+/* --- Icon-Only Button for Education/Array Management --- */
+.btn-icon-danger {
+    background: none;
+    border: none;
+    color: #f44336;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    align-self: center; /* Center it in the grid column */
+    transition: color 0.2s, transform 0.1s;
+    height: 100%; 
+}
+.btn-icon-danger:hover {
+    color: #d32f2f;
+    transform: scale(1.1);
+}
+
 
 .file-upload-label {
     display: block;
@@ -257,8 +291,9 @@
     margin-bottom: 15px;
 }
 .education-item-grid {
+    /* Updated for the 4th column for the delete icon */
     display: grid;
-    grid-template-columns: 2fr 2fr 1fr;
+    grid-template-columns: 2fr 2fr 1fr auto; 
     gap: 15px;
     padding-bottom: 15px;
     border-bottom: 1px dashed #eee;
@@ -309,6 +344,8 @@
     line-height: 1;
     transition: color 0.2s;
     padding: 0 2px;
+    display: flex; /* For Lucide icon removal */
+    align-items: center;
 }
 .remove-skill:hover {
     color: var(--primary-orange);
@@ -378,7 +415,9 @@
     text-align: center;
     font-size: 0.95em;
     text-decoration: none;
-    display: block;
+    display: flex; /* Changed to flex for icon alignment */
+    align-items: center;
+    justify-content: center;
     /* --- Layout fixes --- */
     width: 100%;
     margin-bottom: 10px;
@@ -392,9 +431,7 @@
 
 
 /* ========================================
-FIX: THE SIDEBAR STRUCTURE
-The sidebar is now an INVISIBLE container, and the
-items inside it are now the cards.
+FIX: THE SIDEBAR STRUCTURE (Bento Stack)
 ========================================
 */
 .resume-upload-sidebar { 
@@ -406,9 +443,6 @@ items inside it are now the cards.
     flex-direction: column;
     gap: 20px; /* This is the space BETWEEN the sidebar cards */
 }
-
-/* The sections inside the sidebar are now styled by the */
-/* default .profile-card rule, which is what we want. */
 
 .resume-upload-sidebar .section-account-actions {
     /* This rule adds a border-top to the *last* card */
@@ -434,6 +468,8 @@ items inside it are now the cards.
     margin: 0;
     font-weight: 600;
     color: var(--primary-dark);
+    display: flex;
+    align-items: center;
 }
 .file-actions {
     display: flex;
@@ -452,7 +488,7 @@ items inside it are now the cards.
     margin-top: 10px;
 }
 
-/* --- Alerts (No longer used, but fine) --- */
+/* --- Alerts --- */
 .alert-message {
     padding: 12px 20px;
     border-radius: 8px;
@@ -526,9 +562,120 @@ items inside it are now the cards.
 
 /* --- Account Actions --- */
 .logout-btn {
-  width: 100%;
-  font-size: 1em;
+    width: 100%;
+    font-size: 1em;
 }
+
+
+/* ========================================
+## SKELETON LOADING STYLES
+========================================
+*/
+/* The animation */
+@keyframes shimmer {
+    0% { background-position: -468px 0; }
+    100% { background-position: 468px 0; }
+}
+
+.is-loading .profile-card,
+.is-loading .submit-action-bar,
+.is-loading .education-item-grid {
+    pointer-events: none; /* Disable interaction */
+    user-select: none;
+    background: #f7f7f7 !important;
+}
+
+/* Base Skeleton Class */
+.skeleton-line,
+.skeleton-input,
+.skeleton-button,
+.page-title-skeleton,
+.skeleton-avatar-placeholder {
+    background-color: var(--skeleton-light);
+    background-image: linear-gradient(to right, var(--skeleton-light) 0%, var(--skeleton-dark) 20%, var(--skeleton-light) 40%, var(--skeleton-light) 100%);
+    background-repeat: no-repeat;
+    background-size: 800px 104px; 
+    animation-duration: 1.5s;
+    animation-fill-mode: forwards;
+    animation-iteration-count: infinite;
+    animation-name: shimmer;
+    border-radius: 8px; /* Softer, iOS-style corners */
+}
+
+/* Specific Element Sizes */
+.page-title-skeleton {
+    height: 35px;
+    width: 60%;
+    margin-bottom: 30px;
+}
+
+.skeleton-profile-card .section-title {
+    visibility: hidden; /* Hide the actual title */
+}
+.skeleton-profile-card .skeleton-line.full {
+    height: 25px;
+    width: 90%;
+    margin-bottom: 25px;
+}
+.skeleton-avatar-placeholder {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: none !important;
+}
+
+.profile-header-info-col .skeleton-line.short {
+    height: 15px;
+    width: 30%;
+    margin-bottom: 10px;
+}
+.skeleton-input {
+    height: 48px;
+    width: 100%;
+    margin-bottom: 20px;
+}
+.skeleton-line.half {
+    height: 18px;
+    width: 50%;
+}
+.skeleton-line.small {
+    height: 12px;
+    width: 30%;
+}
+.mt-3 {
+    margin-top: 15px;
+}
+
+/* Submit Bar Skeleton */
+.skeleton-submit-bar {
+    justify-content: space-between;
+    display: flex;
+    align-items: center;
+}
+.skeleton-submit-bar .skeleton-line {
+    height: 15px;
+    width: 25%;
+}
+.skeleton-button {
+    height: 44px;
+    width: 200px;
+    border-radius: 10px;
+}
+
+/* Sidebar Skeletons */
+.resume-upload-sidebar .skeleton-card {
+    padding: 30px;
+}
+
+/* General Icon Spin for saving state */
+.spin-icon {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
 
 /*
 ========================================
@@ -538,29 +685,30 @@ items inside it are now the cards.
 @media (max-width: 1000px) {
     .profile-wrapper {
         padding-top: 80px; 
-        padding-bottom: 80px;
+        padding-bottom: 1600px;
     }
     
     .profile-content-area {
         grid-template-columns: 1fr; /* Stack main and sidebar */
         padding: 0 15px;
         gap: 25px;
+            margin-top: 0px;
+
+    }
+
+    .page-title {
+        font-size: 1.5rem;
+        margin-top: 0px;
+        margin-bottom: 0px;
+        text-align: center;
     }
 
     .resume-upload-sidebar { 
         position: static;
         max-height: none;
-        /* The tablet stacking bug fix is still here (no 'order: -1') */
-        /* And now we remove the card styles from the container */
         background: none;
         padding: 0;
         box-shadow: none;
-    }
-    
-    .page-title {
-        font-size: 2em;
-        text-align: center;
-        margin-top: 10px;
     }
 
     .form-grid-3 {
@@ -569,19 +717,42 @@ items inside it are now the cards.
     }
 
     .education-item-grid {
+        /* When stacked, only one column for inputs, delete icon is absolute */
         grid-template-columns: 1fr;
         gap: 10px;
         padding: 15px;
         background-color: #fcfcfc;
         border: 1px solid #eee;
         border-radius: 8px;
+        position: relative; /* Context for absolute delete button */
     }
 
+    .education-item-grid .btn-icon-danger {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        height: auto;
+        width: auto;
+    }
+
+    /* Fixed Save Bar on Mobile (Enhanced) */
     .submit-action-bar {
         flex-direction: column;
         gap: 15px;
         padding: 20px 15px;
-        margin-bottom: 20px;
+        margin-bottom: 0; /* Remove margin since it's fixed */
+        
+        position: fixed; 
+        bottom: 70px;
+        left: 0;
+        right: 0;
+        z-index: 50; 
+        border-radius: 0; 
+        box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1); 
+    }
+    
+    .profile-wrapper {
+        padding-bottom: 120px; /* Space for the fixed bottom bar + InternNav */
     }
     
     .submit-action-bar .save-button {
@@ -601,15 +772,24 @@ items inside it are now the cards.
     
     .profile-pic-controls {
         align-items: center;
-        width: 100%; /* This is the fix from last time */
+        width: 100%; 
         margin-bottom: 10px;
     }
-    
     
     /* Stack header grid on mobile */
     .profile-header-grid {
         grid-template-columns: 1fr;
         gap: 25px;
+    }
+
+    /* Skeleton Mobile Fixes */
+    .skeleton-submit-bar {
+        flex-direction: row;
+        padding: 15px;
+    }
+    .skeleton-button {
+        width: 150px;
+        height: 40px;
     }
 }
 
@@ -619,9 +799,18 @@ items inside it are now the cards.
 ========================================
 */
 @media (max-width: 500px) {
-    .profile-card { /* Simplified this rule */
+    .profile-card { 
         padding: 20px;
         border-radius: 12px;
+    }
+
+    .profile-content-area {
+        margin-top: 0px;
+    }
+    .page-title {
+        font-size: 1.5rem;
+        margin-top: 0px;
+        margin-bottom: 0px;
     }
     
     .section-title {

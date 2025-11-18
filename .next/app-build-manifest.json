@@ -1,28 +1,10 @@
 {
   "pages": {
-    "/page": [
+    "/company/jobs/new/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/css/css-app_LandingPage_css.css",
-      "static/chunks/app/page.js"
-    ],
-    "/layout": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/css/css-app_company_applicants_applicants_css-app_company_dashboard_CompanyDashboard_css-app_comp-02ee5e.css",
-      "static/chunks/app/layout.js"
-    ],
-    "/auth/companyAuthPage/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/css/css-app_components_AuthPage_module_css.css",
-      "static/chunks/app/auth/companyAuthPage/page.js"
-    ],
-    "/company/dashboard/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/css/css-app_company_applicants_applicants_css-app_company_dashboard_CompanyDashboard_css-app_comp-02ee5e.css",
-      "static/chunks/app/company/dashboard/page.js"
+      "static/css/css-app_company_applicants_applicants_css-app_company_jobs_new_NewJobPost_css-app_components_-e46c5c.css",
+      "static/chunks/app/company/jobs/new/page.js"
     ],
     "/company/layout": [
       "static/chunks/webpack.js",
@@ -30,49 +12,64 @@
       "static/css/css-app_components_CompanyNav_css.css",
       "static/chunks/app/company/layout.js"
     ],
-    "/company/jobs/new/page": [
+    "/layout": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/css/css-app_company_jobs_new_NewJobPost_css.css",
-      "static/css/css-app_company_applicants_applicants_css-app_company_dashboard_CompanyDashboard_css-app_comp-02ee5e.css",
-      "static/chunks/app/company/jobs/new/page.js"
+      "static/css/css-app_company_applicants_applicants_css-app_company_jobs_new_NewJobPost_css-app_components_-e46c5c.css",
+      "static/chunks/app/layout.js"
     ],
-    "/coordinator/approvals/page": [
+    "/company/dashboard/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/css/css-app_components_CoordinatorSidebar_css-app_coordinator_approvals_approvals_css-app_coordin-953360.css",
-      "static/chunks/app/coordinator/approvals/page.js"
+      "static/css/css-app_company_dashboard_CompanyDashboard_css.css",
+      "static/css/css-app_company_applicants_applicants_css-app_company_jobs_new_NewJobPost_css-app_components_-e46c5c.css",
+      "static/chunks/app/company/dashboard/page.js"
     ],
     "/company/jobs/listings/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/css/css-app_company_jobs_listings_listings_css.css",
+      "static/css/css-app_company_applicants_applicants_css-app_company_jobs_new_NewJobPost_css-app_components_-e46c5c.css",
       "static/chunks/app/company/jobs/listings/page.js"
+    ],
+    "/company/applicants/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/css-app_company_applicants_applicants_css-app_company_jobs_new_NewJobPost_css-app_components_-e46c5c.css",
+      "static/chunks/app/company/applicants/page.js"
+    ],
+    "/company/profile/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/css-app_company_profile_profile_css.css",
+      "static/chunks/app/company/profile/page.js"
+    ],
+    "/company/messages/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/css-app_company_messages_messages_css.css",
+      "static/chunks/app/company/messages/page.js"
+    ],
+    "/intern/dashboard/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/css-app_intern_dashboard_Dashboard_css.css",
+      "static/css/css-app_company_applicants_applicants_css-app_company_jobs_new_NewJobPost_css-app_components_-e46c5c.css",
+      "static/chunks/app/intern/dashboard/page.js"
     ],
     "/intern/listings/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/css/css-app_intern_listings_Listings_css.css",
-      "static/css/css-app_company_applicants_applicants_css-app_company_dashboard_CompanyDashboard_css-app_comp-02ee5e.css",
+      "static/css/css-app_company_applicants_applicants_css-app_company_jobs_new_NewJobPost_css-app_components_-e46c5c.css",
       "static/chunks/app/intern/listings/page.js"
     ],
-    "/company/applicants/page": [
+    "/intern/profile/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/css/css-app_company_applicants_applicants_css-app_company_dashboard_CompanyDashboard_css-app_comp-02ee5e.css",
-      "static/chunks/app/company/applicants/page.js"
-    ],
-    "/coordinator/companies/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/css/css-app_components_CoordinatorSidebar_css-app_coordinator_approvals_approvals_css-app_coordin-953360.css",
-      "static/chunks/app/coordinator/companies/page.js"
-    ],
-    "/coordinator/internships/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/css/css-app_components_CoordinatorSidebar_css-app_coordinator_approvals_approvals_css-app_coordin-953360.css",
-      "static/chunks/app/coordinator/internships/page.js"
+      "static/css/css-app_intern_profile_Profile_css.css",
+      "static/css/css-app_company_applicants_applicants_css-app_company_jobs_new_NewJobPost_css-app_components_-e46c5c.css",
+      "static/chunks/app/intern/profile/page.js"
     ],
     "/auth/internAuthPage/page": [
       "static/chunks/webpack.js",
@@ -80,17 +77,17 @@
       "static/css/css-app_components_AuthPage_module_css.css",
       "static/chunks/app/auth/internAuthPage/page.js"
     ],
-    "/intern/dashboard/page": [
+    "/intern/history/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/css/css-app_intern_dashboard_Dashboard_css.css",
-      "static/css/css-app_company_applicants_applicants_css-app_company_dashboard_CompanyDashboard_css-app_comp-02ee5e.css",
-      "static/chunks/app/intern/dashboard/page.js"
+      "static/css/css-app_intern_history_ApplicationHistory_css.css",
+      "static/css/css-app_company_applicants_applicants_css-app_company_jobs_new_NewJobPost_css-app_components_-e46c5c.css",
+      "static/chunks/app/intern/history/page.js"
     ],
     "/intern/companies/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/css/css-app_company_applicants_applicants_css-app_company_dashboard_CompanyDashboard_css-app_comp-02ee5e.css",
+      "static/css/css-app_company_applicants_applicants_css-app_company_jobs_new_NewJobPost_css-app_components_-e46c5c.css",
       "static/chunks/app/intern/companies/page.js"
     ]
   }

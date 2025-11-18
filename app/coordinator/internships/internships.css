@@ -1,146 +1,125 @@
+/* --- Global Styles & Layout --- */
 .coordinator-page {
-  display: flex;
-  min-height: 100vh; /* Make full height */
-  background-color: #f5f5f5;
+    display: flex;
+    min-height: 100vh;
+    background-color: #f5f7fa; /* Light background for dashboard */
+    font-family: 'Poppins', sans-serif;
 }
 
 .placements-content {
-  flex: 1;              /* Take remaining space next to sidebar */
-  padding: 2rem;
-  display: flex;
-  flex-direction: column; /* Stack header + cards vertically */
+    flex: 1; 
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
 }
 
 
 /* --- Page Header --- */
 .header-section {
-  margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
 }
 
 .header-section h2 {
-  font-size: 1.8rem;
-  font-weight: 600;
-  color: #333;
-  margin: 0;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #344767; /* Dark text color */
+    margin: 0;
 }
 
 /* --- Placements Grid --- */
 .placements-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1.5rem;
- 
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 2rem;
+  
 }
 
 /* --- Individual Placement Card --- */
 .placement-card {
-  background-color: #fff;
-  border-radius: 12px;
-  padding: 1.5rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  border: 1px solid #e0e0e0;
-  transition: all 0.3s ease;
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    border-top: 5px solid #3498db; /* Primary color accent */
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
 }
 
 .placement-card:hover {
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
-  transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    transform: translateY(-3px);
 }
 
-.placement-card h3 {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #111;
-  margin-bottom: 0.5rem;
+.placement-card .intern-name {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #111;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
 }
 
 .placement-card p {
-  font-size: 0.95rem;
-  color: #555;
-  margin-bottom: 0.25rem;
-  line-height: 1.5;
+    font-size: 0.95rem;
+    color: #555;
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
 }
 
 .placement-card p strong {
-  color: #333;
-  font-weight: 500;
+    color: #333;
+    font-weight: 600;
+}
+
+.card-separator {
+    border: 0;
+    height: 1px;
+    background: #e0e0e0;
+    margin: 1rem 0;
 }
 
 /* --- Status Badge --- */
-.placement-card .status {
-  font-weight: 600;
-  color: #e67e22; /* Orange */
-  margin-top: 0.75rem;
-  padding: 0.25rem 0.5rem;
-  background-color: #fdf3e8;
-  border-radius: 6px;
-  display: inline-block;
+.status-badge {
+    font-weight: 600;
+    color: #ffffff;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    display: inline-block;
+    margin-top: 1rem;
+    align-self: flex-start; /* Keeps the badge tidy */
+    text-transform: capitalize;
+    font-size: 0.9rem;
 }
 
-/* --- Action Buttons Container --- */
-.action-buttons {
-  margin-top: 1.25rem;
-  display: flex;
-  gap: 0.75rem;
-}
-
-/* --- Generic Button Styles --- */
-.action-buttons button {
-  flex: 1;
-  padding: 0.6rem 1rem;
-  font-size: 0.9rem;
-  font-weight: 600;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  text-align: center;
-}
-
-/* --- Approve Button (Green) --- */
-.action-buttons .approve-btn {
-  background-color: #27ae60;
-  color: white;
-}
-
-.action-buttons .approve-btn:hover {
-  background-color: #2ecc71;
-}
-
-/* --- Reject Button (Red) --- */
-.action-buttons .reject-btn {
-  background-color: #c0392b;
-  color: white;
-}
-
-.action-buttons .reject-btn:hover {
-  background-color: #e74c3c;
+/* Specific Status Styling (Active/Approved) */
+.approved_by_coordinator {
+    background-color: #3498db; /* Blue for Active/Approved */
+    box-shadow: 0 2px 4px rgba(52, 152, 219, 0.4);
 }
 
 /* --- Empty State Text --- */
-.placements-content p {
-  font-size: 1rem;
-  color: #777;
-  margin: 1rem 0;
+.empty-state-text {
+    font-size: 1.1rem;
+    color: #777;
+    margin: 3rem 0;
+    text-align: center;
+    padding: 20px;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
 /* --- Responsive Adjustments --- */
 @media (max-width: 768px) {
-  .placements-list {
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  }
-
-  .placement-card {
-    padding: 1.2rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .placement-card h3 {
-    font-size: 1.1rem;
-  }
-
-  .placement-card p {
-    font-size: 0.9rem;
-  }
+    .placements-list {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    }
+    .placements-content {
+        padding: 1rem;
+    }
 }

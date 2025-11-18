@@ -1,19 +1,25 @@
+/* --- Variables & Core Layout --- */
+:root {
+  --primary-color: #007bff; /* Corporate Blue */
+  --secondary-color: #6c757d; /* Muted Grey */
+  --header-bg: #344767; /* Dark Grey/Blue for sidebar/dashboard element */
+  --success-color: #28a745;
+  --danger-color: #dc3545;
+  --bg-light: #f5f7fa; /* Light background */
+  --card-bg: #ffffff;
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --border-radius-lg: 10px;
+}
+
 /* ---- Root Layout ---- */
 .dashboard-root {
   display: flex;
   min-height: 100vh;
-  background-color: #f4f6f8;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--bg-light);
+  font-family: 'Poppins', sans-serif;
 }
 
-/* ---- Sidebar ---- */
-.dashboard-root .coordinator-sidebar {
-  width: 250px;
-  background-color: #1f2937;
-  color: #fff;
-  padding-top: 20px;
-  flex-shrink: 0;
-}
+/* NOTE: Assuming CoordinatorSidebar styles are defined externally. */
 
 /* ---- Main Content ---- */
 .dashboard-main {
@@ -22,134 +28,162 @@
 }
 
 .dash-title {
-  font-size: 28px;
-  font-weight: 600;
+  font-size: 2rem;
+  font-weight: 700;
   margin-bottom: 5px;
-  color: #111827;
+  color: var(--header-bg);
 }
 
 .dash-subtitle {
-  font-size: 16px;
-  color: #6b7280;
-  margin-bottom: 20px;
+  font-size: 1rem;
+  color: var(--secondary-color);
+  margin-bottom: 25px;
 }
 
-/* ---- Table ---- */
+/* -------------------------------------- */
+/* ---- Applications Table Section ---- */
+/* -------------------------------------- */
 .applications-table {
   overflow-x: auto;
-  background-color: #fff;
-  padding: 15px;
-  border-radius: 10px;
-  box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.05);
+  background-color: var(--card-bg);
+  padding: 20px;
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-md);
 }
 
 .applications-table table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate; /* Allows for rounded corners */
+  border-spacing: 0;
+  overflow: hidden; /* Ensures borders/shadows don't leak */
 }
 
 .applications-table th,
 .applications-table td {
-  padding: 12px 15px;
+  padding: 15px 18px;
   text-align: left;
-  color: black;
+  color: #344767; /* Dark text for readability */
+  font-size: 0.95rem;
 }
 
 .applications-table th {
-  background-color: #e5e7eb;
-  color: #374151;
+  background-color: var(--header-bg); /* Dark header background */
+  color: white;
   font-weight: 600;
-  border-bottom: 2px solid #d1d5db;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+}
+
+/* Rounded corners for the table header */
+.applications-table thead tr:first-child th:first-child {
+    border-top-left-radius: var(--border-radius-lg);
+}
+.applications-table thead tr:first-child th:last-child {
+    border-top-right-radius: var(--border-radius-lg);
 }
 
 .applications-table tbody tr {
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e9ecef;
   transition: background-color 0.2s ease;
 }
 
 .applications-table tbody tr:hover {
-  background-color: #f9fafb;
+  background-color: #f1f4f8;
 }
 
-.applications-table a {
-  color: #3b82f6;
-  text-decoration: none;
+/* Remove bottom border from the last row */
+.applications-table tbody tr:last-child {
+    border-bottom: none;
 }
 
-.applications-table a:hover {
-  text-decoration: underline;
-}
 
-/* ---- Loading State ---- */
-.dash-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 70vh;
-  font-size: 18px;
-  color: #6b7280;
-}
-
-/* --- ADDED STYLES FOR BUTTONS --- */
-
-/* Style for the 'View' resume link to look like a button */
+/* ---- Resume Link Button ---- */
 .resume-link-btn {
-  color: black;
+  /* This style is for the link in the table cell */
+  color: white;
   display: inline-block;
   padding: 6px 12px;
-  font-size: 0.875rem;
+  font-size: 0.85rem;
   font-weight: 500;
-  background-color: #007aff; /* Blue */
+  background-color: var(--primary-color);
   border: none;
-  border-radius: 8px;
+  border-radius: 6px;
   text-decoration: none;
   text-align: center;
-  transition: background-color 0.2s;
-  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
 }
 
 .resume-link-btn:hover {
   background-color: #0056b3;
-  text-decoration: none; /* Override default link hover */
-}
-
-/* Container for the action buttons */
-.action-cell {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-
-/* Base style for action buttons */
-.action-btn {
-  padding: 6px 12px;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.2s, transform 0.1s;
-}
-
-.action-btn:hover {
+  text-decoration: none;
   transform: translateY(-1px);
 }
 
-/* Approve button specific styles */
+/* ---- Action Buttons (Approve/Reject) ---- */
+.action-cell {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.action-btn {
+  padding: 8px 14px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow on buttons */
+}
+
+.action-btn:hover {
+  transform: translateY(0); /* Removed the translateY on hover for a cleaner look */
+  opacity: 0.9;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
 .approve-btn {
-  background-color: #34c759; /* Green */
+  background-color: var(--success-color); /* Green */
 }
 
 .approve-btn:hover {
-  background-color: #28a745;
+  background-color: #1e7e34;
 }
 
-/* Reject button specific styles */
 .reject-btn {
-  background-color: #ff3b30; /* Red */
+  background-color: var(--danger-color); /* Red */
 }
 
 .reject-btn:hover {
-  background-color: #dc3545;
+  background-color: #bd2130;
+}
+
+
+/* ---- Responsive Adjustments ---- */
+@media (max-width: 992px) {
+    .applications-table {
+        padding: 10px;
+    }
+    .applications-table th,
+    .applications-table td {
+        padding: 10px 8px;
+        font-size: 0.85rem;
+    }
+    .action-cell {
+        flex-direction: column;
+        gap: 5px;
+    }
+    .action-btn {
+        width: 100%;
+        padding: 6px;
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-main {
+        padding: 20px 15px;
+    }
 }

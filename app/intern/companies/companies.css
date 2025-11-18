@@ -435,3 +435,52 @@ body.modal-open {
   }
 }
 
+.jobs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.job-card {
+  width: 100%;
+}
+
+.submit-review {
+  margin-top: 15px;
+}
+
+.submit-review textarea {
+  width: 100%;
+  min-height: 80px;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  margin-bottom: 8px;
+}
+
+.submit-review div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.submit-review select {
+  padding: 5px 10px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+}
+
+.submit-review button {
+  padding: 6px 15px;
+  background: var(--primary-color);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.submit-review button:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
+

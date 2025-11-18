@@ -1,186 +1,222 @@
+/* ----- Layout ----- */
 .coordinator-page {
   display: flex;
   min-height: 100vh;
+  background: #f3f4f6;
 }
 
-/* Main content */
+/* Main container */
 .announcement-page {
   flex: 1;
-  padding: 30px;
-  background-color: #f8f9fa;
+  padding: 30px 40px;
   font-family: "Inter", sans-serif;
-  color: #000; /* ✅ Make all text black by default */
+  color: #111827;
 }
 
-/* Header */
+/* ----- Header ----- */
 .announcement-header {
-  background-color: #fff;
-  padding: 20px 25px;
-  border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-  margin-bottom: 30px;
-  color: #000;
+  background: #ffffff;
+  padding: 25px 30px;
+  border-radius: 16px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.05);
+  margin-bottom: 35px;
 }
 
 .announcement-header h1 {
-  font-size: 26px;
+  font-size: 28px;
   font-weight: 700;
-  margin: 0;
-  color: #000;
+  letter-spacing: -0.5px;
 }
 
-.announcement-header p {
-  margin: 5px 0 0;
-  color: #000;
-  font-size: 14px;
-}
-
-/* Layout */
+/* ----- Layout: left & right ----- */
 .announcement-content {
   display: flex;
   gap: 40px;
   align-items: flex-start;
 }
 
-/* Left Section */
+/* ----- LEFT: Announcement List ----- */
 .latest-updates {
   flex: 2;
-  color: #000;
 }
 
 .latest-updates h2 {
-  font-size: 20px;
+  font-size: 22px;
+  font-weight: 700;
   margin-bottom: 15px;
-  color: #000;
 }
 
 .announcement-list {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 20px;
+  overflow-y: auto;
+  max-height: calc(100vh - 220px);
+  padding-right: 10px;
 }
 
+/* Announcement Card */
 .announcement-item {
-  background-color: #fff;
-  padding: 15px 20px;
-  border-radius: 10px;
-  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
-  color: #000;
+  background: #ffffff;
+  padding: 18px 22px;
+  border-radius: 14px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
-.announcement-item h3 {
-  margin: 10px 0 8px;
-  font-size: 18px;
-  color: #000;
+.announcement-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
 }
 
-.announcement-item p {
-  margin: 0 0 10px;
-  color: #000;
-}
-
-.announcement-item .date {
-  font-size: 13px;
-  color: #000;
-}
-
-/* Announcement image */
+/* Image */
 .announcement-img {
   width: 100%;
-  max-height: 220px;
+  height: 100%;
   object-fit: cover;
-  border-radius: 10px;
+  border-radius: 12px;
+  margin-bottom: 15px;
 }
 
-/* Right Section */
+/* Title */
+.announcement-item h3 {
+  font-size: 20px;
+  margin-bottom: 6px;
+  font-weight: 700;
+}
+
+/* Content */
+.announcement-item p {
+  font-size: 15px;
+  margin-bottom: 10px;
+  color: #374151;
+}
+
+/* Date */
+.announcement-item .date {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+/* Buttons */
+.announcement-actions {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+}
+
+.announcement-actions button {
+  background-color: #4f46e5;
+  border: none;
+  padding: 7px 16px;
+  font-size: 14px;
+  color: #fff;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.announcement-actions button:hover {
+  background-color: #3b35bd;
+}
+
+.announcement-actions .delete-btn {
+  background-color: #e11d48;
+}
+
+.announcement-actions .delete-btn:hover {
+  background-color: #be123c;
+}
+
+/* ----- RIGHT: Create Form ----- */
 .create-announcement {
-  flex: 1;
-  background-color: #fff;
-  padding: 20px 25px;
-  border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  color: #000;
+  flex: 1.2;
+  background: #ffffff;
+  padding: 25px 28px;
+  border-radius: 16px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+  position: sticky;
+  top: 40px;
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
 }
 
+.create-announcement::-webkit-scrollbar {
+  width: 6px;
+}
+
+.create-announcement::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+
+/* Form Title */
 .create-announcement h2 {
   font-size: 20px;
   font-weight: 700;
   margin-bottom: 15px;
-  color: #000;
+  color: #1f2937;
 }
 
+/* Labels */
 .create-announcement label {
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
+  margin-top: 12px;
   display: block;
-  margin-top: 10px;
-  margin-bottom: 5px;
-  color: #000;
+  color: #374151;
 }
 
+/* Inputs */
 .create-announcement input,
 .create-announcement textarea {
   width: 100%;
-  border: 1px solid #dee2e6;
-  border-radius: 8px;
-  padding: 10px;
+  padding: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  margin-top: 6px;
   font-size: 14px;
-  resize: none;
-  outline: none;
-  color: #000;
+  transition: border-color 0.2s ease;
+  background: #f9fafb;
 }
 
-.create-announcement textarea {
-  height: 120px;
+.create-announcement input:focus,
+.create-announcement textarea:focus {
+  border-color: #6366f1;
+  background: #fff;
 }
 
+/* Button */
 .create-announcement button {
-  margin-top: 15px;
   width: 100%;
-  background-color: #4f46e5;
-  border: none;
-  border-radius: 8px;
-  padding: 10px;
-  font-size: 15px;
+  background: #4f46e5;
+  color: #ffffff;
+  padding: 12px;
   font-weight: 600;
+  margin-top: 18px;
+  border: none;
+  border-radius: 10px;
   cursor: pointer;
-  transition: background-color 0.3s;
-  color: white;
+  transition: background 0.25s ease;
 }
 
 .create-announcement button:hover {
-  background-color: #3b35c2;
+  background: #3c37c5;
 }
 
+/* Cancel Button */
+.cancel-btn {
+  background: #9ca3af !important;
+}
+
+.cancel-btn:hover {
+  background: #6b7280 !important;
+}
+
+/* Empty State */
 .no-announcement {
-  color: #000;
+  color: #6b7280;
   font-size: 15px;
-}
-/* Edit and Delete Buttons */
-.announcement-actions {
   margin-top: 10px;
-}
-
-.announcement-actions button {
-  background-color: #3498db; /* Edit button color */
-  color: white;
-  border: none;
-  padding: 5px 12px;
-  margin-right: 8px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 0.85rem;
-  transition: background-color 0.2s;
-}
-
-.announcement-actions button:hover {
-  background-color: #2980b9;
-}
-
-.announcement-actions button.delete-btn {
-  background-color: #e74c3c; /* Delete button color */
-}
-
-.announcement-actions button.delete-btn:hover {
-  background-color: #c0392b;
+  text-align: center;
 }

@@ -2,12 +2,14 @@
 
 /* --- Base container --- */
 .new-job-post-container {
-  max-width: 1000px; /* Slightly narrower for better form readability */
-  margin-top: 500px;    
-  margin-bottom: 100px; 
-  margin-left: auto;
-  margin-right: auto;  padding: 3rem; /* Symmetrical padding on all 4 sides */
+  max-width: 800px; /* Standard read-width */
   
+  /* ✅ Adjusted Margins */
+  margin-top: 90px;    /* Enough space so Header doesn't cover it */
+  margin-bottom: 70px; 
+  margin-left: auto;
+  margin-right: auto;
+  padding: 2rem;
   background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(20px);
   border-radius: 1.5rem;
@@ -21,8 +23,8 @@
   font-weight: 700;
   color: #1c1c1e;
   margin-top: 0;
-  margin-bottom: 2.5rem; /* Generous space below title */
-  text-align: center; /* Centered for symmetry */
+  margin-bottom: 1.5rem;
+  text-align: center;
   letter-spacing: -0.5px;
 }
 
@@ -30,16 +32,17 @@
 .job-post-form {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem; /* Uniform 24px spacing between every field */
+  gap: 1.5rem;
 }
 
 /* Input Labels */
 label {
   display: block;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 600;
   color: #3a3a3c;
-  margin-bottom: 0.5rem; /* Consistent space between label and input */
+  margin-bottom: 0.1rem;
+  margin-left: 4px; /* Slight alignment with input curve */
 }
 
 /* Inputs, Textareas, Selects */
@@ -47,17 +50,15 @@ input,
 textarea, 
 select {
   width: 100%;
-  padding: 0.85rem 1rem; /* Symmetrical internal padding (13.6px 16px) */
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+  padding: 0.65rem 1rem;
+  font-family: inherit;
   font-size: 1rem;
-  
   border: 1px solid #d1d1d6;
-  border-radius: 12px; /* Smoother corners */
+  border-radius: 12px;
   background: #ffffff;
   color: #1c1c1e;
-  
   transition: all 0.2s ease;
-  box-sizing: border-box;
+  box-sizing: border-box; /* Ensures padding doesn't break width */
 }
 
 input:focus, 
@@ -65,23 +66,20 @@ textarea:focus,
 select:focus {
   outline: none;
   border-color: #007aff;
-  box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.15); /* Softer focus ring */
-  background-color: #fff;
+  box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.15);
 }
 
 textarea {
   resize: vertical;
-  min-height: 140px;
+  min-height: 120px;
   line-height: 1.5;
 }
 
 /* --- Submit Button --- */
 .post-job {
-  width: 100%; /* Full width to match input fields */
-  padding: 1rem; /* Larger click area */
-  margin-top: 1rem; /* Separate slightly from the last input */
-  margin-bottom: 0;
-  
+  width: 100%;
+  padding: 1rem;
+  margin-top: 1rem;
   background: linear-gradient(135deg, #007aff, #0a84ff);
   color: white;
   font-size: 1.1rem;
@@ -89,7 +87,6 @@ textarea {
   border: none;
   border-radius: 12px;
   cursor: pointer;
-  
   box-shadow: 0 4px 12px rgba(0, 122, 255, 0.25);
   transition: all 0.2s ease;
 }
@@ -99,29 +96,36 @@ textarea {
   box-shadow: 0 6px 20px rgba(0, 122, 255, 0.35);
 }
 
-.post-job:active:not(:disabled) {
-  transform: translateY(1px);
-  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.25);
-}
-
 .post-job:disabled {
   background: #e5e5ea;
   color: #aeaeb2;
   cursor: not-allowed;
   box-shadow: none;
-  transform: none;
 }
 
 /* --- Responsive Adjustments --- */
 @media (max-width: 768px) {
-  .new-job-post-container {
-    width: 90%; /* Add breathing room on sides */
-    margin: 2rem auto;
-    padding: 1.5rem; /* Reduce padding on mobile */
-  }
 
   .head {
-    font-size: 1.75rem;
-    margin-bottom: 2rem;
+    margin-bottom: 0;
   }
+
+  .label {
+    margin-bottom: 0;
+    margin-top: 0;
+  }
+
+  .new-job-post-container {
+    width: 90%;
+    margin-top: 50px; /* Slightly less top margin on mobile */
+    padding: 1.5rem;
+  }
+
+.job-post-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 1.5rem;
+}
+
 }

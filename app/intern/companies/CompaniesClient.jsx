@@ -16,6 +16,11 @@ export default function CompaniesClient({ initialCompanies }) {
   const [search, setSearch] = useState('');
   const [animateClose, setAnimateClose] = useState(false);
 
+  // For submitting new review
+  const [newComment, setNewComment] = useState('');
+  const [newRating, setNewRating] = useState(5);
+  const [submittingReview, setSubmittingReview] = useState(false);
+
   // Scroll lock
   useEffect(() => {
     if (selectedCompany) {
@@ -54,6 +59,8 @@ export default function CompaniesClient({ initialCompanies }) {
       setSelectedCompany(null);
       setAnimateClose(false);
       setReviews([]);
+      setNewComment('');
+      setNewRating(5);
     }, 200);
   };
 
@@ -130,6 +137,50 @@ export default function CompaniesClient({ initialCompanies }) {
     toast.success("Application submitted successfully!");
   }, [supabase, closeModal]);
 
+  // Submit comment/rating
+  const handleSubmitReview = useCallback(async () => {
+    if (!newComment.trim()) return;
+
+    setSubmittingReview(true);
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      toast.error("You must be logged in to submit a review.");
+      setSubmittingReview(false);
+      return;
+    }
+
+    try {
+      const { error } = await supabase.from('company_reviews').insert([
+        {
+          company_id: selectedCompany.id,
+          student_id: user.id,
+          comment: newComment,
+          rating: newRating,
+        }
+      ]);
+      if (error) throw error;
+      toast.success("Review submitted!");
+      setNewComment('');
+      setNewRating(5);
+
+      // Refresh reviews
+      const { data } = await supabase
+        .from('company_reviews')
+        .select('id, comment, rating, profiles:student_id(fullname)')
+        .eq('company_id', selectedCompany.id)
+        .order('created_at', { ascending: false });
+
+      setReviews(data);
+
+    } catch (err) {
+      console.error("Error submitting review:", err);
+      toast.error("Failed to submit review.");
+    } finally {
+      setSubmittingReview(false);
+    }
+  }, [newComment, newRating, selectedCompany, supabase]);
+
   const filteredCompanies = companies.filter((c) =>
     (c.name || '').toLowerCase().includes((search || '').toLowerCase())
   );
@@ -179,7 +230,7 @@ export default function CompaniesClient({ initialCompanies }) {
               <h2>{selectedCompany.name}</h2>
               <p className="description-text">{selectedCompany.description}</p>
               <div className="stats">
-                <span>⭐ {selectedCompany.star_rating || 0} / 5</span>
+                <span>⭐ {reviews.length ? (reviews.reduce((a,b)=>a+b.rating,0)/reviews.length).toFixed(1) : 0} / 5</span>
                 <span>📄 {selectedCompany.applications_count} student(s) applied</span>
               </div>
             </div>
@@ -222,6 +273,26 @@ export default function CompaniesClient({ initialCompanies }) {
               ) : (
                 <p>No reviews yet.</p>
               )}
+
+              {/* Submit review */}
+              <div className="submit-review">
+                <textarea
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  placeholder="Write your review..."
+                />
+                <div>
+                  <label>
+                    Rating:
+                    <select value={newRating} onChange={(e)=>setNewRating(Number(e.target.value))}>
+                      {[1,2,3,4,5].map(n => <option key={n} value={n}>{n}</option>)}
+                    </select>
+                  </label>
+                  <button onClick={handleSubmitReview} disabled={submittingReview || !newComment.trim()}>
+                    {submittingReview ? "Submitting..." : "Submit Review"}
+                  </button>
+                </div>
+              </div>
             </div>
 
             {/* Send Message */}

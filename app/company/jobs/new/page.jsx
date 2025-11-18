@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useRouter } from 'next/navigation';
 import TagInput from '../../../components/TagInput'; 
-import './NewJobPost.css';
+import './NewJobPost.css'; // This imports the styles above
 import Header from '../../../components/Header';
 
 export default function NewJobPost() {
@@ -81,7 +81,6 @@ export default function NewJobPost() {
   };
 
   return (
-    // 2. ✅ WRAP EVERYTHING IN A FRAGMENT (<> ... </>)
     <>
       <Header />
       
@@ -124,14 +123,8 @@ export default function NewJobPost() {
 
           <button type="submit" className="post-job" disabled={loading}>{loading ? 'Posting...' : 'Post Job'}</button>
         </form>
-
-        <style jsx>{`
-          .new-job-post-container { max-width:760px; margin:2rem auto; padding:1.5rem; background:rgba(255,255,255,0.95); border-radius:12px; }
-          label { display:block; margin-top:12px; font-weight:600; color:#333; }
-          input, textarea, select { width:100%; padding:10px; border-radius:8px; border:1px solid #ddd; margin-top:6px; }
-          button { margin-top:16px; padding:10px 14px; background: linear-gradient(135deg,#007aff,#0a84ff); color:white; border:none; border-radius:10px; cursor:pointer; }
-        `}</style>
       </div>
+      {/* I removed the <style jsx> tag here to prevent style conflicts */}
     </>
   );
 }

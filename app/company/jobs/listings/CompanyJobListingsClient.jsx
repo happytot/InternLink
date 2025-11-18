@@ -4,6 +4,7 @@
 import { useEffect, useState } from 'react'; // No longer need useCallback
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import './listings.css';
+import Header from './../../../components/Header';
 
 // 1. We now accept the 'initialJobs' prop from the server
 export default function CompanyJobListingsClient({ initialJobs }) {
@@ -134,6 +135,8 @@ export default function CompanyJobListingsClient({ initialJobs }) {
   if (loading) return <div className="text-center mt-8">Updating job...</div>;
 
   return (
+    <>
+    <Header />
     <div className="job-listings-container">
       <div className="header-bar">
         <h1>Your Job Listings</h1>
@@ -274,5 +277,6 @@ export default function CompanyJobListingsClient({ initialJobs }) {
         </div>
       )}
     </div>
+    </>
   );
 }

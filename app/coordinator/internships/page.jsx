@@ -1,11 +1,11 @@
-// app/coordinator/placements/page.jsx
 'use client';
 
 import { useEffect, useState } from 'react';
 import { supabase } from '../../../lib/supabaseClient'; // Adjust this path if needed
 import CoordinatorSidebar from '../../components/CoordinatorSidebar'; // Adjust this path
 import { toast } from 'sonner';
-import './internships.css'; // We'll keep using this CSS
+import { FaUserGraduate, FaBuilding, FaBriefcase } from 'react-icons/fa'; // Added icons
+import './internships.css'; // Using the provided CSS
 
 export default function CoordinatorPlacements() {
     const [placements, setPlacements] = useState([]);
@@ -14,9 +14,7 @@ export default function CoordinatorPlacements() {
     const fetchPlacements = async () => {
         setLoading(true);
         try {
-            // --- THIS IS THE FIXED QUERY ---
-            // We are now using the explicit foreign key names
-            // that we know work from your other pages.
+            // Fetch applications where status is 'approved_by_coordinator' (Active Internship)
             const { data, error } = await supabase
                 .from("job_applications")
                 .select(`
@@ -28,7 +26,6 @@ export default function CoordinatorPlacements() {
                         companies ( name ) 
                     )
                 `)
-                // This is the "Active Internship" status:
                 .eq("status", "approved_by_coordinator"); 
 
             if (error) throw error;
@@ -46,6 +43,11 @@ export default function CoordinatorPlacements() {
         fetchPlacements();
     }, []);
 
+    const formatStatus = (status) => {
+        if (!status) return 'N/A';
+        return status.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    };
+
     return (
         <div className="coordinator-page">
             <CoordinatorSidebar />
@@ -57,22 +59,32 @@ export default function CoordinatorPlacements() {
                 {loading ? (
                     <p>Loading active interns...</p>
                 ) : placements.length === 0 ? (
-                    <p>No interns are currently registered and active.</p>
+                    <p className="empty-state-text">No interns are currently registered and active.</p>
                 ) : (
                     <div className="placements-list">
                         {placements.map((app) => (
                             <div key={app.id} className="placement-card">
-                                <h3>{app.profiles?.fullname}</h3>
+                                <h3 className="intern-name">
+                                    <FaUserGraduate style={{ marginRight: '8px' }} />
+                                    {app.profiles?.fullname}
+                                </h3>
                                 <p><strong>Email:</strong> {app.profiles?.email}</p>
                                 <p><strong>Department:</strong> {app.profiles?.department || 'N/A'}</p>
-                                <hr style={{ margin: '12px 0' }} />
-                                {/* Use the corrected data structure */}
-                                <p><strong>Company:</strong> {app.job_posts?.companies?.name || 'Unknown'}</p>
-                                <p><strong>Role:</strong> {app.job_posts?.title}</p>
                                 
-                                <p className="status">
-                                    {app.status.replace(/_/g, ' ')}
+                                <hr className="card-separator" />
+                                
+                                <p>
+                                    <FaBuilding style={{ marginRight: '8px', color: '#3498db' }} />
+                                    <strong>Company:</strong> {app.job_posts?.companies?.name || 'Unknown'}
                                 </p>
+                                <p>
+                                    <FaBriefcase style={{ marginRight: '8px', color: '#2ecc71' }} />
+                                    <strong>Role:</strong> {app.job_posts?.title}
+                                </p>
+                                
+                                <div className={`status-badge ${app.status}`}>
+                                    {formatStatus(app.status)}
+                                </div>
                             </div>
                         ))}
                     </div>

@@ -1,21 +1,29 @@
 'use client';
 
-// 1. ⛔️ REMOVED your old supabase import
-// import { supabase } from '../../../lib/supabaseClient';
-
-// 2. ✅ ADDED this import instead
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-
-import React, { useState, useEffect, useCallback } from 'react'; // Added useCallback
+import React, { useState, useEffect, useCallback } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
+import { useRouter } from 'next/navigation';
 import './CompanyDashboard.css';
-
-// 1. ✅ FIXED THE IMPORT PATH
 import Header from '../../components/Header';
 
+// Lucide Icons
+import { 
+  Briefcase, 
+  Users, 
+  Clock, 
+  CheckCircle2, 
+  ChevronRight, 
+  Plus, 
+  FileText, 
+  Settings,
+  Activity,
+  Calendar
+} from 'lucide-react';
+
 const CompanyDashboard = () => {
-  // 3. ✅ INITIALIZED the client *inside* the component
   const supabase = createClientComponentClient();
+  const router = useRouter();
 
   const [user, setUser] = useState(null);
   const [stats, setStats] = useState({
@@ -27,7 +35,6 @@ const CompanyDashboard = () => {
   const [recentActivities, setRecentActivities] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Simple refetch function for realtime listeners
   const fetchData = useCallback(async (userId) => {
     if (!userId) return;
     
@@ -52,146 +59,202 @@ const CompanyDashboard = () => {
 
       const { data: recentApps } = await supabase
         .from('job_applications')
-        .select('*, profiles:intern_id(fullname)')
+        .select('id, created_at, status, profiles:intern_id(fullname), job_posts(title)')
         .in('job_id', jobs.map(j => j.id))
         .order('created_at', { ascending: false })
-        .limit(3);
+        .limit(5);
 
       const activityFeed = recentApps.map(a => ({
-        title: 'New Application',
-        content: `${a.profiles?.fullname || 'A student'} applied for a position.`,
-        time: new Date(a.created_at).toLocaleString(),
+        id: a.id,
+        title: a.job_posts?.title || 'Job Post',
+        content: `${a.profiles?.fullname || 'A candidate'} applied for this position.`,
+        time: new Date(a.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
       }));
 
       setStats({ activeListings, newApplications, pendingReviews, hiredInterns });
       setRecentActivities(activityFeed);
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
-      // Don't toast on initial load, only on realtime failure
-      // toast.error('Failed to load dashboard data.');
     } finally {
-      setLoading(false); // Make sure to set loading false in all cases
+      setLoading(false);
     }
-  }, [supabase]); // Added supabase dependency
+  }, [supabase]);
 
-  // ✅ Fetch current user (This will now work)
   useEffect(() => {
     const getUserAndData = async () => {
       const { data: { user }, error } = await supabase.auth.getUser();
-      
-      if (error) {
-        console.error('Error fetching user:', error.message);
-        toast.error('Could not find session. Please log in.');
+      if (error || !user) {
+        toast.error('Please log in.');
+        setLoading(false);
+        return;
       }
-      
       setUser(user);
-      
-      if (user) {
-        await fetchData(user.id); // Fetch data *after* getting user
-      } else {
-        setLoading(false); // If no user, stop loading
-      }
+      await fetchData(user.id);
     };
     getUserAndData();
-  }, [supabase, fetchData]); // Run when supabase client or fetchData function changes
+  }, [supabase, fetchData]);
 
-  // ⚡ Real-time listeners with toast notifications
   useEffect(() => {
     if (!user?.id) return;
-
     const channel = supabase.channel('company-dashboard-updates');
-
     channel
-      .on('postgres_changes', 
-        { 
-          event: 'INSERT', 
-          schema: 'public', 
-          table: 'job_posts',
-          filter: `company_id=eq.${user.id}` 
-        },
-        (payload) => {
-          toast.success(`🏢 New job posted: ${payload.new.title}`);
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'job_posts', filter: `company_id=eq.${user.id}` }, (payload) => {
+          if(payload.eventType === 'INSERT') toast.success(`New job posted!`);
           fetchData(user.id); 
-        }
-      )
-      .on('postgres_changes', 
-        { 
-          event: 'INSERT', 
-          schema: 'public', 
-          table: 'job_applications'
-        },
-        (payload) => {
-          // We can't filter this easily, so just refetch
-          toast.success(`🧑‍🎓 New application received!`);
+        })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'job_applications' }, () => {
+          toast('Dashboard updated', { icon: 'Hz' });
           fetchData(user.id);
-        }
-      )
-      .on('postgres_changes', 
-        { 
-          event: 'UPDATE', 
-          schema: 'public', 
-          table: 'job_applications'
-        },
-        (payload) => {
-          const status = payload.new.status || 'updated';
-          toast(`📋 Application ${status}`, { icon: '📋' });
-          fetchData(user.id);
-        }
-      )
+        })
       .subscribe();
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [user, supabase, fetchData]); // Added fetchData dependency
+    return () => { supabase.removeChannel(channel); };
+  }, [user, supabase, fetchData]);
 
-  if (loading) return <div className="dashboard-loading">Loading company dashboard...</div>;
+  // Navigation
+  const handlePostJob = () => router.push('/company/jobs/new'); 
+  const navigateToJobs = () => router.push('/company/jobs/listings');
+  const navigateToApplications = (filter) => router.push(`/company/applications?status=${filter}`);
+  const navigateToApplicationDetail = (id) => router.push(`/company/applications/${id}`);
+  const navigateToProfile = () => router.push('/company/profile');
 
-  // This will show if the user isn't found after loading
-  if (!user) return <div className="dashboard-loading">Session not found. Please log in.</div>
+  if (loading) return (
+    <>
+      <Header />
+      <div className="loading-container"><Activity className="spin-icon" size={40} /></div>
+    </>
+  );
 
-  // 2. ✅ RENDER THE HEADER
+  if (!user) return (
+    <>
+      <Header />
+      <div className="loading-container">Session not found.</div>
+    </>
+  );
+
   return (
     <>
       <Header />
-      <div className="company-dashboard">
-        <Toaster position="top-right" toastOptions={{ duration: 4000 }} />
+      
+      <div className="dashboard-container">
+        <Toaster position="bottom-right" toastOptions={{ style: { borderRadius: '12px', background: '#333', color: '#fff' } }} />
 
-        <h1 className="welcome-header">
-          Welcome back, {user?.email || 'Guest'}!
-        </h1>
+        {/* ✅ Stats Grid now includes the Welcome Header as the first item */}
+        <section className="stats-grid">
+          
+          {/* 1. The New Horizontal Welcome Widget */}
+          <div className="welcome-widget">
+            <div className="welcome-content">
+              <h1>Dashboard</h1>
+              <p>Welcome back, {user.email}</p>
+            </div>
+            <div className="welcome-date">
+              <Calendar size={18} className="date-icon"/>
+              <span>{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</span>
+            </div>
+          </div>
 
-        {/* --- Stats Section --- */}
-        <section className="dashboard-stats">
-          <div className="stat-card"><span>🏢</span><p>Active Listings</p><h2>{stats.activeListings}</h2></div>
-          <div className="stat-card"><span>📩</span><p>New Applications</p><h2>{stats.newApplications}</h2></div>
-          <div className="stat-card"><span>👀</span><p>Pending Reviews</p><h2>{stats.pendingReviews}</h2></div>
-          <div className="stat-card"><span>✅</span><p>Hired Interns</p><h2>{stats.hiredInterns}</h2></div>
+          {/* 2. Stat Cards */}
+          <div className="stat-widget clickable-widget" onClick={navigateToJobs}>
+            <div className="stat-icon-bg"><Briefcase size={24} strokeWidth={2} /></div>
+            <div>
+              <h2 className="stat-value">{stats.activeListings}</h2>
+              <span className="stat-label">Active Jobs</span>
+            </div>
+          </div>
+
+          <div className="stat-widget clickable-widget" onClick={() => navigateToApplications('Pending')}>
+            <div className="stat-icon-bg"><Users size={24} strokeWidth={2} /></div>
+            <div>
+              <h2 className="stat-value">{stats.newApplications}</h2>
+              <span className="stat-label">New Applicants</span>
+            </div>
+          </div>
+
+          <div className="stat-widget clickable-widget" onClick={() => navigateToApplications('Review')}>
+            <div className="stat-icon-bg"><Clock size={24} strokeWidth={2} /></div>
+            <div>
+              <h2 className="stat-value">{stats.pendingReviews}</h2>
+              <span className="stat-label">In Review</span>
+            </div>
+          </div>
+
+          <div className="stat-widget clickable-widget" onClick={() => navigateToApplications('Accepted')}>
+            <div className="stat-icon-bg"><CheckCircle2 size={24} strokeWidth={2} /></div>
+            <div>
+              <h2 className="stat-value">{stats.hiredInterns}</h2>
+              <span className="stat-label">Hired</span>
+            </div>
+          </div>
+
         </section>
 
-        {/* --- Activity + Actions --- */}
-        <section className="dashboard-content-grid">
-          <div className="recent-activity-feed">
-            <h2>Recent Activity</h2>
-            {recentActivities.length > 0 ? (
-              recentActivities.map((activity, idx) => (
-                <div key={idx} className="activity-card">
-                  <h3>{activity.title}</h3>
-                  <p>{activity.content}</p>
-                  <small>{activity.time}</small>
+        {/* Content Grid (Activity + Actions) */}
+        <section className="content-grid">
+          
+          <div className="widget-card">
+            <h3 className="widget-title">
+              <Activity size={20} className="widget-icon-header" /> 
+              Recent Activity
+            </h3>
+            <div className="activity-list">
+              {recentActivities.length > 0 ? (
+                recentActivities.map((activity) => (
+                  <div 
+                    key={activity.id} 
+                    className="activity-item clickable-activity"
+                    onClick={() => navigateToApplicationDetail(activity.id)}
+                  >
+                    <div className="activity-dot"></div>
+                    <div className="activity-details">
+                      <h4>{activity.title}</h4>
+                      <p>{activity.content}</p>
+                      <span className="activity-time">{activity.time}</span>
+                    </div>
+                    <ChevronRight size={16} className="activity-arrow" />
+                  </div>
+                ))
+              ) : (
+                <div className="empty-state">
+                   <FileText size={40} color="#e5e5ea" />
+                   <p>No recent activity.</p>
                 </div>
-              ))
-            ) : (
-              <p>No recent activity yet.</p>
-            )}
+              )}
+            </div>
           </div>
 
-          <div className="quick-actions">
-            <h2>Quick Actions</h2>
-            <button className="btn-primary full-width-btn">✍️ Post a New Internship</button>
-            <button className="btn-secondary full-width-btn">📋 Review Applications</button>
-            <button className="btn-secondary full-width-btn">⚙️ Company Settings</button>
+          <div className="widget-card">
+            <h3 className="widget-title">
+              <Settings size={20} className="widget-icon-header" /> 
+              Quick Actions
+            </h3>
+            <div className="action-buttons">
+              <button onClick={handlePostJob} className="ios-btn btn-primary">
+                <div className="btn-content">
+                  <Plus size={20} />
+                  <span>Post New Job</span>
+                </div>
+                <ChevronRight size={20} className="btn-arrow" />
+              </button>
+              
+              <button onClick={() => navigateToApplications('All')} className="ios-btn btn-secondary">
+                <div className="btn-content">
+                  <FileText size={20} />
+                  <span>Review Applications</span>
+                </div>
+                <ChevronRight size={20} className="btn-arrow" />
+              </button>
+              
+              <button onClick={navigateToProfile} className="ios-btn btn-secondary">
+                <div className="btn-content">
+                  <Settings size={20} />
+                  <span>Company Profile</span>
+                </div>
+                <ChevronRight size={20} className="btn-arrow" />
+              </button>
+            </div>
           </div>
+
         </section>
       </div>
     </>
