@@ -1,7 +1,5 @@
 {
-  "/page": "app/page.js",
-  "/intern/history/page": "app/intern/history/page.js",
-  "/auth/internAuthPage/page": "app/auth/internAuthPage/page.js",
-  "/intern/companies/page": "app/intern/companies/page.js",
-  "/coordinator/announcements/page": "app/coordinator/announcements/page.js"
+  "/coordinator/announcements/page": "app/coordinator/announcements/page.js",
+  "/coordinator/companies/page": "app/coordinator/companies/page.js",
+  "/page": "app/page.js"
 }

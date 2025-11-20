@@ -1,66 +1,28 @@
 {
   "pages": {
+    "/coordinator/announcements/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/css-app_components_CoordinatorSidebar_css-app_coordinator_announcements_announcements_css-app-543383.css",
+      "static/chunks/app/coordinator/announcements/page.js"
+    ],
+    "/layout": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/css-app_globals_css-app_index_css.css",
+      "static/chunks/app/layout.js"
+    ],
+    "/coordinator/companies/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/css-app_components_CoordinatorSidebar_css-app_coordinator_announcements_announcements_css-app-543383.css",
+      "static/chunks/app/coordinator/companies/page.js"
+    ],
     "/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/css/css-app_LandingPage_css.css",
       "static/chunks/app/page.js"
-    ],
-    "/layout": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/css/css-app_components_InternNav_css-app_globals_css-app_index_css-app_intern_companies_companies-2a3b61.css",
-      "static/chunks/app/layout.js"
-    ],
-    "/coordinator/announcements/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/css/css-app_components_CoordinatorSidebar_css-app_coordinator_announcements_announcements_css.css",
-      "static/chunks/app/coordinator/announcements/page.js"
-    ],
-    "/auth/internAuthPage/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/css/css-app_components_AuthPage_module_css.css",
-      "static/chunks/app/auth/internAuthPage/page.js"
-    ],
-    "/intern/logbook/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/css/css-app_components_intern_Logbook_module_css.css",
-      "static/chunks/app/intern/logbook/page.js"
-    ],
-    "/intern/dashboard/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/css/css-app_components_InternNav_css-app_globals_css-app_index_css-app_intern_companies_companies-2a3b61.css",
-      "static/chunks/app/intern/dashboard/page.js"
-    ],
-    "/intern/listings/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/css/css-app_intern_listings_Listings_css.css",
-      "static/css/css-app_components_InternNav_css-app_globals_css-app_index_css-app_intern_companies_companies-2a3b61.css",
-      "static/chunks/app/intern/listings/page.js"
-    ],
-    "/intern/history/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/css/css-app_intern_history_ApplicationHistory_css.css",
-      "static/css/css-app_components_InternNav_css-app_globals_css-app_index_css-app_intern_companies_companies-2a3b61.css",
-      "static/chunks/app/intern/history/page.js"
-    ],
-    "/intern/companies/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/css/css-app_components_InternNav_css-app_globals_css-app_index_css-app_intern_companies_companies-2a3b61.css",
-      "static/chunks/app/intern/companies/page.js"
-    ],
-    "/intern/profile/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/css/css-app_components_InternNav_css-app_globals_css-app_index_css-app_intern_companies_companies-2a3b61.css",
-      "static/chunks/app/intern/profile/page.js"
     ]
   }
 }
