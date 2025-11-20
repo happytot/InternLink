@@ -1,6 +1,10 @@
 /* 🌿 Modern Apple-like INTERN listings UI (matches company style) */
 
 body {
+  background-image: url('/assets/desktop-bg.png');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed; 
   background-color: #f5f5f7;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
   color: #1c1c1e;
@@ -12,15 +16,26 @@ body {
 .listings-container {
   max-width: 1100px;
   margin: 3rem auto;
-  padding: 2rem;
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(20px);
-  border-radius: 1.5rem;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  transition: all 0.3s ease;
   margin-top: 100px;
   margin-bottom: 100px;
+  padding: 2rem;
+
+  /* --- iOS Frosted Glass Effect --- */
+  /* 1. More transparent background (0.7 instead of 0.85) */
+  background: rgba(255, 255, 255, 0.7);
+
+  /* 2. The "Vibrant" Blur - Key for iOS look */
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%); /* For Safari/iOS */
+
+  /* 3. Subtle white border for the "cut glass" edge */
+  border: 1px solid rgba(255, 255, 255, 0.5);
+
+  /* 4. Soft shadow for depth */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+
+  border-radius: 1.5rem;
+  transition: all 0.3s ease;
 }
 
 .listings-container:hover {
@@ -39,6 +54,7 @@ body {
 
 /* 🔍 Search Bar */
 .search-filter-bar {
+  width: 100%;
   display: flex;
   margin-bottom: 2rem;
 }
@@ -396,6 +412,18 @@ body {
 
 /* For mobile phones */
 @media (max-width: 600px) {
+
+  .listings-container {
+    margin-top: 4.4rem;
+    padding-top: 0px;
+  }
+
+  .listing-card {
+    margin-bottom: 1px;
+  }
+  .search-filter-bar {
+    width: 93%;
+  }
   .modal-overlay {
     /* On mobile, align to top with less padding */
     padding-top: 5vh;

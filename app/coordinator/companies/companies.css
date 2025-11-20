@@ -443,3 +443,81 @@ input:checked + .slider::before { transform: translateX(24px); }
 
 /* Fixing original style issues */
 p, tbody { color: var(--text-color); }
+
+/* Skeleton Loading */
+.skeleton-card {
+  background: var(--card-bg);
+  border-radius: var(--border-radius);
+  padding: 25px;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  animation: pulse 1.2s infinite;
+}
+
+.skeleton-avatar {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: #e0e0e0;
+}
+
+.skeleton-line {
+  height: 12px;
+  width: 80%;
+  background: #e0e0e0;
+  border-radius: 6px;
+}
+
+.skeleton-line.short { width: 50%; }
+
+.skeleton-row {
+  height: 40px;
+  margin-bottom: 10px;
+  background: #e0e0e0;
+  border-radius: 6px;
+  animation: pulse 1.2s infinite;
+}
+
+@keyframes pulse {
+  0% { background-color: #e0e0e0; }
+  50% { background-color: #f0f0f0; }
+  100% { background-color: #e0e0e0; }
+}
+
+/* Bento Box Modal */
+.bento-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.bento-left {
+  flex: 1 1 55%;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.bento-right {
+  flex: 1 1 40%;
+}
+
+/* Modal open animation */
+.bento-modal {
+  animation: modalOpen 0.4s ease forwards;
+}
+
+@keyframes modalOpen {
+  0% { transform: scale(0.7); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Responsive */
+@media (max-width: 850px) {
+  .bento-container { flex-direction: column; }
+  .bento-left, .bento-right { flex: 1 1 100%; }
+}

@@ -1,19 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-// 1. ⛔️ REMOVED your old supabase import
-// import { supabase } from '../../../lib/supabaseClient';
-
-// 2. ✅ ADDED this import instead
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-
 import './Listings.css';
 import Header from '../../components/Header';
 import InternNav from '../../components/InternNav';
 import { toast } from 'sonner';
 
 export default function Listings() {
-  // 3. ✅ INITIALIZED the client *inside* the component
   const supabase = createClientComponentClient();
 
   const [user, setUser] = useState(null); // Logged-in intern

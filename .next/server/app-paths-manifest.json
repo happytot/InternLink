@@ -1,9 +1,7 @@
 {
+  "/page": "app/page.js",
   "/intern/history/page": "app/intern/history/page.js",
-  "/intern/profile/page": "app/intern/profile/page.js",
-  "/intern/companies/page": "app/intern/companies/page.js",
-  "/intern/dashboard/page": "app/intern/dashboard/page.js",
-  "/api/embedding/intern/route": "app/api/embedding/intern/route.js",
   "/auth/internAuthPage/page": "app/auth/internAuthPage/page.js",
-  "/company/dashboard/page": "app/company/dashboard/page.js"
+  "/intern/companies/page": "app/intern/companies/page.js",
+  "/coordinator/announcements/page": "app/coordinator/announcements/page.js"
 }

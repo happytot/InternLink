@@ -72,6 +72,7 @@ export default function LandingPage() {
         <div className="hero-image fade-in">
           <img
             src="https://www.codedesk.in/images/cwdt.png"
+
             alt="Internship platform illustration"
           />
         </div>
