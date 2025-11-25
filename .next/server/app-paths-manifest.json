@@ -1,5 +1,8 @@
 {
-  "/coordinator/announcements/page": "app/coordinator/announcements/page.js",
-  "/coordinator/companies/page": "app/coordinator/companies/page.js",
-  "/page": "app/page.js"
+  "/intern/dashboard/page": "app/intern/dashboard/page.js",
+  "/intern/history/page": "app/intern/history/page.js",
+  "/coordinator/dashboard/page": "app/coordinator/dashboard/page.js",
+  "/auth/coordinatorAuthPage/page": "app/auth/coordinatorAuthPage/page.js",
+  "/api/match/[internId]/route": "app/api/match/[internId]/route.js",
+  "/company/dashboard/page": "app/company/dashboard/page.js"
 }

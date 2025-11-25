@@ -13,22 +13,13 @@
     --border-color: #e5e7eb;
 }
 
-.body {
-  background-image: url('/assets/desktop-bg.png');
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed; 
-}
+
 
 /* =========================================
    2. BASE LAYOUT
    ========================================= */
 
 .profile-wrapper {
-    background-image: url('/assets/desktop-bg.png');
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed; 
     min-height: 100vh;
     background-color: var(--background-light);
     padding-top: 80px;
@@ -80,6 +71,10 @@
 
 .bento-col col-left .form-group {
     width: 90%;
+}
+
+.resumeFileUpload {
+    width: 85%;
 }
 
 

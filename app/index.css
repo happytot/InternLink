@@ -46,7 +46,7 @@ body {
 }
 
 /* ======================== */
-/* HEADER STYLES            */
+/* HEADER STYLES            */
 /* ======================== */
 header {
     width: 100%;
@@ -56,23 +56,31 @@ header {
     top: 0;
     left: 0;
     z-index: 1000;
-    background-color: rgb(4, 44, 54);
-    margin: 0; /* Ensures the fixed header doesn't cause margins */
-}
+    background-color: whitesmoke;
+    margin: 0; 
+    box-shadow: 0px  0px 40px 0px grey;}
 
 nav {
     display: flex;
-    justify-content: center;
+    /* 🌟 CHANGE: 'center' to 'flex-start' to align left, 
+       or 'space-between' if you plan to add links on the right later. */
+    justify-content: flex-start; 
+    align-items: center; /* Ensures text is vertically centered */
 }
 
+/* 🌟 REMOVED: The ".logo text-2xl..." selector was invalid CSS syntax */
+
 .logo {
-    font-size: 24px;
+    padding-left: 1rem;
+    /* 🌟 FIXED: removed invalid 'align-items: left' property */
+    font-size: 28px;
     font-weight: bold;
-    color: white;
+    color: rgb(4, 44, 54);
+    text-decoration: none; /* Good practice if logo is a link */
 }
 
 .intern-part {
-    font-family: 'Libre Baskerville', serif;
+    font-family: 'Satoshi', sans-serif;
     font-size: 24px;
     font-weight: 700;
 }

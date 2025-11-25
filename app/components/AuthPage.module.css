@@ -1,204 +1,310 @@
-/* src/components/AuthPage.module.css */
-
-/* --- GLOBAL & BODY STYLES --- */
+/* =========================================
+   🖼️ MAIN LAYOUT & BACKGROUND
+   ========================================= */
 .bodyContainer {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    
-    /* RESTORED: Your original background image properties */
-    background-image: url("/assets/desktop-bg.png");
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: center;
-    
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* Uses global var from globals.css */
+    background-color: var(--bg-main);
+    font-family: var(--font-body);
+    overflow: hidden;
+    color: var(--text-main);
+}
+
+/* Creating the Ambient Orbs using Pseudo-elements */
+.bodyContainer::before,
+.bodyContainer::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(100px);
+    z-index: 0;
+    animation: floatOrb 10s infinite ease-in-out alternate;
+}
+
+/* Orange Orb (Top Left) */
+.bodyContainer::before {
+    width: 600px;
+    height: 600px;
+    background: var(--primary-orange);
+    opacity: 0.15;
+    top: -200px;
+    left: -200px;
+}
+
+/* Blue/Cyan Orb (Bottom Right) */
+.bodyContainer::after {
+    width: 500px;
+    height: 500px;
+    background: var(--accent-blue);
+    opacity: 0.1;
+    bottom: -150px;
+    right: -100px;
+    animation-delay: -5s;
+}
+
+@keyframes floatOrb {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(20px, 40px); }
+}
+
+/* =========================================
+   🧊 GLASS CARD CONTAINER
+   ========================================= */
+.container {
+    width: 100%;
     display: flex;
     justify-content: center;
-    align-items: center; 
-    min-height: 100vh;
-    width: 100%;
+    padding: 20px;
+    z-index: 1; /* Brings content above orbs */
 }
 
-/* --- CONTAINER (The Form Card) --- */
-.container {
-    /* Fixed size for desktop, but responsive on mobile */
-    width: 90%;
-    max-width: 420px; /* Standard size for a centered auth form */
-    height: auto;
-    
-    /* Sequoia/iOS card design */
-    background: rgba(255, 255, 255, 0.7); /* Slightly transparent white */
-    border-radius: 20px; /* Highly rounded corners */
-    border: 1px solid rgba(255, 255, 255, 0.3); /* Subtle light border */
-    
-    /* Frosted glass effect - KEY for modern macOS/iOS look */
-    backdrop-filter: blur(20px); 
-    -webkit-backdrop-filter: blur(20px);
-    
-    /* Multi-layer shadow for depth and elevation */
-    box-shadow: 
-        0 4px 6px rgba(0, 0, 0, 0.05), /* Inner subtle shadow */
-        0 20px 30px rgba(0, 0, 0, 0.1); /* Outer main elevation shadow */
-}
-
-/* --- FORM CONTENT WRAPPER --- */
 .formContainer {
-    /* Since we removed the image, formContainer is now the only content */
-    display: flex;
-    flex-direction: column;
-    justify-content: center; 
-    padding: 35px;
     position: relative;
-    /* Removed flex properties that were only needed for the side-by-side layout */
+    width: 100%;
+    max-width: 440px;
+    background: var(--bg-glass);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--border-color);
+    border-radius: 24px;
+    padding: 48px 40px;
+    box-shadow: var(--shadow-card);
+    
+    /* Entrance Animation */
+    opacity: 0;
+    transform: translateY(20px);
+    animation: revealUp 0.6s ease-out forwards;
 }
 
-/* Back Button Style (Retained) */
+@keyframes revealUp {
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* =========================================
+   🔙 NAVIGATION & HEADERS
+   ========================================= */
 .backButton {
     position: absolute;
-    top: 15px;
-    right: 15px;
-    background: none;
-    border: none;
-    font-size: 24px;
-    color: #555;
+    top: 20px;
+    left: 20px;
+    width: 36px;
+    height: 36px;
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: 50%;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
     cursor: pointer;
-    padding: 5px;
-    line-height: 1;
-    transition: color 0.2s;
+    transition: all 0.2s ease;
+    padding-bottom: 4px;
 }
 
 .backButton:hover {
-    color: #EE7428;
-}
-
-/* Form box & Header */
-.formBox {
-    text-align: center;
-    height: max-content;
+    border-color: var(--primary-orange);
+    color: var(--primary-orange);
+    transform: translateY(-2px);
 }
 
 .formBox h2 {
-    margin: 0 0 30px 0;
-    color: #333;
-    font-size: 28px;
-    font-weight: 600; 
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 2rem;
+    text-align: center;
+    margin-bottom: 32px;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, var(--text-main) 30%, var(--text-muted) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
-/* --- INPUT FIELDS --- */
+/* =========================================
+   📝 INPUT FIELDS
+   ========================================= */
 .inputGroup {
     margin-bottom: 20px;
-    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
 .inputGroup label {
-    display: block;
-    font-size: 13px;
+    font-size: 0.9rem;
     font-weight: 500;
-    margin-bottom: 6px;
-    color: #555;
+    color: var(--text-muted);
+    margin-left: 4px;
 }
 
 .inputGroup input {
-    width: 100%;
-    padding: 12px 15px;
-    border: none; 
-    background: #f8f8fa; 
-    border-radius: 10px; 
-    font-size: 15px;
-    box-sizing: border-box;
-    transition: box-shadow 0.3s, background 0.3s;
+    width: 90%;
+    padding: 14px 16px;
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    color: var(--text-main);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    outline: none;
 }
 
 .inputGroup input:focus {
-    outline: none;
-    background: #ffffff; 
-    box-shadow: inset 0 0 0 1px #EE7428; 
+    border-color: var(--primary-orange);
+    box-shadow: 0 0 0 3px rgba(238, 116, 40, 0.1);
+    background: rgba(255, 255, 255, 0.05);
 }
 
-/* --- BUTTONS --- */
-.formBox button[type="submit"] {
-    width: 100%;
-    padding: 14px;
+/* Autofill Fix for Dark Mode */
+.inputGroup input:-webkit-autofill,
+.inputGroup input:-webkit-autofill:hover, 
+.inputGroup input:-webkit-autofill:focus {
+    -webkit-text-fill-color: var(--text-main);
+    -webkit-box-shadow: 0 0 0px 1000px #061f26 inset;
+    transition: background-color 5000s ease-in-out 0s;
+    
+}
+
+.passwordWrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.eyeButton {
+    position: absolute;
+    right: 16px;
+    background: none;
     border: none;
-    background: #EE7428; 
-    color: white;
-    font-size: 16px;
-    font-weight: 600;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 1.1rem;
+    padding: 0;
+    display: flex;
+    transition: color 0.2s;
+}
+
+.eyeButton:hover {
+    color: var(--primary-orange);
+}
+
+/* =========================================
+   🔘 BUTTONS & LINKS
+   ========================================= */
+/* 🟢 FIXED: Changed from button[type="submit"] to .submitButton */
+.submitButton {
+    width: 100%;
+    margin-top: 12px;
+    padding: 14px;
+    background: var(--primary-orange);
+    color: var(--text-inverse);
+    border: none;
     border-radius: 12px;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 1rem;
     cursor: pointer;
-    transition: background 0.3s, transform 0.1s, box-shadow 0.3s;
-    margin-top: 20px;
-    box-shadow: 0 4px 10px rgba(238, 116, 40, 0.4); 
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(238, 116, 40, 0.2);
 }
 
-.formBox button[type="submit"]:hover {
-    background: #e25c09;
-    box-shadow: 0 6px 12px rgba(238, 116, 40, 0.5);
-    transform: translateY(-1px);
+.submitButton:hover {
+    background: var(--primary-orange-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(238, 116, 40, 0.3);
 }
 
-/* Links and Secondary Actions */
+.submitButton:active {
+    transform: translateY(0);
+}
+
 .formBox p {
-    margin: 20px 0 10px 0;
-    font-size: 14px;
-    color: #666;
+    text-align: center;
+    margin-top: 24px;
+    color: var(--text-muted);
+    font-size: 0.95rem;
 }
 
-/* Link Button style for changing views (Login/Sign Up) */
 .linkButton {
-    background: none !important;
-    border: none !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    width: auto !important;
-    font-size: 15px !important;
-    font-weight: 600; 
-    color: #EE7428 !important; 
-    text-decoration: none;
+    background: none;
+    border: none;
+    color: var(--primary-orange);
+    font-weight: 600;
     cursor: pointer;
+    text-decoration: none;
+    font-size: 0.95rem;
+    padding: 0 4px;
+    transition: opacity 0.2s;
 }
 
 .linkButton:hover {
-    background: none !important;
     text-decoration: underline;
+    opacity: 0.9;
 }
 
-/* Hide forms */
+/* =========================================
+   🌓 THEME TOGGLE BUTTON (NEW)
+   ========================================= */
+.themeToggle {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--border-color);
+    border-radius: 50%;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 10; 
+}
+
+.themeToggle:hover {
+    background: rgba(238, 116, 40, 0.1); 
+    border-color: var(--primary-orange);
+    color: var(--primary-orange);
+    transform: rotate(15deg) scale(1.05); 
+    box-shadow: 0 0 15px rgba(238, 116, 40, 0.3);
+}
+
+/* =========================================
+   👁️ VISIBILITY UTILS
+   ========================================= */
 .hidden {
     display: none;
 }
 
-/* --- Password Toggle Styles --- */
-.passwordWrapper {
-    position: relative;
-    width: 100%;
-}
-
-.passwordWrapper input {
-    padding-right: 45px !important; 
-}
-
-.formBox .passwordWrapper .eyeButton {
-    position: absolute;
-    right: 0px;
-    top: 50%;
-    transform: translateY(-50%);
-
-    /* Resets */
-    background: none;
-    border: none;
-    color: #999; 
-    width: 40px; 
-    height: 100%;
-    margin: 0;
-    padding: 0;
-    font-size: 18px; 
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: color 0.2s;
-}
-
-.formBox .passwordWrapper .eyeButton:hover {
-    background: transparent; 
-    color: #ee7428;
+/* =========================================
+   📱 RESPONSIVE
+   ========================================= */
+@media (max-width: 600px) {
+    .formContainer {
+        padding: 32px 24px;
+        border-radius: 20px;
+        border: none;
+        background: var(--bg-main);
+    }
+    
+    .backButton {
+        top: 10px;
+        left: 10px;
+    }
+    
+    .themeToggle {
+        top: 10px;
+        right: 10px;
+    }
 }

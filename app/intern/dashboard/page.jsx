@@ -4,7 +4,6 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import Link from 'next/link';
 import './Dashboard.css';
-import Header from '../../components/Header';
 import InternNav from '../../components/InternNav';
 import { toast } from 'sonner';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
@@ -20,7 +19,9 @@ import {
   User,
   ExternalLink,
   ChevronRight,
-  Loader2
+  Loader2,
+  Sun,   // Added for Theme Toggle
+  Moon   // Added for Theme Toggle
 } from 'lucide-react';
 
 // --- Helper: Get Date for Welcome Box ---
@@ -32,8 +33,7 @@ const getCurrentDate = () => {
   };
 };
 
-// --- SKELETON COMPONENTS ---
-
+// --- SKELETON COMPONENTS (Unchanged) ---
 const SkeletonBox = ({ width = '100%', height = '20px', className = '' }) => (
   <div className={`skeleton-box ${className}`} style={{ width, height }}></div>
 );
@@ -84,14 +84,11 @@ const SliderSkeleton = () => {
 
 const WidgetSkeleton = () => (
   <div className="dashboard-sidebar">
-    {/* Profile Widget Skeleton */}
     <section className="card profile-card skeleton-widget">
       <SkeletonBox width="150px" height="24px" className="mx-auto mb-3" />
       <SkeletonBox width="80%" height="16px" className="mx-auto mb-5" />
       <SkeletonBox width="120px" height="38px" className="mx-auto" />
     </section>
-
-    {/* Announcements Skeleton */}
     <section className="card dashboard-announcements skeleton-widget">
       <SkeletonBox width="180px" height="26px" className="mb-3" />
       <div className="announcement-list">
@@ -119,7 +116,6 @@ const StatsSummary = ({ applications }) => {
 
   return (
     <section className="bento-grid-stats">
-      {/* Links and Stat Content (unchanged) */}
       <Link href="/intern/history" className="stat-card stat-total-applied">
         <div className="stat-icon-bg"><ClipboardList size={20} strokeWidth={2.5} /></div>
         <div className="stat-content">
@@ -252,7 +248,7 @@ const ApplicationSlider = ({ applications }) => {
   );
 };
 
-// --- 4. Recommended Matches (Updated to handle its own loading, but kept the loading check for the skeleton) ---
+// --- 4. Recommended Matches (Unchanged) ---
 const RecommendedMatches = ({ user, openModal }) => {
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -274,10 +270,6 @@ const RecommendedMatches = ({ user, openModal }) => {
     fetchMatches();
   }, [user]);
 
-  // If the dashboard component is loading, this component shouldn't run its fetch, 
-  // but if it is running its own fetch, we can show a lighter skeleton state here.
-  // For simplicity, we assume the main dashboard loader covers the initial fetch, 
-  // but we handle the component's internal loading too.
   if (loading) {
      return (
         <section className="card dashboard-slider-card">
@@ -332,7 +324,7 @@ const RecommendedMatches = ({ user, openModal }) => {
   );
 };
 
-// --- 5. Announcements (Updated to handle its own loading) ---
+// --- 5. Announcements (Unchanged) ---
 const Announcements = () => {
   const supabase = createClientComponentClient();
   const [announcements, setAnnouncements] = useState([]);
@@ -394,7 +386,7 @@ const Announcements = () => {
   );
 };
 
-// --- 6. Profile Widget (Updated to handle its own loading) ---
+// --- 6. Profile Widget (Unchanged) ---
 const ProfileWidget = ({ loading }) => (
   <section className="card profile-card">
     <h3><User size={20} className="card-title-icon"/> Your Profile</h3>
@@ -414,8 +406,7 @@ const ProfileWidget = ({ loading }) => (
   </section>
 );
 
-
-// --- 7. Main Component ---
+// --- 7. Main Component (UPDATED with Theme Logic) ---
 export default function InternDashboard() {
   const supabase = createClientComponentClient();
   const [user, setUser] = useState(null);
@@ -425,6 +416,31 @@ export default function InternDashboard() {
   const [selectedJob, setSelectedJob] = useState(null);
   const [animateClose, setAnimateClose] = useState(false);
   
+  // --- NEW: Theme State Logic ---
+  const [theme, setTheme] = useState('dark');
+
+  useEffect(() => {
+    // Load saved theme on mount
+    const saved = localStorage.getItem('theme') || 'dark';
+    setTheme(saved);
+  }, []);
+
+  useEffect(() => {
+    // Apply class to HTML tag (required for CSS to switch modes)
+    const root = document.documentElement;
+    if (theme === 'light') {
+      root.classList.add('light');
+    } else {
+      root.classList.remove('light');
+    }
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'light' ? 'dark' : 'light');
+  };
+  // -------------------------------
+
   const dateInfo = getCurrentDate();
 
   const fetchProfile = useCallback(async (userId) => {
@@ -459,7 +475,6 @@ export default function InternDashboard() {
       const { data: { user: currentUser } } = await supabase.auth.getUser();
       if (currentUser) {
         setUser(currentUser);
-        // We handle loading at the dashboard level initially
         await Promise.all([fetchProfile(currentUser.id), fetchApplications(currentUser.id)]);
       }
       setLoading(false);
@@ -527,12 +542,11 @@ export default function InternDashboard() {
     }
   };
 
+  // --- Loading Return ---
   if (loading) {
     return (
       <>
-        <Header />
         <div className="dashboard-container">
-          {/* Welcome Banner Skeleton */}
           <section className="welcome-banner skeleton-banner">
             <div className="welcome-text">
               <SkeletonBox width="250px" height="30px" className="mb-2" />
@@ -543,19 +557,12 @@ export default function InternDashboard() {
               <SkeletonBox width="100px" height="24px" />
             </div>
           </section>
-
-          {/* Stats Grid Skeleton */}
           <StatsSkeleton />
-
           <div className="dashboard-grid">
             <main className="dashboard-main">
-              {/* Application History Skeleton */}
               <SliderSkeleton />
-              {/* Recommended Matches Skeleton (using the same slider skeleton) */}
               <SliderSkeleton />
             </main>
-
-            {/* Sidebar Skeletons */}
             <WidgetSkeleton />
           </div>
         </div>
@@ -564,19 +571,45 @@ export default function InternDashboard() {
     );
   }
 
-  // --- Normal Render State (Unchanged) ---
+  // --- Main Render ---
   return (
     <>
-      <Header />
       <div className="dashboard-container">
         <section className="welcome-banner">
           <div className="welcome-text">
             <h1>Welcome Back, {userName.split(' ')[0] || 'Ace'}!</h1>
             <p>Ready to manage your journey and find your next role?</p>
           </div>
-          <div className="welcome-date">
-            <span className="date-day">{dateInfo.day}</span>
-            <span className="date-full">{dateInfo.dateStr}</span>
+          
+          {/* UPDATED: Wrapper for Date + Toggle Button */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            
+            {/* Theme Toggle Button */}
+            <button 
+              onClick={toggleTheme} 
+              style={{
+                background: 'rgba(255,255,255,0.05)',
+                border: '1px solid var(--border-color)',
+                borderRadius: '50%',
+                width: '40px',
+                height: '40px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                color: theme === 'light' ? 'var(--primary-orange)' : 'var(--text-main)',
+                transition: 'all 0.2s'
+              }}
+              title="Toggle Theme"
+            >
+              {theme === 'light' ? <Sun size={20} /> : <Moon size={20} />}
+            </button>
+
+            <div className="welcome-date">
+              <span className="date-day">{dateInfo.day}</span>
+              <span className="date-full">{dateInfo.dateStr}</span>
+            </div>
+
           </div>
         </section>
 
@@ -589,7 +622,7 @@ export default function InternDashboard() {
           </main>
 
           <aside className="dashboard-sidebar">
-            <ProfileWidget loading={false} /> {/* Explicitly set loading to false for Profile Widget */}
+            <ProfileWidget loading={false} />
             <Announcements />
           </aside>
         </div>

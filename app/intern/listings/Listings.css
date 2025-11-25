@@ -1,10 +1,6 @@
 /* 🌿 Modern Apple-like INTERN listings UI (matches company style) */
 
 body {
-  background-image: url('/assets/desktop-bg.png');
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed; 
   background-color: #f5f5f7;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
   color: #1c1c1e;

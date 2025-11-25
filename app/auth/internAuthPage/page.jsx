@@ -1,124 +1,140 @@
 'use client';
 
-import { useState } from 'react';
-// 1. ✅ CORRECT: Using createClientComponentClient
+import { useState, useEffect } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import styles from '../../components/AuthPage.module.css';
+import styles from '../../components/AuthPage.module.css'; // Ensure this path is correct relative to this file
 import { useRouter } from 'next/navigation';
 import { Toaster, toast } from 'sonner';
-import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { FaEye, FaEyeSlash, FaSun, FaMoon } from 'react-icons/fa';
+import { useTheme } from 'next-themes';
 
-// Helper function to translate errors for the toast
+// --- UTILS ---
 const translateSupabaseError = (error) => {
   if (!error) return 'An unknown error occurred.';
-  switch (error.message) {
-    case 'Invalid login credentials':
-      return 'Invalid Credentials. Please check your email and password.';
-    case 'User already registered':
-      return 'This email address is already registered.';
-    default:
-      return error.message;
-  }
+  const msg = error.message.toLowerCase();
+  if (msg.includes('invalid login')) return 'Invalid Credentials. Please check your email and password.';
+  if (msg.includes('already registered')) return 'This email address is already registered.';
+  return error.message;
 };
 
 export default function InternAuthPage() {
   const router = useRouter();
-
-  // 2. ✅ CORRECT: Initializing client inside the component
   const supabase = createClientComponentClient();
 
-  const [isLoginView, setIsLoginView] = useState(true);
-  const [loginData, setLoginData] = useState({ email: '', password: '' });
-  const [signupData, setSignupData] = useState({
-    fullname: '',
-    email: '',
-    password: '',
-  });
+  // --- THEME & UI STATE ---
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  
+  // --- FORM STATE ---
+  const [isLoginView, setIsLoginView] = useState(true);
+  const [formData, setFormData] = useState({ 
+    fullname: '', 
+    email: '', 
+    password: '' 
+  });
 
+  // Prevent hydration mismatch
+  useEffect(() => setMounted(true), []);
+
+  // --- HANDLERS ---
   const handleGoBack = () => router.push('/');
 
-// --- UPDATED LOGIN HANDLER (FIX) ---
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value });
+  };
+
+  // --- LOGIN LOGIC (Optimized) ---
   const handleLogin = async (e) => {
     e.preventDefault();
-    const { email, password } = loginData;
+    setIsLoading(true);
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: formData.email,
+        password: formData.password,
+      });
 
-    if (error) {
-      toast.error(translateSupabaseError(error));
-      return;
-    }
+      if (error) throw error;
 
-    if (data.user) {
-      // 1. Get the user_type from the metadata returned by auth.
-      //    This avoids the RLS query problem.
-      const userType = data.user.user_metadata?.user_type;
+      // 1. Metadata Check (Fastest)
+      const metaType = data.user?.user_metadata?.user_type;
+      if (metaType === 'student') {
+        router.refresh();
+        router.push('/intern/dashboard');
+        return;
+      }
 
-      // 2. Check the userType from the metadata
-      if (userType === 'student') {
-        // We add a router.refresh() to ensure the root layout re-fetches the session
+      // 2. Database Fallback (Legacy/Safety)
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('user_type')
+        .eq('id', data.user.id)
+        .single();
+
+      if (!profileError && profile?.user_type === 'student') {
         router.refresh();
         router.push('/intern/dashboard');
       } else {
-        // This will run if user_type is missing or not 'student'
         await supabase.auth.signOut();
-        toast.error('Access Denied. This is not a student account.');
+        toast.error('Access Denied', { description: 'This is not a student account.' });
       }
-    } else {
-      toast.error('Login failed.');
+    } catch (err) {
+      toast.error('Login Failed', { description: translateSupabaseError(err) });
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  // --- 3. ✅ UPDATED SIGNUP HANDLER (Uses Trigger) ---
+  // --- SIGNUP LOGIC ---
   const handleSignup = async (e) => {
     e.preventDefault();
-    const { fullname, email, password } = signupData;
+    setIsLoading(true);
 
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      // Pass data to the SQL trigger
-      options: {
-        data: {
-          fullname: fullname,
-          user_type: 'student',
+    try {
+      const { error } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          data: {
+            fullname: formData.fullname,
+            user_type: 'student',
+          },
         },
-      },
-    });
+      });
 
-    if (error) {
-      toast.error(translateSupabaseError(error));
-      return;
+      if (error) throw error;
+
+      toast.success('Signup Successful!', { description: 'Please check your email to verify your account.' });
+      setFormData({ fullname: '', email: '', password: '' });
+      setIsLoginView(true);
+    } catch (err) {
+      toast.error('Signup Failed', { description: translateSupabaseError(err) });
+    } finally {
+      setIsLoading(false);
     }
-
-    // We no longer need to .insert() into profiles!
-    // The trigger handles it.
-    toast.success('Signup successful! Please check your email to verify and then log in.');
-    setSignupData({ fullname: '', email: '', password: '' });
-    setIsLoginView(true);
   };
 
-  const handleLoginChange = (e) => {
-    setLoginData({ ...loginData, [e.target.id]: e.target.value });
-  };
+  if (!mounted) return null;
 
-  const handleSignupChange = (e) => {
-    setSignupData({ ...signupData, [e.target.id]: e.target.value });
-  };
-
-  // --- JSX (No changes needed) ---
   return (
     <div className={styles.bodyContainer}>
-      <Toaster richColors position="top-right" />
+      {/* 🍞 Global CSS handles the glass styling automatically */}
 
-      {/* CONTAINER REVERTED TO BE JUST THE FORM WRAPPER */}
+      {/* 🌗 THEME TOGGLE */}
+      <button
+        className={styles.themeToggle}
+        onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+        aria-label="Toggle Theme"
+      >
+        {theme === 'dark' ? <FaSun /> : <FaMoon />}
+      </button>
+
       <div className={styles.container}>
-        {/* RIGHT SIDE FORMS (Now centered and full width of container) */}
         <div className={styles.formContainer}>
+          
+          {/* BACK BUTTON */}
           <button className={styles.backButton} onClick={handleGoBack}>
             &times;
           </button>
@@ -132,9 +148,10 @@ export default function InternAuthPage() {
                 <input
                   type="email"
                   id="email"
-                  value={loginData.email}
-                  onChange={handleLoginChange}
+                  value={formData.email}
+                  onChange={handleChange}
                   required
+                  disabled={isLoading}
                 />
               </div>
 
@@ -144,27 +161,33 @@ export default function InternAuthPage() {
                   <input
                     type={showPassword ? 'text' : 'password'}
                     id="password"
-                    value={loginData.password}
-                    onChange={handleLoginChange}
+                    value={formData.password}
+                    onChange={handleChange}
                     required
+                    disabled={isLoading}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className={styles.eyeButton}
+                    disabled={isLoading}
                   >
                     {showPassword ? <FaEyeSlash /> : <FaEye />}
                   </button>
                 </div>
               </div>
 
-              <button type="submit">Login as Intern</button>
+              <button type="submit" className={styles.submitButton} disabled={isLoading}>
+                {isLoading ? 'Logging in...' : 'Login as Intern'}
+              </button>
+              
               <p>
                 Don't have an account?{' '}
                 <button
                   type="button"
                   className={styles.linkButton}
                   onClick={() => setIsLoginView(false)}
+                  disabled={isLoading}
                 >
                   Sign up
                 </button>
@@ -181,9 +204,10 @@ export default function InternAuthPage() {
                 <input
                   type="text"
                   id="fullname"
-                  value={signupData.fullname}
-                  onChange={handleSignupChange}
+                  value={formData.fullname}
+                  onChange={handleChange}
                   required
+                  disabled={isLoading}
                 />
               </div>
 
@@ -192,9 +216,10 @@ export default function InternAuthPage() {
                 <input
                   type="email"
                   id="email"
-                  value={signupData.email}
-                  onChange={handleSignupChange}
+                  value={formData.email}
+                  onChange={handleChange}
                   required
+                  disabled={isLoading}
                 />
               </div>
 
@@ -204,37 +229,42 @@ export default function InternAuthPage() {
                   <input
                     type={showPassword ? 'text' : 'password'}
                     id="password"
-                    value={signupData.password}
-                    onChange={handleSignupChange}
+                    value={formData.password}
+                    onChange={handleChange}
                     required
+                    disabled={isLoading}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className={styles.eyeButton}
+                    disabled={isLoading}
                   >
                     {showPassword ? <FaEyeSlash /> : <FaEye />}
                   </button>
                 </div>
               </div>
 
-              <button type="submit">Sign Up as Intern</button>
+              <button type="submit" className={styles.submitButton} disabled={isLoading}>
+                {isLoading ? 'Creating Account...' : 'Sign Up as Intern'}
+              </button>
+              
               <p>
                 Already have an account?{' '}
                 <button
                   type="button"
                   className={styles.linkButton}
                   onClick={() => setIsLoginView(true)}
+                  disabled={isLoading}
                 >
                   Login
                 </button>
               </p>
             </form>
           </div>
-        </div>{' '}
-        {/* END formContainer */}
-      </div>{' '}
-      {/* END container */}
+
+        </div>
+      </div>
     </div>
   );
 }

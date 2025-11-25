@@ -1,174 +1,152 @@
 'use client';
 
-import { useState } from 'react';
-// 1. ⛔️ REMOVED your old supabase import
-// import { supabase } from '../../../lib/supabase';
-
-// 2. ✅ ADDED this import instead
+import { useState, useEffect } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-
 import styles from '../../components/AuthPage.module.css';
 import { useRouter } from 'next/navigation';
 import { Toaster, toast } from 'sonner';
-import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { FaEye, FaEyeSlash, FaSun, FaMoon } from 'react-icons/fa';
+import { useTheme } from 'next-themes';
 
 const translateSupabaseError = (error) => {
   if (!error) return 'An unknown error occurred.';
-  switch (error.message) {
-    case 'Invalid login credentials':
-      return 'Invalid Credentials. Please check your email and password.';
-    case 'User already registered':
-      return 'This email address is already registered.';
-    default:
-      return error.message;
-  }
+  if (error.message.includes('Invalid login')) return 'Invalid Credentials. Please check your details.';
+  if (error.message.includes('already registered')) return 'This email is already registered.';
+  return error.message;
 };
 
 export default function CompanyAuthPage() {
   const router = useRouter();
-
-  // 3. ✅ INITIALIZED the client *inside* the component
   const supabase = createClientComponentClient();
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
 
   const [isLoginView, setIsLoginView] = useState(true);
-  const [loginData, setLoginData] = useState({ email: '', password: '' });
-  const [signupData, setSignupData] = useState({
-    companyName: '',
-    email: '',
-    password: '',
+  const [isLoading, setIsLoading] = useState(false);
+  const [formData, setFormData] = useState({ 
+    companyName: '', 
+    email: '', 
+    password: '' 
   });
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleGoBack = () => router.push('/');
+  useEffect(() => setMounted(true), []);
 
-// --- UPDATED LOGIN HANDLER (Checks 'profiles' table) ---
-// --- UPDATED LOGIN HANDLER (Checks metadata) ---
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
   const handleLogin = async (e) => {
     e.preventDefault();
-    const { email, password } = loginData;
+    setIsLoading(true);
+    
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: formData.email,
+        password: formData.password,
+      });
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+      if (error) throw error;
 
-    if (error) {
-      toast.error(translateSupabaseError(error));
-      return;
-    }
+      const userType = data.user?.user_metadata?.user_type;
 
-    if (data.user) {
-      // 1. Get the user_type from the metadata returned by auth.
-      //    This is the most reliable check.
-      const userType = data.user.user_metadata?.user_type;
-
-      // 2. Check the userType
       if (userType === 'company') {
-        router.refresh(); // Refresh the cookie session
+        router.refresh();
         router.push('/company/dashboard');
       } else {
-        // This will run if user_type is missing (like your account) or not 'company'
         await supabase.auth.signOut();
-        toast.error('Access Denied. This is not a company account.');
+        toast.error('Access Denied', { description: 'This is not a company account.' });
       }
-    } else {
-      toast.error('Login failed.');
+    } catch (err) {
+      toast.error('Login Failed', { description: translateSupabaseError(err) });
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  // --- 5. ✅ UPDATED SIGNUP HANDLER (Uses Trigger) ---
   const handleSignup = async (e) => {
     e.preventDefault();
-    const { companyName, email, password } = signupData;
+    setIsLoading(true);
 
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      // Pass data to the SQL trigger
-      options: {
-        data: {
-          company_name: companyName, // Matches our new SQL trigger
-          user_type: 'company',
+    try {
+      const { error } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          data: {
+            company_name: formData.companyName,
+            user_type: 'company',
+          },
         },
-      },
-    });
+      });
 
-    if (error) {
-      toast.error(translateSupabaseError(error));
-      return;
+      if (error) throw error;
+
+      toast.success('Signup Successful!', { description: `Welcome, ${formData.companyName}. Please check email to verify.` });
+      setFormData({ companyName: '', email: '', password: '' });
+      setIsLoginView(true);
+    } catch (err) {
+      toast.error('Signup Failed', { description: translateSupabaseError(err) });
+    } finally {
+      setIsLoading(false);
     }
-
-    // We no longer need to .insert() into profiles!
-    toast.success(`Signup successful for ${companyName}! Please log in.`);
-    setSignupData({ companyName: '', email: '', password: '' });
-    setIsLoginView(true);
   };
 
-  const handleLoginChange = (e) => {
-    setLoginData({ ...loginData, [e.target.id]: e.target.value });
-  };
+  if (!mounted) return null;
 
-  const handleSignupChange = (e) => {
-    setSignupData({ ...signupData, [e.target.id]: e.target.value });
-  };
-
-  // --- JSX (No changes) ---
   return (
    <div className={styles.bodyContainer}>
-    <Toaster richColors position="top-right" />
+    {/* 🍞 Styled via global CSS */}
+
+    <button
+      className={styles.themeToggle}
+      onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+      aria-label="Toggle Theme"
+    >
+      {theme === 'dark' ? <FaSun /> : <FaMoon />}
+    </button>
+
     <div className={styles.container}>
-      {/* RIGHT FORM SIDE */}
       <div className={styles.formContainer}>
-        <button className={styles.backButton} onClick={handleGoBack}>
-          &times;
-        </button>
+        <button className={styles.backButton} onClick={() => router.push('/')}>&times;</button>
 
         {/* LOGIN FORM */}
         <div className={`${styles.formBox} ${!isLoginView ? styles.hidden : ''}`}>
           <h2>Company Login</h2>
           <form onSubmit={handleLogin}>
             <div className={styles.inputGroup}>
-              <label htmlFor="email">Email</label>
+              <label htmlFor="login-email">Email</label>
               <input
                 type="email"
-                id="email"
-                value={loginData.email}
-                onChange={handleLoginChange}
+                id="login-email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
                 required
               />
             </div>
-
             <div className={styles.inputGroup}>
-              <label htmlFor="password">Password</label>
+              <label htmlFor="login-password">Password</label>
               <div className={styles.passwordWrapper}>
                 <input
                   type={showPassword ? "text" : "password"}
-                  id="password"
-                  value={loginData.password}
-                  onChange={handleLoginChange}
+                  id="login-password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
                   required
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className={styles.eyeButton}
-                >
+                <button type="button" onClick={() => setShowPassword(!showPassword)} className={styles.eyeButton}>
                   {showPassword ? <FaEyeSlash /> : <FaEye />}
                 </button>
               </div>
             </div>
-
-            <button type="submit">Login as Company</button>
-
+            <button type="submit" className={styles.submitButton} disabled={isLoading}>
+              {isLoading ? 'Logging in...' : 'Login as Company'}
+            </button>
             <p>
-              Don't have an account?{" "}
-              <button
-                type="button"
-                className={styles.linkButton}
-                onClick={() => setIsLoginView(false)}
-              >
-                Sign up
-              </button>
+              Don't have an account?{' '}
+              <button type="button" className={styles.linkButton} onClick={() => setIsLoginView(false)}>Sign up</button>
             </p>
           </form>
         </div>
@@ -178,58 +156,49 @@ export default function CompanyAuthPage() {
           <h2>Company Sign Up</h2>
           <form onSubmit={handleSignup}>
             <div className={styles.inputGroup}>
-              <label htmlFor="companyName">Company Name</label>
+              <label htmlFor="signup-company">Company Name</label>
               <input
                 type="text"
-                id="companyName"
-                value={signupData.companyName}
-                onChange={handleSignupChange}
+                id="signup-company"
+                name="companyName"
+                value={formData.companyName}
+                onChange={handleChange}
                 required
               />
             </div>
-
             <div className={styles.inputGroup}>
-              <label htmlFor="email">Email</label>
+              <label htmlFor="signup-email">Email</label>
               <input
                 type="email"
-                id="email"
-                value={signupData.email}
-                onChange={handleSignupChange}
+                id="signup-email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
                 required
               />
             </div>
-
             <div className={styles.inputGroup}>
-              <label htmlFor="password">Password</label>
+              <label htmlFor="signup-password">Password</label>
               <div className={styles.passwordWrapper}>
                 <input
                   type={showPassword ? "text" : "password"}
-                  id="password"
-                  value={signupData.password}
-                 onChange={handleSignupChange}
+                  id="signup-password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
                   required
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className={styles.eyeButton}
-                >
+                <button type="button" onClick={() => setShowPassword(!showPassword)} className={styles.eyeButton}>
                   {showPassword ? <FaEyeSlash /> : <FaEye />}
                 </button>
               </div>
             </div>
-
-            <button type="submit">Sign Up as Company</button>
-
+            <button type="submit" className={styles.submitButton} disabled={isLoading}>
+              {isLoading ? 'Creating Account...' : 'Sign Up as Company'}
+            </button>
             <p>
-              Already have an account?{" "}
-              <button
-                type="button"
-                className={styles.linkButton}
-                onClick={() => setIsLoginView(true)}
-              >
-                Login
-              </button>
+              Already have an account?{' '}
+              <button type="button" className={styles.linkButton} onClick={() => setIsLoginView(true)}>Login</button>
             </p>
           </form>
         </div>

@@ -4,7 +4,6 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import { Toaster, toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import Header from '../../components/Header';
 import InternNav from '../../components/InternNav';
 
 import { 
@@ -429,7 +428,6 @@ export default function Profile() {
     return (
         <div className="profile-wrapper">
             <Toaster position="top-center" richColors />
-            <Header /> 
             
             <form onSubmit={handleSubmit}>
                 
