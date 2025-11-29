@@ -5,7 +5,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
 import './CompanyDashboard.css';
-import Header from '../../components/Header';
 
 // Lucide Icons
 import { 
@@ -15,13 +14,12 @@ import {
   CheckCircle2, 
   ChevronRight, 
   Plus, 
-  FileText, 
-  Settings,
   Activity,
-  Calendar
+  Calendar,
+  Layers
 } from 'lucide-react';
 
-const CompanyDashboard = () => {
+export default function CompanyDashboard() {
   const supabase = createClientComponentClient();
   const router = useRouter();
 
@@ -39,40 +37,46 @@ const CompanyDashboard = () => {
     if (!userId) return;
     
     try {
+      // 1. Get Jobs
       const { data: jobs, error: jobsError } = await supabase
         .from('job_posts') 
-        .select('*')
+        .select('id')
         .eq('company_id', userId);
       if (jobsError) throw jobsError;
 
       const activeListings = jobs.length;
 
-      const { data: applications, error: appsError } = await supabase
-        .from('job_applications')
-        .select('status')
-        .in('job_id', jobs.map(j => j.id));
-      if (appsError) throw appsError;
+      // 2. Get Applications linked to those jobs
+      if (activeListings > 0) {
+        const jobIds = jobs.map(j => j.id);
+        const { data: applications, error: appsError } = await supabase
+          .from('job_applications')
+          .select('id, status, created_at, intern_id, profiles:intern_id(fullname), job_posts(title)')
+          .in('job_id', jobIds);
+          
+        if (appsError) throw appsError;
 
-      const newApplications = applications.filter(a => a.status === 'Pending').length;
-      const pendingReviews = applications.filter(a => a.status === 'Company_Approved_Waiting_Coordinator').length;
-      const hiredInterns = applications.filter(a => a.status === 'Accepted').length;
+        const newApplications = applications.filter(a => a.status === 'Pending').length;
+        const pendingReviews = applications.filter(a => a.status === 'Company_Approved_Waiting_Coordinator').length;
+        const hiredInterns = applications.filter(a => a.status === 'Accepted' || a.status === 'active_intern' || a.status === 'ongoing').length;
 
-      const { data: recentApps } = await supabase
-        .from('job_applications')
-        .select('id, created_at, status, profiles:intern_id(fullname), job_posts(title)')
-        .in('job_id', jobs.map(j => j.id))
-        .order('created_at', { ascending: false })
-        .limit(5);
+        // 3. Activity Feed
+        const sortedApps = applications.sort((a, b) => new Date(b.created_at) - new Date(a.created_at)).slice(0, 5);
+        const activityFeed = sortedApps.map(a => ({
+          id: a.id,
+          title: a.job_posts?.title || 'Job Post',
+          content: `${a.profiles?.fullname || 'A candidate'} applied for this position.`,
+          time: new Date(a.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        }));
 
-      const activityFeed = recentApps.map(a => ({
-        id: a.id,
-        title: a.job_posts?.title || 'Job Post',
-        content: `${a.profiles?.fullname || 'A candidate'} applied for this position.`,
-        time: new Date(a.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
-      }));
+        setStats({ activeListings, newApplications, pendingReviews, hiredInterns });
+        setRecentActivities(activityFeed);
+      } else {
+        // No jobs yet
+        setStats({ activeListings: 0, newApplications: 0, pendingReviews: 0, hiredInterns: 0 });
+        setRecentActivities([]);
+      }
 
-      setStats({ activeListings, newApplications, pendingReviews, hiredInterns });
-      setRecentActivities(activityFeed);
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
     } finally {
@@ -84,7 +88,6 @@ const CompanyDashboard = () => {
     const getUserAndData = async () => {
       const { data: { user }, error } = await supabase.auth.getUser();
       if (error || !user) {
-        toast.error('Please log in.');
         setLoading(false);
         return;
       }
@@ -94,6 +97,7 @@ const CompanyDashboard = () => {
     getUserAndData();
   }, [supabase, fetchData]);
 
+  // Realtime
   useEffect(() => {
     if (!user?.id) return;
     const channel = supabase.channel('company-dashboard-updates');
@@ -103,7 +107,6 @@ const CompanyDashboard = () => {
           fetchData(user.id); 
         })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'job_applications' }, () => {
-          toast('Dashboard updated', { icon: 'Hz' });
           fetchData(user.id);
         })
       .subscribe();
@@ -111,154 +114,124 @@ const CompanyDashboard = () => {
     return () => { supabase.removeChannel(channel); };
   }, [user, supabase, fetchData]);
 
-  // Navigation
+  // Navigation Helpers
   const handlePostJob = () => router.push('/company/jobs/new'); 
   const navigateToJobs = () => router.push('/company/jobs/listings');
-  const navigateToApplications = (filter) => router.push(`/company/applications?status=${filter}`);
-  const navigateToApplicationDetail = (id) => router.push(`/company/applications/${id}`);
-  const navigateToProfile = () => router.push('/company/profile');
+  const navigateToApplications = (filter) => router.push('/company/applicants'); 
 
   if (loading) return (
-    <>
-      <Header />
-      <div className="loading-container"><Activity className="spin-icon" size={40} /></div>
-    </>
-  );
-
-  if (!user) return (
-    <>
-      <Header />
-      <div className="loading-container">Session not found.</div>
-    </>
+    <div className="loading-container"><Activity className="spin-icon" size={40} /></div>
   );
 
   return (
-    <>
-      <Header />
-      
-      <div className="dashboard-container">
-        <Toaster position="bottom-right" toastOptions={{ style: { borderRadius: '12px', background: '#333', color: '#fff' } }} />
+    <div className="dashboard-content">
+      <Toaster position="bottom-right" toastOptions={{ style: { borderRadius: '12px', background: '#333', color: '#fff' } }} />
 
-        {/* ✅ Stats Grid now includes the Welcome Header as the first item */}
-        <section className="stats-grid">
-          
-          {/* 1. The New Horizontal Welcome Widget */}
-          <div className="welcome-widget">
-            <div className="welcome-content">
-              <h1>Dashboard</h1>
-              <p>Welcome back, {user.email}</p>
-            </div>
-            <div className="welcome-date">
-              <Calendar size={18} className="date-icon"/>
-              <span>{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</span>
-            </div>
+{/* --- 🟢 0. NEW TOP BRAND BAR --- */}
+      <div className="brand-bar-card">
+        <div className="brand-logo">
+          <div className="logo-icon-bg">
+            <Layers size={22} strokeWidth={2.5} />
           </div>
+          <span className="logo-text">InternLink</span>
+        </div>
+        
+        <div className="brand-date">
+          <Calendar size={18} className="text-gray-400" />
+          <span>
+            {new Date().toLocaleDateString('en-US', { 
+              weekday: 'long', 
+              year: 'numeric', 
+              month: 'long', 
+              day: 'numeric' 
+            })}
+          </span>
+        </div>
+      </div>     
 
-          {/* 2. Stat Cards */}
-          <div className="stat-widget clickable-widget" onClick={navigateToJobs}>
-            <div className="stat-icon-bg"><Briefcase size={24} strokeWidth={2} /></div>
-            <div>
-              <h2 className="stat-value">{stats.activeListings}</h2>
-              <span className="stat-label">Active Jobs</span>
-            </div>
+      {/* --- 2. STATS GRID --- */}
+      <section className="stats-grid">
+        <div className="stat-card" onClick={navigateToJobs}>
+          <div className="icon-wrapper blue"><Briefcase size={24} /></div>
+          <div className="stat-info">
+            <h2>{stats.activeListings}</h2>
+            <span>Active Jobs</span>
           </div>
+        </div>
 
-          <div className="stat-widget clickable-widget" onClick={() => navigateToApplications('Pending')}>
-            <div className="stat-icon-bg"><Users size={24} strokeWidth={2} /></div>
-            <div>
-              <h2 className="stat-value">{stats.newApplications}</h2>
-              <span className="stat-label">New Applicants</span>
-            </div>
+        <div className="stat-card" onClick={() => navigateToApplications('Pending')}>
+          <div className="icon-wrapper orange"><Users size={24} /></div>
+          <div className="stat-info">
+            <h2>{stats.newApplications}</h2>
+            <span>New Applicants</span>
           </div>
+        </div>
 
-          <div className="stat-widget clickable-widget" onClick={() => navigateToApplications('Review')}>
-            <div className="stat-icon-bg"><Clock size={24} strokeWidth={2} /></div>
-            <div>
-              <h2 className="stat-value">{stats.pendingReviews}</h2>
-              <span className="stat-label">In Review</span>
-            </div>
+        <div className="stat-card" onClick={() => navigateToApplications('Review')}>
+          <div className="icon-wrapper purple"><Clock size={24} /></div>
+          <div className="stat-info">
+            <h2>{stats.pendingReviews}</h2>
+            <span>Under Review</span>
           </div>
+        </div>
 
-          <div className="stat-widget clickable-widget" onClick={() => navigateToApplications('Accepted')}>
-            <div className="stat-icon-bg"><CheckCircle2 size={24} strokeWidth={2} /></div>
-            <div>
-              <h2 className="stat-value">{stats.hiredInterns}</h2>
-              <span className="stat-label">Hired</span>
-            </div>
+        <div className="stat-card" onClick={() => navigateToApplications('Hired')}>
+          <div className="icon-wrapper green"><CheckCircle2 size={24} /></div>
+          <div className="stat-info">
+            <h2>{stats.hiredInterns}</h2>
+            <span>Hired Interns</span>
           </div>
+        </div>
+      </section>
 
-        </section>
-
-        {/* Content Grid (Activity + Actions) */}
-        <section className="content-grid">
-          
-          <div className="widget-card">
-            <h3 className="widget-title">
-              <Activity size={20} className="widget-icon-header" /> 
-              Recent Activity
-            </h3>
-            <div className="activity-list">
-              {recentActivities.length > 0 ? (
-                recentActivities.map((activity) => (
-                  <div 
-                    key={activity.id} 
-                    className="activity-item clickable-activity"
-                    onClick={() => navigateToApplicationDetail(activity.id)}
-                  >
-                    <div className="activity-dot"></div>
-                    <div className="activity-details">
-                      <h4>{activity.title}</h4>
-                      <p>{activity.content}</p>
-                      <span className="activity-time">{activity.time}</span>
-                    </div>
-                    <ChevronRight size={16} className="activity-arrow" />
+      {/* --- 3. MAIN CONTENT SPLIT --- */}
+      <section className="dashboard-split">
+        
+        {/* LEFT: Activity Feed */}
+        <div className="feed-card">
+          <div className="card-header">
+            <h3>Recent Activity</h3>
+          </div>
+          <div className="feed-list">
+            {recentActivities.length === 0 ? (
+              <p className="empty-text">No recent activity found.</p>
+            ) : (
+              recentActivities.map((activity) => (
+                <div key={activity.id} className="feed-item">
+                  <div className="feed-icon"><Activity size={16} /></div>
+                  <div className="feed-content">
+                    <h4>{activity.title}</h4>
+                    <p>{activity.content}</p>
                   </div>
-                ))
-              ) : (
-                <div className="empty-state">
-                   <FileText size={40} color="#e5e5ea" />
-                   <p>No recent activity.</p>
+                  <span className="feed-time">{activity.time}</span>
                 </div>
-              )}
-            </div>
+              ))
+            )}
           </div>
+        </div>
 
-          <div className="widget-card">
-            <h3 className="widget-title">
-              <Settings size={20} className="widget-icon-header" /> 
-              Quick Actions
-            </h3>
-            <div className="action-buttons">
-              <button onClick={handlePostJob} className="ios-btn btn-primary">
-                <div className="btn-content">
-                  <Plus size={20} />
-                  <span>Post New Job</span>
-                </div>
-                <ChevronRight size={20} className="btn-arrow" />
-              </button>
-              
-              <button onClick={() => navigateToApplications('All')} className="ios-btn btn-secondary">
-                <div className="btn-content">
-                  <FileText size={20} />
-                  <span>Review Applications</span>
-                </div>
-                <ChevronRight size={20} className="btn-arrow" />
-              </button>
-              
-              <button onClick={navigateToProfile} className="ios-btn btn-secondary">
-                <div className="btn-content">
-                  <Settings size={20} />
-                  <span>Company Profile</span>
-                </div>
-                <ChevronRight size={20} className="btn-arrow" />
-              </button>
-            </div>
+        {/* RIGHT: Quick Actions / Tips */}
+        <div className="tips-card">
+          <div className="card-header">
+            <h3>Quick Actions</h3>
           </div>
+          <div className="tips-list">
+            <button className="tip-item" onClick={navigateToJobs}>
+              <span>Manage Listings</span>
+              <ChevronRight size={16} />
+            </button>
+            <button className="tip-item" onClick={() => router.push('/company/profile')}>
+              <span>Update Company Profile</span>
+              <ChevronRight size={16} />
+            </button>
+            <button className="tip-item" onClick={() => router.push('/company/logbook')}>
+              <span>View Logbooks</span>
+              <ChevronRight size={16} />
+            </button>
+          </div>
+        </div>
 
-        </section>
-      </div>
-    </>
+      </section>
+    </div>
   );
-};
-
-export default CompanyDashboard;
+}

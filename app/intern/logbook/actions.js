@@ -1,32 +1,68 @@
-// /app/intern/logbook/actions.js
 'use server';
 
-// 🔑 FIX: Import the new server helper using a relative path
-import { createSupabaseServerClient } from '../../../lib/supabase/server'; 
+import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { revalidatePath } from 'next/cache';
 
-const REQUIRED_HOURS = 486; // The goal hours for the OJT
-
-/**
- * Fetches all logbook entries for the logged-in intern and calculates total hours.
- */
 export async function getInternLogbookData() {
-    // 🔑 CREATE THE SERVER CLIENT
     const supabase = createSupabaseServerClient(); 
     
-    const { data: userData, error: userError } = await supabase.auth.getUser();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    if (userError || !userData?.user) {
-        console.error("Auth Error in getInternLogbookData:", userError);
-        return { success: false, error: 'User not authenticated. Please log in again.' }; 
+    if (authError || !user) {
+        return { success: false, error: 'Not authenticated' };
     }
 
-    const internId = userData.user.id;
-
     try {
+        // 1. Fetch Active App IDs AND the Custom Goal
+        const { data: activeApp, error: appError } = await supabase
+            .from('job_applications')
+            .select(`
+                id, 
+                company_id, 
+                job_id,
+                required_hours
+            `) 
+            .eq('intern_id', user.id)
+            .eq('status', 'ongoing')     
+            .maybeSingle();
+
+        if (appError) console.error("Error fetching app:", appError);
+
+        // Define the Goal (Use DB value, fallback to 486 if missing)
+        const goalHours = activeApp?.required_hours || 486;
+
+        // Case: No Active Internship found
+        if (!activeApp) {
+            return {
+                success: true,
+                isInternshipApproved: false,
+                logs: [], 
+                totalApprovedHours: 0, 
+                progress: 0, 
+                requiredHours: goalHours, // Send to UI
+                activeJobTitle: '',       
+                activeCompany: ''
+            };
+        }
+
+        // 2. Manual Fetch for Names (Prevents Ambiguous FK errors)
+        const { data: jobData } = await supabase
+            .from('job_posts')
+            .select('title')
+            .eq('id', activeApp.job_id)
+            .maybeSingle();
+
+        const { data: companyData } = await supabase
+            .from('companies')
+            .select('name')
+            .eq('id', activeApp.company_id)
+            .maybeSingle();
+
+        // 3. Fetch Logs
         const { data: logs, error: logsError } = await supabase
-            .from('logbook_entries')
+            .from('logbooks')
             .select('*')
-            .eq('intern_id', internId)
+            .eq('application_id', activeApp.id) 
             .order('date', { ascending: false });
 
         if (logsError) throw logsError;
@@ -35,37 +71,43 @@ export async function getInternLogbookData() {
             .filter(log => log.status === 'Approved')
             .reduce((sum, log) => sum + (log.hours_worked || 0), 0);
 
-        const progress = Math.min(100, (totalApprovedHours / REQUIRED_HOURS) * 100);
+        // Calculate progress dynamically based on goalHours
+        const progress = Math.min(100, (totalApprovedHours / goalHours) * 100);
 
         return {
             success: true,
             logs,
             totalApprovedHours,
             progress,
-            requiredHours: REQUIRED_HOURS
+            requiredHours: goalHours, // 🟢 Send the dynamic goal to UI
+            isInternshipApproved: true,
+            activeJobTitle: jobData?.title || 'Unknown Job', 
+            activeCompany: companyData?.name || 'Unknown Company'
         };
 
     } catch (e) {
-        console.error('Error fetching logbook data:', e);
-        return { success: false, error: e.message || 'An unexpected error occurred.' };
+        console.error("Logbook Data Error:", e);
+        return { success: false, error: e.message };
     }
 }
 
-/**
- * Handles the submission of a new logbook entry.
- */
 export async function submitNewLogEntry(formData) {
-    // 🔑 CREATE THE SERVER CLIENT
     const supabase = createSupabaseServerClient(); 
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { success: false, error: 'User not authenticated' };
 
-    const { data: userData, error: userError } = await supabase.auth.getUser();
+    // Gatekeeper: Check for ongoing internship
+    const { data: activeApp } = await supabase
+        .from('job_applications')
+        .select('id, company_id')
+        .eq('intern_id', user.id)
+        .eq('status', 'ongoing') 
+        .maybeSingle();
 
-    if (userError || !userData?.user) {
-        console.error("Auth Error in submitNewLogEntry:", userError);
-        return { success: false, error: 'User not authenticated. Please log in again.' };
+    if (!activeApp) {
+        return { success: false, error: 'No active internship found. Please check your history page.' };
     }
 
-    const internId = userData.user.id;
     const date = formData.get('date');
     const attendance_status = formData.get('attendance_status');
     const hours_worked = parseFloat(formData.get('hours_worked'));
@@ -76,23 +118,24 @@ export async function submitNewLogEntry(formData) {
     }
 
     try {
-        const { error } = await supabase
-            .from('logbook_entries')
-            .insert({
-                intern_id: internId,
-                date,
-                attendance_status,
-                hours_worked,
-                tasks_completed,
-                status: 'Pending' 
-            });
+        const { error } = await supabase.from('logbooks').insert({
+            intern_id: user.id,
+            application_id: activeApp.id,
+            company_id: activeApp.company_id,
+            date,
+            attendance_status,
+            hours_worked,
+            tasks_completed,
+            status: 'Pending' 
+        });
 
         if (error) throw error;
 
-        return { success: true, message: 'Logbook entry submitted successfully for review!' };
+        // Force refresh so the new entry shows up immediately
+        revalidatePath('/intern/logbook');
 
+        return { success: true, message: 'Logbook entry submitted!' };
     } catch (e) {
-        console.error('Error submitting log entry:', e);
-        return { success: false, error: e.message || 'Failed to submit entry.' };
+        return { success: false, error: e.message };
     }
 }

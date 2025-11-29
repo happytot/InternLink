@@ -10,22 +10,57 @@ import { toast } from 'sonner';
 export default function Listings() {
   const supabase = createClientComponentClient();
 
-  const [user, setUser] = useState(null); // Logged-in intern
+  const [user, setUser] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedJob, setSelectedJob] = useState(null);
-  const [animateClose, setAnimateClose] = useState(false);
+  // 🔑 State now tracks the ID of the selected job, not the object
+  const [selectedJobId, setSelectedJobId] = useState(null);
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(true);
+const [savedJobs, setSavedJobs] = useState([]); // Stores saved job objects
+const [showSavedJobs, setShowSavedJobs] = useState(false); // Toggle modal/panel
+const [postTimeFilter, setPostTimeFilter] = useState(''); // '', '24h', '7d', '30d'
+  const [filterType, setFilterType] = useState('');
 
-  // --- Fetch Logged-in Intern (This will now work) ---
+
+
+  // ... (Fetch Logged-in Intern useEffect remains the same) ...
   useEffect(() => {
     const getUser = async () => {
-      // This 'supabase' variable is now the cookie-aware one
       const { data } = await supabase.auth.getUser();
       if (data?.user) setUser(data.user);
     };
     getUser();
-  }, [supabase]); // Added supabase to dependency array
+  }, [supabase]);
+
+  // Helper: convert timestamp to "time ago"
+  // <-- THIS FUNCTION FIXES the ReferenceError by ensuring timeAgo is defined inside the component scope
+  const timeAgo = (timestamp) => {
+    if (!timestamp) return 'Just now';
+    const now = new Date();
+    const posted = new Date(timestamp);
+    const seconds = Math.floor((now - posted) / 1000);
+
+    if (seconds < 5) return 'Just now';
+
+    const intervals = [
+      { label: 'year', seconds: 31536000 },
+      { label: 'month', seconds: 2592000 },
+      { label: 'week', seconds: 604800 },
+      { label: 'day', seconds: 86400 },
+      { label: 'hour', seconds: 3600 },
+      { label: 'minute', seconds: 60 },
+      { label: 'second', seconds: 1 },
+    ];
+
+    for (const interval of intervals) {
+      const count = Math.floor(seconds / interval.seconds);
+      if (count >= 1) {
+        return `${count} ${interval.label}${count > 1 ? 's' : ''} ago`;
+      }
+    }
+
+    return 'Just now';
+  };
 
   // --- Fetch job listings from Supabase ---
   useEffect(() => {
@@ -60,6 +95,10 @@ export default function Listings() {
         }));
 
         setListings(transformedData);
+        // 🆕 Set the first job as automatically selected
+        if (transformedData.length > 0) {
+          setSelectedJobId(transformedData[0].id);
+        }
       } catch (err) {
         console.error('Error fetching job listings:', err.message);
         toast.error('Failed to load job listings.');
@@ -69,9 +108,9 @@ export default function Listings() {
     };
 
     fetchListings();
-  }, [supabase]); // Added supabase to dependency array
+  }, [supabase]);
 
-  // --- Apply to Job Function (This will now work) ---
+  // --- Apply to Job Function (Remains the same, but calls apply directly) ---
   const applyToJob = async (jobId, companyId) => {
     if (!user) {
       toast.error("Please login first.");
@@ -106,30 +145,189 @@ export default function Listings() {
       }
       return;
     }
-    closeModal();
-    toast.success("Application submitted successfully!");
+    // Re-fetch listings to update 'Applied' status (simple refresh, could be optimized)
+    setListings(prev => prev.map(job => 
+        job.id === jobId 
+            ? { ...job, job_applications: [...(job.job_applications || []), { intern_id: user.id }] }
+            : job
+    ));
+    toast.success("Application submitted successfully! 🚀");
   };
 
-  // --- Modal control ---
-  const openJobDetailModal = (jobData) => {
-    setSelectedJob(jobData);
-    document.body.classList.add('modal-open');
-  };
-
-  const closeModal = () => {
-    setAnimateClose(true);
-    setTimeout(() => {
-      setSelectedJob(null);
-      setAnimateClose(false);
-      document.body.classList.remove('modal-open');
-    }, 300);
+  // --- New Job Select Function ---
+  const selectJob = (jobId) => {
+    setSelectedJobId(jobId);
   };
 
   // --- Filter Logic ---
-  const filteredInternships = listings.filter((job) =>
+// Unified filter logic
+const filteredInternships = listings
+  .filter(job =>
     job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     job.company.toLowerCase().includes(searchTerm.toLowerCase())
+  )
+  .filter(job =>
+    filterType ? job.work_setup.toLowerCase() === filterType.toLowerCase() : true
+  )
+  .filter(job => {
+    if (!postTimeFilter) return true;
+
+    const now = new Date();
+    const posted = new Date(job.created_at);
+    const diffHours = (now - posted) / 1000 / 3600; // hours difference
+
+    if (postTimeFilter === '24h') return diffHours <= 24;
+    if (postTimeFilter === '7d') return diffHours <= 24 * 7;
+    if (postTimeFilter === '30d') return diffHours <= 24 * 30;
+
+    return true;
+  });
+
+  
+  // 🔑 Get the currently selected job object
+  const selectedJob = listings.find(job => job.id === selectedJobId);
+
+  // Helper function to render list items (same as before)
+  const renderList = (items) => (
+    <ul className="job-detail-list">
+      {items.map((item, index) => (
+        <li key={index}>{item}</li>
+      ))}
+    </ul>
   );
+
+  // --- Job Detail Component (Refactored from Modal content) ---
+  const JobDetailsPane = ({ job, applyFn, user }) => {
+    if (!job) {
+        return (
+            <div className="job-details-pane no-job-selected">
+                <h2>Select an Internship to View Details</h2>
+                <p>Click on any listing on the left to see the full description, requirements, and apply.</p>
+                
+            </div>
+        );
+    }
+
+    const isApplied = job.job_applications?.some(app => app.intern_id === user?.id);
+
+<button
+  className={`secondary-btn save-btn ${savedJobs.some(j => j.id === job.id) ? 'saved' : ''}`}
+  onClick={() => {
+    if (!savedJobs.some(j => j.id === job.id)) {
+      setSavedJobs([...savedJobs, job]);
+      toast.success("Job saved!");
+    } else {
+      setSavedJobs(savedJobs.filter(j => j.id !== job.id));
+      toast("Job removed from saved list");
+    }
+  }}
+>
+  {savedJobs.some(j => j.id === job.id) ? "Saved" : "Save"}
+</button>
+
+
+
+
+    return (
+      <div className="job-details-pane">
+        <div className="modal-header">
+            <h2>Job Details</h2>
+            {/* The close button is removed here */}
+        </div>
+
+        <div className="modal-body">
+            {/* --- 1. Header & Company Info --- */}
+            <div className="job-detail-group">
+                <h3 className="job-detail-title">{job.title}</h3>
+                <p className="job-detail-company">{job.company}</p>
+                <p className="posted-ago">Posted {timeAgo(job.created_at)}</p>
+            </div>
+
+            {/* --- 2. Secondary Info Grid --- */}
+            <div className="job-detail-secondary-grid">
+                <div className="job-detail-item">
+                    <span className="job-detail-label">Location</span>
+                    <span className="job-detail-value">{job.location}</span>
+                </div>
+                {job.work_setup && (
+                    <div className="job-detail-item">
+                        <span className="job-detail-label">Work Setup</span>
+                        <span className="job-detail-value">{job.work_setup}</span>
+                    </div>
+                )}
+                {job.work_schedule && (
+                    <div className="job-detail-item">
+                        <span className="job-detail-label">Work Schedule</span>
+                        <span className="job-detail-value">{job.work_schedule}</span>
+                    </div>
+                )}
+                {job.salary != null && (
+                    <div className="job-detail-item">
+                        <span className="job-detail-label">Salary</span>
+                        <span className="job-detail-value">₱{
+                            isNaN(Number(job.salary))
+                                ? job.salary
+                                : Number(job.salary).toLocaleString()
+                        }</span>
+                    </div>
+                )}
+            </div>
+              
+            {/* --- 3. Description --- */}
+            <div className="detail-card">
+                <span className="job-detail-subheading">Job Description</span>
+                <p className="job-detail-description">{job.description}</p>
+            </div>
+
+            {/* --- 4. Responsibilities --- */}
+            {job.responsibilities && job.responsibilities.length > 0 && (
+                <div className="detail-card">
+                    <span className="job-detail-subheading">Key Responsibilities</span>
+                    {renderList(job.responsibilities)}
+                </div>
+            )}
+
+            {/* --- 5. Requirements --- */}
+            {job.requirements && job.requirements.length > 0 && (
+                <div className="detail-card">
+                    <span className="job-detail-subheading">Minimum Requirements</span>
+                    {renderList(job.requirements)}
+                </div>
+            )}
+        </div>
+
+       <div className="modal-footer">
+  {/* Save Button */}
+  <button
+    className={`secondary-btn save-btn ${savedJobs.some(j => j.id === job.id) ? 'saved' : ''}`}
+    onClick={() => {
+      if (!savedJobs.some(j => j.id === job.id)) {
+        setSavedJobs([...savedJobs, job]);
+        toast.success("Job saved! ❤️");
+      } else {
+        setSavedJobs(savedJobs.filter(j => j.id !== job.id));
+        toast("Job removed from saved list");
+      }
+    }}
+  >
+    {savedJobs.some(j => j.id === job.id) ? 'Saved ❤️' : 'Save'}
+  </button>
+
+  {/* Apply Button */}
+  <button
+    className="primary-btn"
+    onClick={() => applyFn(job.id, job.company_id)}
+    disabled={job.job_applications?.some(app => app.intern_id === user?.id)}
+  >
+    {job.job_applications?.some(app => app.intern_id === user?.id) ? "Applied ✔️" : "Apply Now"}
+  </button>
+</div>
+
+
+      </div>
+    );
+  };
+
 
   return (
     <>
@@ -144,132 +342,117 @@ export default function Listings() {
             onChange={(e) => setSearchTerm(e.target.value)}
             className="search-input"
           />
+          <button
+  className="saved-jobs-btn"
+  onClick={() => setShowSavedJobs(true)}
+>
+  Saved Jobs ({savedJobs.length})
+</button>
+          <select
+  className="filter-select"
+  value={filterType}
+  onChange={(e) => setFilterType(e.target.value)}
+>
+  <option value="">All Types</option>
+  <option value="Remote">Remote</option>
+  <option value="On-site">On-site</option>
+  <option value="Hybrid">Hybrid</option>
+</select>
+
+<select
+  className="filter-select"
+  value={postTimeFilter}
+  onChange={(e) => setPostTimeFilter(e.target.value)}
+>
+  <option value="">Any time</option>
+  <option value="24h">Last 24 hours</option>
+  <option value="7d">Last 7 days</option>
+  <option value="30d">Last 30 days</option>
+</select>
+
         </div>
 
-        {/* Loading or No Results */}
-        {loading && <p className="no-results">Loading listings...</p>}
-        {!loading && filteredInternships.length === 0 && (
-          <p className="no-results">No internships found matching your criteria.</p>
-        )}
+        <div className="bento-box-layout">
+          {/* ⬅️ Left Pane: Listing Cards */}
+          <div className="listings-pane">
+            {loading && <p className="no-results">Loading listings...</p>}
+            {!loading && filteredInternships.length === 0 && (
+              <p className="no-results">No internships found matching your criteria.</p>
+            )}
 
-        {/* Internship Grid */}
-        {filteredInternships.length > 0 && (
-          <div className="internship-results">
-            {filteredInternships.map((job) => (
-              <div key={job.id} className="listing-card">
-                <h2 className="job-title">{job.title}</h2>
-                <p className="job-company">{job.company}</p>
-                <p className="job-meta"><span>{job.location}</span></p>
+            {filteredInternships.length > 0 && (
+              <div className="internship-results-list">
+                {filteredInternships.map((job) => (
+                  <div 
+                    key={job.id} 
+                    className={`listing-card ${job.id === selectedJobId ? 'selected-card' : ''}`}
+                    onClick={() => selectJob(job.id)}
+                  >
+                    <h2 className="job-title">{job.title}</h2>
+                    <p className="job-company">{job.company}</p>
+                    <p className="job-meta">
+                      <span className="location-pill">{job.location}</span>
+                      {job.work_setup && <span className="work-setup-pill">{job.work_setup}</span>}
+                    </p>
+
+                    <p className="job-timeago">{timeAgo(job.created_at)}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* ➡️ Right Pane: Job Details */}
+          <JobDetailsPane 
+            job={selectedJob} 
+            applyFn={applyToJob} 
+            user={user} 
+          />
+        </div>
+      </div>
+{/* --- Saved Jobs Modal --- */}
+{showSavedJobs && (
+  <div className="modal-overlay active" onClick={() => setShowSavedJobs(false)}>
+    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+      <div className="modal-header">
+        <h2>Saved Jobs</h2>
+        <button className="close-btn" onClick={() => setShowSavedJobs(false)}>×</button>
+      </div>
+      <div className="modal-body">
+        {savedJobs.length === 0 ? (
+          <p>You haven't saved any jobs yet.</p>
+        ) : (
+          savedJobs.map((job) => (
+            <div key={job.id} className="listing-card saved-listing-card">
+              <h3 className="job-title">{job.title}</h3>
+              <p className="job-company">{job.company}</p>
+              <p className="job-meta">{job.location} | {job.work_setup}</p>
+              <div className="saved-card-footer">
                 <button
-                  onClick={() => openJobDetailModal(job)}
-                  className="btn-details"
+                  className="primary-btn"
+                  onClick={() => {
+                    selectJob(job.id);
+                    setShowSavedJobs(false); // Close modal and view job details
+                  }}
                 >
                   View Details
                 </button>
+                <button
+                  className="secondary-btn remove-btn"
+                  onClick={() => setSavedJobs(savedJobs.filter(j => j.id !== job.id))}
+                >
+                  Remove
+                </button>
               </div>
-            ))}
-          </div>
+            </div>
+          ))
         )}
       </div>
+    </div>
+  </div>
+)}
 
-      {/* 💎 Animated Modal */}
-      {selectedJob && (
-        <div
-          className={`modal-overlay ${animateClose ? 'modal-closing' : 'active'}`}
-          onClick={closeModal}
-        >
-          <div
-            className={`modal-content ${animateClose ? 'modal-closing' : ''}`}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="modal-header">
-              <h2>Job Details</h2>
-              <button className="close-btn" onClick={closeModal}>×</button>
-            </div>
-
-            <div className="modal-body">
-              {/* Main Info */}
-              <div className="job-detail-group">
-                <h3 className="job-detail-title">{selectedJob.title}</h3>
-                <p className="job-detail-company">{selectedJob.company}</p>
-              </div>
-
-              {/* Secondary Info */}
-              <div className="job-detail-group">
-                <div className="job-detail-item">
-                  <span className="job-detail-label">Location</span>
-                  <span className="job-detail-value">{selectedJob.location}</span>
-                </div>
-                {selectedJob.work_setup && (
-                  <div className="job-detail-item">
-                    <span className="job-detail-label">Work Setup</span>
-                    <span className="job-detail-value">{selectedJob.work_setup}</span>
-                  </div>
-                )}
-                {selectedJob.work_schedule && (
-                  <div className="job-detail-item">
-                    <span className="job-detail-label">Work Schedule</span>
-                    <span className="job-detail-value">{selectedJob.work_schedule}</span>
-                  </div>
-                )}
-                {selectedJob.salary != null && (
-                  <div className="job-detail-item">
-                    <span className="job-detail-label">Salary</span>
-                    <span className="job-detail-value">₱{
-                      isNaN(Number(selectedJob.salary))
-                        ? selectedJob.salary
-                        : Number(selectedJob.salary).toLocaleString()
-                    }</span>
-                  </div>
-                )}
-              </div>
-
-              {/* Description */}
-              <div className="job-detail-group">
-                <span className="job-detail-label">Description</span>
-                <p className="job-detail-description">{selectedJob.description}</p>
-              </div>
-
-              {/* Responsibilities */}
-              {selectedJob.responsibilities && selectedJob.responsibilities.length > 0 && (
-                <div className="job-detail-group">
-                  <span className="job-detail-label">Responsibilities</span>
-                  <ul className="job-detail-list">
-                    {selectedJob.responsibilities.map((item, index) => (
-                      <li key={index}>{item}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {/* Requirements */}
-              {selectedJob.requirements && selectedJob.requirements.length > 0 && (
-                <div className="job-detail-group">
-                  <span className="job-detail-label">Requirements</span>
-                  <ul className="job-detail-list">
-                    {selectedJob.requirements.map((item, index) => (
-                      <li key={index}>{item}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
-
-            <div className="modal-footer">
-              <button className="secondary-btn" onClick={closeModal}>Close</button>
-              <button
-                className="primary-btn"
-                onClick={() => applyToJob(selectedJob.id, selectedJob.company_id)}
-                disabled={selectedJob.job_applications?.some(app => app.intern_id === user?.id)}
-              >
-                {selectedJob.job_applications?.some(app => app.intern_id === user?.id) ? "Applied ✔️" : "Apply Now"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      <InternNav className={selectedJob ? 'hidden' : ''} />
+      <InternNav />
     </>
   );
 }

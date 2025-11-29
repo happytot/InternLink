@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { supabase } from "../../../lib/supabaseClient";
 import CoordinatorSidebar from "../../components/CoordinatorSidebar";
-import "./announcements.css";
+import "./announcements.css"; // The new CSS file
 
 export default function CoordinatorAnnouncements() {
   const [userId, setUserId] = useState("");
@@ -17,6 +17,13 @@ export default function CoordinatorAnnouncements() {
   useEffect(() => {
     getUser();
     fetchAnnouncements();
+
+    // Optional: Update timeAgo every 30s for live updates
+    const interval = setInterval(() => {
+      setAnnouncements((prev) => [...prev]);
+    }, 30000);
+
+    return () => clearInterval(interval);
   }, []);
 
   const getUser = async () => {
@@ -34,43 +41,40 @@ export default function CoordinatorAnnouncements() {
     else setAnnouncements(data);
   };
 
-const uploadImage = async (file) => {
-  try {
-    setUploading(true);
+  const uploadImage = async (file) => {
+    try {
+      setUploading(true);
 
-    if (!file) {
-      alert("No image selected.");
+      if (!file) {
+        alert("No image selected.");
+        return null;
+      }
+
+      const ext = file.name.split(".").pop();
+      const fileName = `${Date.now()}.${ext}`;
+
+      const { data, error } = await supabase.storage
+        .from("announcement_images")
+        .upload(fileName, file, {
+          cacheControl: "3600",
+          upsert: false,
+        });
+
+      if (error) throw error;
+
+      const { data: publicUrl } = supabase.storage
+        .from("announcement_images")
+        .getPublicUrl(fileName);
+
+      return publicUrl.publicUrl;
+    } catch (err) {
+      console.error("Image upload failed:", err);
+      alert("Image upload failed: " + err.message);
       return null;
+    } finally {
+      setUploading(false);
     }
-
-    const ext = file.name.split(".").pop();
-    const fileName = `${Date.now()}.${ext}`;
-
-    const { data, error } = await supabase.storage
-      .from("announcement_images")  // MUST match your bucket name
-      .upload(fileName, file, {
-        cacheControl: "3600",
-        upsert: false
-      });
-
-    if (error) throw error;
-
-    const { data: publicUrl } = supabase.storage
-      .from("announcement_images")
-      .getPublicUrl(fileName);
-
-    return publicUrl.publicUrl;
-
-  } catch (err) {
-    console.error("Image upload failed:", err);
-    alert("Image upload failed: " + err.message);
-    return null;
-  } finally {
-    setUploading(false);
-  }
-};
-
-
+  };
 
   const postAnnouncement = async () => {
     if (!title.trim() || !content.trim()) {
@@ -120,6 +124,7 @@ const uploadImage = async (file) => {
     setEditingId(a.id);
     setTitle(a.title);
     setContent(a.content);
+    setImage(null);
   };
 
   const resetForm = () => {
@@ -129,13 +134,28 @@ const uploadImage = async (file) => {
     setImage(null);
   };
 
+  // --- Utility function for relative time ---
+  const timeAgo = (timestamp) => {
+    const now = new Date();
+    const uploaded = new Date(timestamp);
+    const seconds = Math.floor((now - uploaded) / 1000);
+
+    if (seconds < 60) return `${seconds}s ago`;
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return `${minutes}m ago`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours}h ago`;
+    const days = Math.floor(hours / 24);
+    return `${days}d ago`;
+  };
+
   return (
     <div className="coordinator-page">
       <CoordinatorSidebar />
 
       <div className="announcement-page">
-        <div className="announcement-header">
-          <h1>Announcements</h1>
+        <div className="announcement-header glass-card">
+          <h1>Announcement</h1>
         </div>
 
         <div className="announcement-content">
@@ -144,24 +164,36 @@ const uploadImage = async (file) => {
             <h2>Latest Updates</h2>
 
             {announcements.length === 0 ? (
-              <p className="no-announcement">No announcements yet.</p>
+              <p className="no-announcement">
+                No announcements yet. Ready to post the first one?
+              </p>
             ) : (
               <div className="announcement-list">
                 {announcements.map((a) => (
-                  <div key={a.id} className="announcement-item">
+                  <div
+                    key={a.id}
+                    className="announcement-item card-hover-effect reveal-on-scroll"
+                  >
                     {a.image_url && (
-                      <img src={a.image_url} className="announcement-img" />
+                      <img
+                        src={a.image_url}
+                        className="announcement-img"
+                        alt={a.title}
+                      />
                     )}
-                    <h3>{a.title}</h3>
-                    <p>{a.content}</p>
-                    <span className="date">
-                      {new Date(a.created_at).toLocaleString()}
-                    </span>
+                    <h3 className="announcement-title">{a.title}</h3>
+                    <p className="announcement-text">{a.content}</p>
+                    <span className="date">{timeAgo(a.created_at)}</span>
 
                     <div className="announcement-actions">
-                      <button onClick={() => editAnnouncement(a)}>Edit</button>
                       <button
-                        className="delete-btn"
+                        className="btn-secondary"
+                        onClick={() => editAnnouncement(a)}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        className="btn-delete"
                         onClick={() => deleteAnnouncement(a.id)}
                       >
                         Delete
@@ -174,27 +206,40 @@ const uploadImage = async (file) => {
           </div>
 
           {/* RIGHT FORM */}
-          <div className="create-announcement">
-            <h2>{editingId ? "Edit Announcement" : "Create Announcement"}</h2>
+          <div className="create-announcement glass-card reveal-on-scroll">
+            <h2>
+              {editingId ? "✍️ Edit Announcement" : "✨ Create New Announcement"}
+            </h2>
 
-            <label>Title</label>
+            <label htmlFor="title-input">Title</label>
             <input
+              id="title-input"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="Enter title"
+              placeholder="E.g., Mandatory Orientation on Friday"
             />
 
-            <label>Content</label>
+            <label htmlFor="content-textarea">Content</label>
             <textarea
+              id="content-textarea"
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              placeholder="Write announcement details..."
+              placeholder="Write the detailed announcement here..."
+              rows={6}
             />
 
-            <label>Upload Image</label>
-            <input type="file" onChange={(e) => setImage(e.target.files[0])} />
+            <label htmlFor="image-input">Upload Image</label>
+            <input
+              id="image-input"
+              type="file"
+              onChange={(e) => setImage(e.target.files[0])}
+            />
 
-            <button onClick={postAnnouncement} disabled={uploading}>
+            <button
+              onClick={postAnnouncement}
+              disabled={uploading}
+              className="btn-primary"
+            >
               {uploading
                 ? "Uploading..."
                 : editingId
@@ -203,8 +248,8 @@ const uploadImage = async (file) => {
             </button>
 
             {editingId && (
-              <button className="cancel-btn" onClick={resetForm}>
-                Cancel
+              <button className="btn-cancel" onClick={resetForm}>
+                Cancel Edit
               </button>
             )}
           </div>

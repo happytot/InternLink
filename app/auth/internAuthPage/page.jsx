@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import styles from '../../components/AuthPage.module.css'; // Ensure this path is correct relative to this file
+import styles from '../../components/AuthPage.module.css'; 
 import { useRouter } from 'next/navigation';
-import { Toaster, toast } from 'sonner';
+// 1. ✅ ADDED Toaster to JSX (Explained below)
+import { Toaster, toast } from 'sonner'; 
 import { FaEye, FaEyeSlash, FaSun, FaMoon } from 'react-icons/fa';
 import { useTheme } from 'next-themes';
 
@@ -45,7 +46,7 @@ export default function InternAuthPage() {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
 
-  // --- LOGIN LOGIC (Optimized) ---
+  // --- LOGIN LOGIC ---
   const handleLogin = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -58,28 +59,40 @@ export default function InternAuthPage() {
 
       if (error) throw error;
 
-      // 1. Metadata Check (Fastest)
+      // 2. ✅ LOGIC FIX: Refresh BEFORE logic logic to prime the router
+      // This ensures the middleware cookie is set before we push.
+      router.refresh(); 
+
+      // Check User Type
       const metaType = data.user?.user_metadata?.user_type;
+      let isStudent = false;
+
+      // Check Metadata first (Fast)
       if (metaType === 'student') {
-        router.refresh();
-        router.push('/intern/dashboard');
-        return;
+        isStudent = true;
+      } 
+      // Fallback to Database (Safe)
+      else {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('user_type')
+          .eq('id', data.user.id)
+          .single();
+        
+        if (profile?.user_type === 'student') {
+          isStudent = true;
+        }
       }
 
-      // 2. Database Fallback (Legacy/Safety)
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('user_type')
-        .eq('id', data.user.id)
-        .single();
-
-      if (!profileError && profile?.user_type === 'student') {
-        router.refresh();
-        router.push('/intern/dashboard');
+      if (isStudent) {
+        // Use replace instead of push so they can't click "Back" to login page
+        router.replace('/intern/dashboard');
+        // toast.success("Welcome back!"); // Optional
       } else {
         await supabase.auth.signOut();
-        toast.error('Access Denied', { description: 'This is not a student account.' });
+        toast.error('Access Denied', { description: 'This account is not registered as an Intern.' });
       }
+
     } catch (err) {
       toast.error('Login Failed', { description: translateSupabaseError(err) });
     } finally {
@@ -93,22 +106,32 @@ export default function InternAuthPage() {
     setIsLoading(true);
 
     try {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
         options: {
           data: {
             fullname: formData.fullname,
-            user_type: 'student',
+            user_type: 'student', // Critical for your RLS policies
           },
         },
       });
 
       if (error) throw error;
 
-      toast.success('Signup Successful!', { description: 'Please check your email to verify your account.' });
-      setFormData({ fullname: '', email: '', password: '' });
-      setIsLoginView(true);
+      // 3. ✅ UX IMPROVEMENT: Handle Auto-Login vs Email Verification
+      // If Email Verification is OFF in Supabase, data.session will exist.
+      if (data.session) {
+          router.refresh();
+          router.replace('/intern/dashboard');
+          toast.success('Account Created!', { description: 'Welcome to the platform.' });
+      } else {
+          // If Email Verification is ON
+          toast.success('Signup Successful!', { description: 'Please check your email to verify your account.' });
+          setFormData({ fullname: '', email: '', password: '' });
+          setIsLoginView(true);
+      }
+
     } catch (err) {
       toast.error('Signup Failed', { description: translateSupabaseError(err) });
     } finally {
@@ -120,7 +143,8 @@ export default function InternAuthPage() {
 
   return (
     <div className={styles.bodyContainer}>
-      {/* 🍞 Global CSS handles the glass styling automatically */}
+      {/* ✅ IMPORTANT: Toaster must be rendered to see notifications */}
+      <Toaster richColors position="top-center" />
 
       {/* 🌗 THEME TOGGLE */}
       <button
@@ -134,7 +158,6 @@ export default function InternAuthPage() {
       <div className={styles.container}>
         <div className={styles.formContainer}>
           
-          {/* BACK BUTTON */}
           <button className={styles.backButton} onClick={handleGoBack}>
             &times;
           </button>
@@ -233,6 +256,7 @@ export default function InternAuthPage() {
                     onChange={handleChange}
                     required
                     disabled={isLoading}
+                    minLength={6} // Basic HTML5 validation
                   />
                   <button
                     type="button"

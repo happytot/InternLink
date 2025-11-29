@@ -1,10 +1,10 @@
-// app/components/intern/LogbookClient.jsx
 'use client';
 
 import { useState, useEffect } from 'react';
+import { supabase } from '../../../lib/supabaseClient'; 
 import { toast, Toaster } from 'sonner';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import styles from './Logbook.module.css'; // 👈 Import CSS Module
+import { getInternLogbookData, submitNewLogEntry } from '@/app/intern/logbook/actions';
+import styles from './Logbook.module.css';
 import LogbookForm from './LogbookForm';
 import LogbookEntry from './LogbookEntry';
 
@@ -18,101 +18,113 @@ const formatDate = (dateString) => {
 };
 
 export default function LogbookClient() {
-  const [internship, setInternship] = useState(null);
   const [logbooks, setLogbooks] = useState([]);
-  const [totalHours, setTotalHours] = useState(0);
+  const [stats, setStats] = useState({
+    totalHours: 0,
+    progress: 0,
+    requiredHours: 486,
+    jobTitle: 'Loading...',
+    companyName: 'Loading...'
+  });
+  
+  const [isApproved, setIsApproved] = useState(false); 
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [user, setUser] = useState(null);
 
-  const supabase = createClientComponentClient();
+  // --- REUSABLE FETCH FUNCTION ---
+  // We moved this OUT of useEffect so the Realtime listener can call it too.
+  const fetchLogbookData = async (showLoadingSpinner = false) => {
+    if (showLoadingSpinner) setIsLoading(true);
+    
+    const result = await getInternLogbookData();
 
+    if (result.success) {
+      setLogbooks(result.logs || []);
+      
+      const goal = result.requiredHours || 486;
+      
+      setStats({
+        totalHours: result.totalApprovedHours,
+        progress: result.progress,
+        requiredHours: goal, 
+        jobTitle: result.activeJobTitle || 'Unknown Job', 
+        companyName: result.activeCompany || 'Unknown Company'
+      });
+      
+      setIsApproved(result.isInternshipApproved);
+    } else {
+      if (result.error) toast.error(result.error);
+    }
+    
+    setIsLoading(false);
+  };
+
+  // --- 1. INITIAL LOAD ---
   useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-      setError(null);
-      try {
-        const { data: { user: currentUser }, error: userError } = await supabase.auth.getUser();
-        if (userError || !currentUser) throw new Error('You are not logged in. Please log in again.');
-        setUser(currentUser);
+    fetchLogbookData(true); // True = show full page loading spinner
+  }, []);
 
-        const { data: internshipData, error: internshipError } = await supabase
-          .from('job_applications')
-          .select('id, company_id, job_id')
-          .eq('intern_id', currentUser.id)
-          .in('status', ['approved_by_coordinator'])
-          .order('created_at', { ascending: false })
-          .limit(1)
-          .single();
-        if (internshipError || !internshipData) throw new Error('No active internship found.');
+  // --- 2. REALTIME LISTENER (The Magic Part) ---
+  useEffect(() => {
+    console.log("🟢 Intern listening for Company updates...");
 
-        const [companyRes, jobRes] = await Promise.all([
-          supabase.from('companies').select('name').eq('id', internshipData.company_id).single(),
-          supabase.from('job_posts').select('title').eq('id', internshipData.job_id).single()
-        ]);
-        
-        const fullInternshipData = {
-          ...internshipData,
-          companies: companyRes.data,
-          job_posts: jobRes.data,
-        };
-        if (companyRes.error) console.error("Error fetching company:", companyRes.error.message);
-        if (jobRes.error) console.error("Error fetching job post:", jobRes.error.message);
-        setInternship(fullInternshipData);
+    const channel = supabase
+      .channel('intern-logbook-updates')
+      .on(
+        'postgres_changes',
+        // Listen specifically for UPDATES on the logbooks table
+        { event: 'UPDATE', schema: 'public', table: 'logbooks' },
+        (payload) => {
+          console.log('Update received:', payload);
 
-        const { data: logbooksData, error: logbooksError } = await supabase
-          .from('logbooks')
-          .select('*')
-          .eq('intern_id', currentUser.id)
-          .order('date', { ascending: false });
-        if (logbooksError) throw new Error('Failed to fetch logbooks: ' + logbooksError.message);
-        setLogbooks(logbooksData);
+          // Check if the status changed to 'Approved'
+          const newStatus = (payload.new.status || '').toLowerCase();
+          if (newStatus === 'approved') {
+            toast.success("Your log entry was just APPROVED!");
+          }
 
-        const total = logbooksData.reduce((acc, log) => acc + parseFloat(log.hours_worked || 0), 0);
-        setTotalHours(total);
-      } catch (err) {
-        setError(err.message);
-        if (err.message !== 'No active internship found.') toast.error(err.message);
-      } finally {
-        setIsLoading(false);
-      }
+          // REFRESH DATA (Updates the list and the progress bar instantly)
+          fetchLogbookData(false); // False = don't show full page spinner, just update UI
+        }
+      )
+      .subscribe();
+
+    // Cleanup
+    return () => {
+      supabase.removeChannel(channel);
     };
-    fetchData();
-  }, [supabase]);
+  }, []);
 
-  const handleAddLog = async (newLog) => {
-    if (!user || !internship) return toast.error('User or internship data is missing.');
-    try {
-      const { data: newEntry, error } = await supabase
-        .from('logbooks')
-        .insert({ ...newLog, intern_id: user.id, internship_id: internship.id, company_id: internship.company_id, status: 'submitted', submitted_at: new Date().toISOString() })
-        .select()
-        .single();
-      if (error) throw new Error('Failed to submit log entry: ' + error.message);
-      const updatedLogbooks = [newEntry, ...logbooks];
-      setLogbooks(updatedLogbooks);
-      const total = updatedLogbooks.reduce((acc, log) => acc + parseFloat(log.hours_worked || 0), 0);
-      setTotalHours(total);
+  // --- 3. HANDLE SUBMISSION ---
+  const handleAddLog = async (logData) => {
+    const formData = new FormData();
+    formData.append('date', logData.date);
+    formData.append('hours_worked', logData.hours_worked);
+    formData.append('tasks_completed', logData.tasks_completed);
+    formData.append('attendance_status', logData.attendance_status || 'Present'); 
+
+    const result = await submitNewLogEntry(formData);
+
+    if (result.success) {
       toast.success('Log entry submitted successfully!');
-    } catch (err) {
-      toast.error(err.message);
+      
+      // We manually add it to the list for instant feedback, 
+      // but fetchLogbookData will also run if RLS triggers an INSERT event.
+      const newEntry = {
+        id: Date.now(), // Temporary ID until refresh
+        ...logData,
+        status: 'Pending',
+        hours_worked: parseFloat(logData.hours_worked)
+      };
+      
+      setLogbooks([newEntry, ...logbooks]);
+      fetchLogbookData(false); // Refresh to get the real ID from server
+    } else {
+      toast.error(result.error);
     }
   };
 
-  const handleDeleteLog = async (logId) => {
-    if (!user) return toast.error('User not found.');
-    if (!confirm('Are you sure you want to delete this entry?')) return;
-    try {
-      const { error } = await supabase.from('logbooks').delete().eq('id', logId).eq('intern_id', user.id);
-      if (error) throw new Error('Failed to delete log entry: ' + error.message);
-      const updatedLogbooks = logbooks.filter((log) => log.id !== logId);
-      setLogbooks(updatedLogbooks);
-      const total = updatedLogbooks.reduce((acc, log) => acc + parseFloat(log.hours_worked || 0), 0);
-      setTotalHours(total);
-      toast.success('Log entry deleted.');
-    } catch (err) {
-      toast.error(err.message);
-    }
+  const handleDeleteLog = (logId) => {
+      toast.info("Delete functionality coming soon.");
   };
 
   if (isLoading) {
@@ -124,56 +136,58 @@ export default function LogbookClient() {
     );
   }
 
-  // This is a custom div for the error, not from the CSS file
-  if (error && error.includes('internship')) {
+  // --- 4. LOCKED STATE ---
+  if (!isApproved) {
     return (
       <div className={styles.pageContainer}>
         <h1 className={styles.header}>Digital Logbook</h1>
-        <div style={{ backgroundColor: '#fffbeb', borderLeft: '4px solid #f59e0b', color: '#b45309', padding: '1rem', borderRadius: '0.375rem' }}>
-          <p style={{ fontWeight: '600' }}>No Active Internship Found</p>
-          <p>You must have an "approved_by_coordinator" internship to submit logbook entries.</p>
+        <div style={{ backgroundColor: '#fffbeb', borderLeft: '4px solid #f59e0b', color: '#b45309', padding: '1rem', borderRadius: '0.375rem', marginTop: '1rem' }}>
+          <p style={{ fontWeight: '600', fontSize: '1.1rem' }}>No Active Internship Found</p>
+          <p style={{ marginTop: '0.5rem' }}>
+            You must go to your <strong>Application History</strong> and click 
+            <span style={{color: '#16a34a', fontWeight: 'bold'}}> "🚀 Start Internship" </span> 
+            on your approved application before you can log hours.
+          </p>
         </div>
       </div>
     );
-  }
-  
-  if (error) {
-    return <div className={styles.pageContainer}><p style={{ color: '#ef4444' }}>Error: {error}</p></div>
   }
 
   return (
     <div className={styles.pageContainer}>
       <Toaster richColors position="top-right" />
+      
       <h1 className={styles.header}>Digital Logbook</h1>
       
-      {internship && (
-        <>
-          <p className={styles.subHeader}>
-            Submitting for: <strong>{internship.job_posts?.title || 'Unknown Job'}</strong> at <strong>{internship.companies?.name || 'Unknown Company'}</strong>
-          </p>
+      <>
+        {/* Dynamic Header */}
+        <p className={styles.subHeader}>
+          Submitting for: <strong>{stats.jobTitle}</strong> at <strong>{stats.companyName}</strong>
+        </p>
 
-          <div className={styles.statsGrid}>
-            <div className={styles.statCard}>
-              <h3 className={styles.statTitle}>Total Hours Rendered</h3>
-              <p className={styles.statValue}>{totalHours}</p>
-            </div>
-            <div className={styles.statCard}>
-              <h3 className={styles.statTitle}>Progress (486 Hours)</h3>
-              <div className={styles.progressContainer}>
-                <div
-                  className={styles.progressBar}
-                  style={{ width: `${Math.min((totalHours / 486) * 100, 100)}%` }}
-                ></div>
-              </div>
-              <p className={styles.progressText}>{((totalHours / 486) * 100).toFixed(1)}% Complete</p>
-            </div>
+        <div className={styles.statsGrid}>
+          <div className={styles.statCard}>
+            <h3 className={styles.statTitle}>Total Hours Approved</h3>
+            <p className={styles.statValue}>{stats.totalHours}</p>
           </div>
+          <div className={styles.statCard}>
+            <h3 className={styles.statTitle}>Progress ({stats.requiredHours} Hours)</h3>
+            
+            <div className={styles.progressContainer}>
+              <div
+                className={styles.progressBar}
+                style={{ width: `${stats.progress}%` }}
+              ></div>
+            </div>
+            
+            <p className={styles.progressText}>{stats.progress.toFixed(1)}% Complete</p>
+          </div>
+        </div>
 
-          <div className={styles.formContainer}>
-            <LogbookForm onSubmit={handleAddLog} />
-          </div>
-        </>
-      )}
+        <div className={styles.formContainer}>
+          <LogbookForm onSubmit={handleAddLog} />
+        </div>
+      </>
 
       <div className={styles.listContainer}>
         <h2 className={styles.listHeader}>Submitted Entries</h2>

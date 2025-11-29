@@ -2,26 +2,22 @@
 
 import Link from 'next/link';
 import './ApplicationHistory.css';
-import Header from '../../components/Header'
+import Header from '../../components/Header';
 import InternNav from '../../components/InternNav';
-// 1. ✅ Import 'useCallback'
 import { useState, useEffect, useCallback } from 'react';
+import { getApplicationHistory, startInternship } from './actions'; // 1. Import Actions
 
-// 2. ⛔️ REMOVED your old supabase import
-// import { supabase } from '../../../lib/supabaseClient';
-
-// 3. ✅ ADDED this import instead
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-
-// ✅ Helper function to format the status text
+// ✅ Helper to format status text (Updated with new statuses)
 const formatStatusText = (status) => {
   switch (status) {
     case 'Pending':
       return 'Pending';
     case 'Company_Approved_Waiting_Coordinator':
-      return 'Company Approved, Waiting for Coordinator';
-    case 'Pending_Coordinator_Approval':
-      return 'Pending Coordinator Approval';
+      return 'Waiting Coordinator Approval';
+    case 'approved_by_coordinator': // The status before starting
+      return 'Approved! Ready to Start';
+    case 'ongoing': // The active status
+      return 'Active Internship';
     case 'Accepted':
       return 'Accepted';
     case 'Rejected':
@@ -31,86 +27,75 @@ const formatStatusText = (status) => {
   }
 };
 
-// ✅ Helper function to get the correct CSS class
+// ✅ Helper for CSS classes
 const getStatusClass = (status) => {
   switch (status) {
     case 'Pending':
     case 'Company_Approved_Waiting_Coordinator':
-    case 'Pending_Coordinator_Approval':
-      return 'pending';
+      return 'pending'; // Yellow/Orange
+    case 'approved_by_coordinator':
+      return 'ready'; // Blue/Purple (You might need to add this class in CSS)
+    case 'ongoing':
     case 'Accepted':
-      return 'accepted';
+      return 'accepted'; // Green
     case 'Rejected':
-      return 'rejected';
+      return 'rejected'; // Red
     default:
       return 'pending';
   }
 };
 
 export default function ApplicationHistory() {
-  // 4. ✅ INITIALIZED the client *inside* the component
-  const supabase = createClientComponentClient();
-
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
+  const [processingId, setProcessingId] = useState(null); // To handle button loading state
 
-  // 5. ✅ Wrapped fetchApplications in useCallback
+  // 2. Fetch data using Server Action
   const fetchApplications = useCallback(async () => {
     setLoading(true);
+    const result = await getApplicationHistory();
 
-    // 1️⃣ Get logged-in user (This will now work)
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      setMessage('You must be logged in to view this page.');
-      setLoading(false);
-      return;
+    if (result.success) {
+      setApplications(result.data || []);
+    } else {
+      setMessage(result.error);
     }
+    setLoading(false);
+  }, []);
 
-    // 2️⃣ Fetch applications for this intern
-    try {
-      const { data, error } = await supabase
-        .from('job_applications')
-        .select(`
-          id,
-          created_at,
-          status,
-          job_posts:job_posts!fk_job_applications_job ( title ),
-          companies:companies!fk_job_applications_company ( name )
-        `)
-        .eq('intern_id', user.id)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-
-      setApplications(data || []);
-    } catch (error) {
-      console.error('Error fetching applications:', error);
-      setMessage('Could not fetch application history.');
-    } finally {
-      setLoading(false);
-    }
-  }, [supabase]); // 6. ✅ Added supabase dependency
-
-  // 7. ✅ Updated useEffect to use the new function
   useEffect(() => {
     fetchApplications();
   }, [fetchApplications]);
 
+  // 3. Handle Start Internship Click
+  const handleStartInternship = async (appId) => {
+    const confirmed = window.confirm("Are you ready to officially start your OJT hours? This will unlock your logbook.");
+    if (!confirmed) return;
+
+    setProcessingId(appId);
+    const result = await startInternship(appId);
+
+    if (result.success) {
+      alert(result.message);
+      fetchApplications(); // Refresh list to show new status
+    } else {
+      alert(result.error);
+    }
+    setProcessingId(null);
+  };
+
   if (loading) {
-    // ✅ Skeleton / loading animation placeholder
     return (
       <>
+        <Header />
         <div className="history-container">
           <h1>📜 Your Application History</h1>
           <div className="skeleton-table">
             {[1, 2, 3].map(i => (
               <div key={i} className="skeleton-row">
-                <div className="skeleton-cell" style={{ width: '25%' }} />
-                <div className="skeleton-cell" style={{ width: '20%' }} />
-                <div className="skeleton-cell" style={{ width: '15%' }} />
-                <div className="skeleton-cell" style={{ width: '20%' }} />
-                <div className="skeleton-cell" style={{ width: '20%' }} />
+                 {/* Skeleton styling */}
+                <div className="skeleton-cell" style={{ width: '100%', height: '50px', background: '#eee' }} />
               </div>
             ))}
           </div>
@@ -129,10 +114,10 @@ export default function ApplicationHistory() {
         {message && <p className="history-summary error">{message}</p>}
 
         <p className="history-summary">
-          You have applied to <strong>{applications.length}</strong> positions. Keep tracking your progress!
+          You have applied to <strong>{applications.length}</strong> positions.
         </p>
 
-        {/* Table View for larger screens */}
+        {/* --- TABLE VIEW (Desktop) --- */}
         <div className="history-table-wrapper table-view">
           <table>
             <thead>
@@ -141,7 +126,7 @@ export default function ApplicationHistory() {
                 <th>Company</th>
                 <th>Date Applied</th>
                 <th>Status</th>
-                <th>Details</th>
+                <th>Action</th> {/* Changed 'Details' to 'Action' */}
               </tr>
             </thead>
             <tbody>
@@ -163,7 +148,26 @@ export default function ApplicationHistory() {
                       </span>
                     </td>
                     <td>
-                      <Link href="/intern/listings" className="view-link">View Job</Link>
+                      {/* 🚀 THE START BUTTON LOGIC */}
+                      {app.status === 'approved_by_coordinator' ? (
+                        <button 
+                            onClick={() => handleStartInternship(app.id)}
+                            disabled={processingId === app.id}
+                            style={{ 
+                                backgroundColor: '#16a34a', color: 'white', 
+                                padding: '6px 12px', borderRadius: '4px', 
+                                border: 'none', cursor: 'pointer', fontWeight: 'bold'
+                            }}
+                        >
+                            {processingId === app.id ? 'Starting...' : '🚀 Start Internship'}
+                        </button>
+                      ) : app.status === 'ongoing' ? (
+                        <span style={{ color: '#16a34a', fontWeight: 'bold', fontSize: '0.9rem' }}>
+                            ✅ Active
+                        </span>
+                      ) : (
+                        <Link href="/intern/listings" className="view-link">View Job</Link>
+                      )}
                     </td>
                   </tr>
                 ))
@@ -172,7 +176,7 @@ export default function ApplicationHistory() {
           </table>
         </div>
 
-        {/* Card View for smaller screens */}
+        {/* --- CARD VIEW (Mobile) --- */}
         <div className="job-grid card-view">
           {applications.map(app => (
             <div key={app.id} className="job-card">
@@ -184,14 +188,35 @@ export default function ApplicationHistory() {
               <p className={`status status-${getStatusClass(app.status)}`}>
                 {formatStatusText(app.status)}
               </p>
-              <Link href="/intern/listings" className="view-link resume-link">View Job</Link>
+              
+              <div style={{ marginTop: '10px' }}>
+                  {app.status === 'approved_by_coordinator' ? (
+                    <button 
+                        onClick={() => handleStartInternship(app.id)}
+                        disabled={processingId === app.id}
+                        style={{ 
+                            width: '100%', backgroundColor: '#16a34a', color: 'white', 
+                            padding: '10px', borderRadius: '4px', 
+                            border: 'none', cursor: 'pointer', fontWeight: 'bold' 
+                        }}
+                    >
+                        {processingId === app.id ? 'Starting...' : '🚀 Start Internship'}
+                    </button>
+                  ) : app.status === 'ongoing' ? (
+                    <div style={{ textAlign: 'center', color: '#16a34a', fontWeight: 'bold', padding: '10px' }}>
+                        ✅ Internship Active
+                    </div>
+                  ) : (
+                    <Link href="/intern/listings" className="view-link resume-link">View Job</Link>
+                  )}
+              </div>
             </div>
           ))}
         </div>
 
         <div className="history-stats">
-          <p>Accepted: <strong>{applications.filter(a => a.status === 'Accepted').length}</strong></p>
-          <p>Pending Review: <strong>{applications.filter(a => a.status.startsWith('Pending') || a.status === 'Company_Approved_Waiting_Coordinator').length}</strong></p>
+            <p>Active/Ongoing: <strong>{applications.filter(a => a.status === 'ongoing').length}</strong></p>
+            <p>Total Applications: <strong>{applications.length}</strong></p>
         </div>
       </div>
 

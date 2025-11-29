@@ -378,7 +378,7 @@ p {
    ========================================= */
 .bento-section {
     padding: 120px 5%;
-    max-width: 1200px;
+    max-width: 100%;
     margin: 0 auto;
     position: relative; z-index: 1;
 }

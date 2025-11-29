@@ -13,35 +13,25 @@ import {
   Briefcase,
   Megaphone,
   Settings,
-  LogOut,
-  Menu, // Toggle icon
+  LogOut
 } from "lucide-react";
 
 export default function CoordinatorSidebar() {
   const [profile, setProfile] = useState(null);
   const pathname = usePathname();
 
-  const [collapsed, setCollapsed] = useState(false); // NEW: sidebar collapse state
-
   useEffect(() => {
     const fetchProfile = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
+      const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        const { data, error } = await supabase
+        const { data } = await supabase
           .from("profiles")
           .select("fullname, user_type")
           .eq("id", user.id)
           .single();
-
-        if (!error) {
-          setProfile(data);
-        }
+        if (data) setProfile(data);
       }
     };
-
     fetchProfile();
   }, []);
 
@@ -52,87 +42,31 @@ export default function CoordinatorSidebar() {
 
   const isActive = (href) => pathname === href;
 
-  return (
-    <aside className={`sidebar ${collapsed ? "collapsed" : ""}`}>
-      {/* Sidebar toggle button */}
-      <button
-        className="sidebar-toggle"
-        onClick={() => setCollapsed(!collapsed)}
-      >
-        <Menu size={22} />
-      </button>
+  const navItems = [
+    { href: "/coordinator/dashboard", icon: <LayoutDashboard size={20} />, label: "Overview" },
+    { href: "/coordinator/students", icon: <Users size={20} />, label: "Students" },
+    { href: "/coordinator/approvals", icon: <CheckSquare size={20} />, label: "Approvals" },
+    { href: "/coordinator/internships", icon: <Briefcase size={20} />, label: "Internships" },
+    { href: "/coordinator/companies", icon: <Building2 size={20} />, label: "Companies" },
+    { href: "/coordinator/announcements", icon: <Megaphone size={20} />, label: "Announcements" },
+    { href: "/coordinator/settings", icon: <Settings size={20} />, label: "Settings" },
+  ];
 
-      <div className="sidebar-top">
-        <h3 className="logo-text">InternLink</h3>
-        <p className="user-type">{profile?.user_type || "Coordinator"}</p>
+  return (
+    <aside className="sidebar-icon-only">
+      <div className="sidebar-nav">
+        {navItems.map((item, index) => (
+          <Link key={index} href={item.href} className={isActive(item.href) ? "active nav-item" : "nav-item"}>
+            {item.icon}
+            <span className="tooltip">{item.label}</span>
+          </Link>
+        ))}
       </div>
 
-      <nav className="sidebar-nav">
-        <Link
-          href="/coordinator/dashboard"
-          className={isActive("/coordinator/dashboard") ? "active" : ""}
-        >
-          <LayoutDashboard size={18} />
-          <span>Overview</span>
-        </Link>
-
-        <Link
-          href="/coordinator/students"
-          className={isActive("/coordinator/students") ? "active" : ""}
-        >
-          <Users size={18} />
-          <span>Students</span>
-        </Link>
-
-        <Link
-          href="/coordinator/approvals"
-          className={isActive("/coordinator/approvals") ? "active" : ""}
-        >
-          <CheckSquare size={18} />
-          <span>Approvals</span>
-        </Link>
-
-        <Link
-          href="/coordinator/internships"
-          className={isActive("/coordinator/internships") ? "active" : ""}
-        >
-          <Briefcase size={18} />
-          <span>Internships</span>
-        </Link>
-
-        <Link
-          href="/coordinator/companies"
-          className={isActive("/coordinator/companies") ? "active" : ""}
-        >
-          <Building2 size={18} />
-          <span>Companies</span>
-        </Link>
-
-        <Link
-          href="/coordinator/announcements"
-          className={isActive("/coordinator/announcements") ? "active" : ""}
-        >
-          <Megaphone size={20} />
-          <span>Announcements</span>
-        </Link>
-
-        <Link
-          href="/coordinator/settings"
-          className={isActive("/coordinator/settings") ? "active" : ""}
-        >
-          <Settings size={18} />
-          <span>Settings</span>
-        </Link>
-      </nav>
-
       <div className="sidebar-bottom">
-        <p className="user-name">
-          {profile ? profile.fullname : "Loading..."}
-        </p>
-
         <button onClick={handleLogout} className="logout-btn">
-          <LogOut size={16} />
-          <span>Logout</span>
+          <LogOut size={20} />
+          <span className="tooltip">Logout</span>
         </button>
       </div>
     </aside>

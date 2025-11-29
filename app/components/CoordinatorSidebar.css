@@ -1,173 +1,91 @@
-/* --- InternLink Design System Variables --- */
-:root {
-    --bg-main: #021217;
-    --bg-card: rgba(14, 28, 38, 0.7);
-    --text-main: #F1F5F9;
-    --text-muted: #94A3B8;
-    --border-color: rgba(62, 85, 99, 0.3);
-    --primary-orange: #EE7428;
-    --primary-orange-hover: #EA580C;
-    --secondary-cyan: #00d4ff;
-    --font-heading: 'Plus Jakarta Sans', sans-serif;
-    --font-body: 'Inter', sans-serif;
-    --radius-card: 24px;
-    --radius-button: 12px;
+.sidebar-icon-only {
+  width: 70px;
+  background: var(--bg-card);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 0;
+  border-right: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+   z-index: 10000;
 }
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@700;800&display=swap');
-
-/* Sidebar */
-.sidebar {
-    position: sticky;
-    top: 0;
-    height: calc(105vh - 60px);
-    width: 240px;
-    background: var(--bg-card);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    color: var(--text-main);
-    display: flex;
-    flex-direction: column;
-    padding: 5px 20px;
-    font-family: var(--font-body);
-    border: 1px solid var(--border-color);
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
-    transition: all 0.3s ease;
-    z-index: 10;
-}
-
-/* ---------------- Sidebar Collapsed ---------------- */
-.sidebar.collapsed {
-    width: 70px;
-    padding: 10px;
-}
-
-.sidebar.collapsed .logo-text,
-.sidebar.collapsed .user-type,
-.sidebar.collapsed .user-name,
-.sidebar.collapsed nav a span,
-.sidebar.collapsed .logout-btn span {
-    display: none;
-}
-
-.sidebar.collapsed .sidebar-nav a {
-    justify-content: center;
-    padding: 12px;
-}
-
-.sidebar.collapsed .logout-btn {
-    justify-content: center;
-    padding: 12px;
-}
-
-/* ---------------- Toggle Button ---------------- */
-.sidebar-toggle {
-    position: absolute;
-    top: 1px;
-    right: -50px;
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
-    padding: 8px;
-    border-radius: 12px;
-    cursor: pointer;
-    color: var(--text-main);
-    backdrop-filter: blur(8px);
-    transition: all 0.3s ease;
-    z-index: 50;
-}
-
-.sidebar-toggle:hover {
-    background: rgba(255, 255, 255, 0.1);
-}
-
-/* Header */
-.sidebar-top {
-    padding-bottom: 10px;
-    border-bottom: 1px solid var(--border-color);
-    margin-bottom: 5px;
-}
-
-.logo-text {
-    margin: 0;
-    font-family: var(--font-heading);
-    font-size: 26px;
-    font-weight: 800;
-    color: var(--primary-orange);
-}
-
-.user-type {
-    color: var(--text-muted);
-    font-size: 0.8rem;
-    font-weight: 500;
-    margin-top: 5px;
-    text-transform: uppercase;
-}
-
-/* Nav Links */
 .sidebar-nav {
-    display: flex;
-    flex-direction: column;
-    padding: 5px 0;
-    flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
+  flex-grow: 1;
+  width: 100px;
+  
 }
 
-.sidebar-nav a {
-    color: var(--text-main);
-    text-decoration: none;
-    margin: 4px 0;
-    padding: 8px 15px;
-    border-radius: var(--radius-button);
-    font-size: 1rem;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: all 0.2s ease;
+.nav-item {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--text-main);
+  width: 100%;
+  padding: 12px 0;
+  transition: all 0.2s ease;
 }
 
-.sidebar-nav a:hover {
-    background-color: rgba(238, 116, 40, 0.1);
-    color: var(--primary-orange);
-    transform: translateX(5px);
+.nav-item.active {
+  color: var(--primary-orange);
 }
 
-.sidebar-nav a.active {
-    background-color: var(--primary-orange);
-    color: var(--bg-main);
-    font-weight: 600;
-    box-shadow: 0 4px 15px rgba(238, 116, 40, 0.4);
+.nav-item:hover {
+  color: var(--primary-orange);
 }
 
-/* Bottom Section */
+/* Tooltip */
+.tooltip {
+  position: absolute;
+  left: 80px;
+  background: var(--primary-orange);
+  color: var(--text-main);
+  padding: 6px 12px;
+  border-radius: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-50%);
+  top: 50%;
+  transition: opacity 0.2s ease;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  font-size: 0.9rem;
+   z-index: 10001;
+}
+
+.nav-item:hover .tooltip,
+.logout-btn:hover .tooltip {
+  opacity: 1;
+}
+
 .sidebar-bottom {
-    border-top: 1px solid var(--border-color);
-    padding-top: 20px;
-}
-
-.user-name {
-    margin-bottom: 15px;
-    font-size: 1rem;
-    font-weight: 600;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .logout-btn {
-    width: 100%;
-    background-color: var(--primary-orange);
-    border: none;
-    color: var(--bg-main);
-    padding: 12px;
-    border-radius: var(--radius-button);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    font-weight: 600;
-    transition: all 0.2s ease;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: var(--primary-orange);
+  color: var(--bg-main);
+  border: none;
+  border-radius: 12px;
+  padding: 12px;
+  cursor: pointer;
+  width: 50px;
+  height: 50px;
 }
 
 .logout-btn:hover {
-    background-color: var(--primary-orange-hover);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 15px rgba(238, 116, 40, 0.3);
+  background: var(--primary-orange-hover);
 }

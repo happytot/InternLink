@@ -1,222 +1,321 @@
+/* --- 1. Core Theme & Colors (Dark Mode Default) --- */
+:root {
+  /* Colors */
+  --bg-dark: #021217;
+  --text-light: #F1F5F9;
+  --primary-orange: #EE7428; /* Dark Mode Accent */
+  --secondary-cyan: #00d4ff;
+  --border-color: rgba(241, 245, 249, 0.1); /* Subtle Border for Glassmorphism */
+  
+  /* Glassmorphism/Card Background */
+  --bg-card: rgba(15, 23, 42, 0.4); 
+  --bg-input: rgba(15, 23, 42, 0.6); 
+
+  /* Shadows for Dark Mode - subtle */
+  --shadow-deep: 0 10px 30px rgba(0, 0, 0, 0.5);
+  --shadow-card: 0 4px 18px rgba(0, 0, 0, 0.3);
+
+  /* Typography */
+  --font-heading: 'Plus Jakarta Sans', sans-serif;
+  --font-body: 'Inter', sans-serif;
+}
+
+/* --- Light Mode Overrides --- */
+.light-mode {
+  --bg-dark: #F8FAFC;
+  --text-light: #0F172A;
+  --primary-orange: #EA580C; /* Light Mode Accent */
+  --secondary-cyan: #3b82f6;
+  --border-color: rgba(15, 23, 42, 0.1);
+
+  --bg-card: rgba(255, 255, 255, 0.6); 
+  --bg-input: rgba(255, 255, 255, 0.8);
+  
+  /* Shadows for Light Mode - lighter */
+  --shadow-deep: 0 10px 30px rgba(0, 0, 0, 0.1);
+  --shadow-card: 0 4px 18px rgba(0, 0, 0, 0.08);
+}
+
+/* --- Global & Typography Setup --- */
+body {
+  font-family: var(--font-body);
+  background-color: var(--bg-dark);
+  color: var(--text-light);
+  transition: background-color 0.3s, color 0.3s;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  letter-spacing: -0.03em; /* Tighter tracking */
+}
+
+p {
+  line-height: 1.6;
+}
+
 /* ----- Layout ----- */
 .coordinator-page {
   display: flex;
   min-height: 100vh;
-  background: #f3f4f6;
 }
 
-/* Main container */
 .announcement-page {
   flex: 1;
-  padding: 30px 40px;
-  font-family: "Inter", sans-serif;
-  color: #111827;
+  padding: 50px 80px; /* High padding for "breathing room" */
 }
 
-/* ----- Header ----- */
+/* ----- Header & Glass Card (24px Radius) --- */
+.glass-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 24px; /* Card/Container Radius */
+  box-shadow: var(--shadow-card);
+}
+
 .announcement-header {
-  background: #ffffff;
-  padding: 25px 30px;
-  border-radius: 16px;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.05);
-  margin-bottom: 35px;
+  padding: 30px 40px;
+  margin-bottom: 40px;
 }
 
 .announcement-header h1 {
-  font-size: 28px;
-  font-weight: 700;
-  letter-spacing: -0.5px;
+  font-size: 32px;
+  color: var(--primary-orange);
 }
 
-/* ----- Layout: left & right ----- */
+/* ----- Layout: left & right (Grid System) ----- */
 .announcement-content {
   display: flex;
-  gap: 40px;
+  gap: 50px;
   align-items: flex-start;
 }
 
-/* ----- LEFT: Announcement List ----- */
 .latest-updates {
   flex: 2;
 }
 
 .latest-updates h2 {
-  font-size: 22px;
-  font-weight: 700;
-  margin-bottom: 15px;
+  font-size: 24px;
+  margin-bottom: 25px;
 }
 
 .announcement-list {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 30px;
   overflow-y: auto;
-  max-height: calc(100vh - 220px);
-  padding-right: 10px;
+  max-height: calc(100vh - 240px);
+  padding-right: 15px;
 }
 
-/* Announcement Card */
+/* Announcement Card Item */
 .announcement-item {
-  background: #ffffff;
-  padding: 18px 22px;
-  border-radius: 14px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  padding: 24px;
+  border-radius: 24px; /* Card/Container Radius */
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-card);
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Smooth transition for hover */
 }
 
-.announcement-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+/* --- Hover Effect: Lift + Orange Border Glow + Deep Shadow --- */
+.card-hover-effect:hover {
+  transform: translateY(-8px); /* Lift */
+  box-shadow: var(--shadow-deep), 0 0 20px 0px rgba(238, 116, 40, 0.4); /* Deep Shadow + Orange Glow */
+  border-color: var(--primary-orange);
 }
 
-/* Image */
 .announcement-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 12px;
-  margin-bottom: 15px;
+  border-radius: 18px; 
+  margin-bottom: 20px;
+  border: 1px solid var(--border-color);
 }
 
-/* Title */
-.announcement-item h3 {
-  font-size: 20px;
-  margin-bottom: 6px;
-  font-weight: 700;
+.announcement-title {
+  font-size: 22px;
+  margin-bottom: 8px;
 }
 
-/* Content */
-.announcement-item p {
-  font-size: 15px;
-  margin-bottom: 10px;
-  color: #374151;
+.announcement-text {
+  font-size: 16px;
+  margin-bottom: 12px;
+  color: var(--text-light);
+  opacity: 0.85;
 }
 
-/* Date */
 .announcement-item .date {
-  font-size: 13px;
-  color: #6b7280;
-}
-
-/* Buttons */
-.announcement-actions {
-  margin-top: 10px;
-  display: flex;
-  gap: 10px;
-}
-
-.announcement-actions button {
-  background-color: #4f46e5;
-  border: none;
-  padding: 7px 16px;
   font-size: 14px;
-  color: #fff;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: 0.2s ease;
+  opacity: 0.6;
 }
 
-.announcement-actions button:hover {
-  background-color: #3b35bd;
-}
-
-.announcement-actions .delete-btn {
-  background-color: #e11d48;
-}
-
-.announcement-actions .delete-btn:hover {
-  background-color: #be123c;
+.announcement-actions {
+  margin-top: 15px;
+  display: flex;
+  gap: 12px;
 }
 
 /* ----- RIGHT: Create Form ----- */
 .create-announcement {
   flex: 1.2;
-  background: #ffffff;
-  padding: 25px 28px;
-  border-radius: 16px;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+  padding: 30px 30px;
   position: sticky;
-  top: 40px;
-  max-height: calc(100vh - 120px);
-  overflow-y: auto;
+  top: 50px; /* Aligned with top padding */
+  max-height: calc(100vh - 100px);
 }
 
-.create-announcement::-webkit-scrollbar {
-  width: 6px;
-}
-
-.create-announcement::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 10px;
-}
-
-/* Form Title */
 .create-announcement h2 {
-  font-size: 20px;
-  font-weight: 700;
-  margin-bottom: 15px;
-  color: #1f2937;
+  font-size: 22px;
+  margin-bottom: 20px;
 }
 
-/* Labels */
 .create-announcement label {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
-  margin-top: 12px;
+  margin-top: 15px;
   display: block;
-  color: #374151;
+  opacity: 0.9;
 }
 
-/* Inputs */
+/* Inputs & Textareas */
 .create-announcement input,
 .create-announcement textarea {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 10px;
-  margin-top: 6px;
-  font-size: 14px;
-  transition: border-color 0.2s ease;
-  background: #f9fafb;
+  width: 90%;
+  padding: 14px;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  margin-top: 8px;
+  font-size: 15px;
+  background: var(--bg-input);
+  color: var(--text-light);
+  transition: all 0.2s ease;
 }
 
 .create-announcement input:focus,
 .create-announcement textarea:focus {
-  border-color: #6366f1;
-  background: #fff;
+  border-color: var(--secondary-cyan);
+  outline: none;
+  background: var(--bg-input); /* Maintain glass background */
 }
 
-/* Button */
+/* --- Buttons (12px Radius) --- */
+.announcement-actions button,
 .create-announcement button {
-  width: 100%;
-  background: #4f46e5;
-  color: #ffffff;
-  padding: 12px;
+  padding: 14px 20px;
   font-weight: 600;
-  margin-top: 18px;
   border: none;
-  border-radius: 10px;
+  border-radius: 12px;
   cursor: pointer;
-  transition: background 0.25s ease;
+  transition: all 0.25s ease;
 }
 
-.create-announcement button:hover {
-  background: #3c37c5;
+/* Primary Button (Form Post) */
+.btn-primary {
+  width: 35%;
+  background: var(--primary-orange);
+  color: var(--bg-dark); /* Dark text on bright orange */
+  margin-top: 25px;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #f78c4a; /* Slightly lighter orange for hover */
+  transform: translateY(-2px); /* Subtle lift */
+  box-shadow: 0 8px 15px rgba(238, 116, 40, 0.3);
+}
+
+.btn-primary:disabled {
+  background: #475569;
+  cursor: not-allowed;
+}
+
+/* Secondary Button (Edit) */
+.btn-secondary {
+  background-color: var(--secondary-cyan);
+  color: var(--bg-dark);
+}
+
+.btn-secondary:hover {
+  background-color: #5edfff;
+  transform: translateY(-2px);
+}
+
+/* Delete Button */
+.btn-delete {
+  background-color: #ef4444; /* Red */
+  color: white;
+}
+
+.btn-delete:hover {
+  background-color: #dc2626;
+  transform: translateY(-2px);
 }
 
 /* Cancel Button */
-.cancel-btn {
-  background: #9ca3af !important;
+.btn-cancel {
+  width: 100%;
+  background: #475569 !important; /* Slate Gray */
+  color: var(--text-light);
+  margin-top: 15px;
 }
 
-.cancel-btn:hover {
-  background: #6b7280 !important;
+.btn-cancel:hover {
+  background: #64748b !important;
+  transform: translateY(-2px);
 }
 
 /* Empty State */
 .no-announcement {
-  color: #6b7280;
-  font-size: 15px;
-  margin-top: 10px;
+  opacity: 0.7;
+  font-size: 16px;
+  margin-top: 20px;
   text-align: center;
+  padding: 40px;
+}
+
+
+/* --- 5. Animations & Effects --- */
+
+/* Reveal on Scroll (Placeholder - in a real app, you'd use IntersectionObserver) */
+@keyframes slideUpFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.reveal-on-scroll {
+  animation: slideUpFadeIn 0.8s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+  opacity: 0;
+}
+
+/* Stagger the animation */
+.announcement-list .announcement-item:nth-child(1) { animation-delay: 0.1s; }
+.announcement-list .announcement-item:nth-child(2) { animation-delay: 0.2s; }
+.announcement-list .announcement-item:nth-child(3) { animation-delay: 0.3s; }
+/* ... continue staggering for more items */
+.create-announcement { animation-delay: 0.15s; }
+
+/* Scrollbar styling for list/form */
+.announcement-list::-webkit-scrollbar,
+.create-announcement::-webkit-scrollbar {
+  width: 8px;
+}
+
+.announcement-list::-webkit-scrollbar-thumb,
+.create-announcement::-webkit-scrollbar-thumb {
+  background: rgba(241, 245, 249, 0.1);
+  border-radius: 10px;
+}
+
+.announcement-list::-webkit-scrollbar-track,
+.create-announcement::-webkit-scrollbar-track {
+  background: transparent;
 }

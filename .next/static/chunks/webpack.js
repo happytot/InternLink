@@ -192,7 +192,7 @@
 /******/ 	
 /******/ 	/* webpack/runtime/getFullHash */
 /******/ 	!function() {
-/******/ 		__webpack_require__.h = function() { return "3d22d230e8a7ad3c"; }
+/******/ 		__webpack_require__.h = function() { return "95ee83ba5229fab0"; }
 /******/ 	}();
 /******/ 	
 /******/ 	/* webpack/runtime/global */
@@ -830,14 +830,19 @@
 /******/ 		// [resolve, reject, Promise] = chunk loading, 0 = chunk loaded
 /******/ 		var installedChunks = __webpack_require__.hmrS_jsonp = __webpack_require__.hmrS_jsonp || {
 /******/ 			"webpack": 0,
-/******/ 			"css-app_components_AuthPage_module_css": 0,
-/******/ 			"css-app_index_css-app_intern_listings_Listings_css": 0,
-/******/ 			"css-app_components_InternNav_css-app_globals_css-app_intern_companies_companies_css-app_inter-acd2b7": 0,
 /******/ 			"css-app_LandingPage_css": 0,
+/******/ 			"css-app_company_applicants_applicants_css-app_index_css-app_intern_listings_Listings_css": 0,
+/******/ 			"css-app_components_InternNav_css-app_globals_css-app_intern_companies_companies_css-app_inter-acd2b7": 0,
+/******/ 			"css-app_components_AuthPage_module_css": 0,
+/******/ 			"css-app_components_intern_Logbook_module_css": 0,
+/******/ 			"css-app_company_logbook_CompanyLogbook_module_css": 0,
+/******/ 			"css-app_components_CompanyNav_css": 0,
+/******/ 			"css-app_components_CoordinatorSidebar_css-app_coordinator_announcements_announcements_css-app-22decf": 0,
 /******/ 			"css-app_intern_history_ApplicationHistory_css": 0,
 /******/ 			"css-app_company_dashboard_CompanyDashboard_css": 0,
-/******/ 			"css-app_components_CompanyNav_css": 0,
-/******/ 			"css-app_components_CoordinatorSidebar_css-app_coordinator_dashboard_dashboard_css-node_module-7362ae": 0
+/******/ 			"css-app_company_profile_profile_css": 0,
+/******/ 			"css-app_company_jobs_new_NewJobPost_css": 0,
+/******/ 			"css-app_company_jobs_listings_listings_css": 0
 /******/ 		};
 /******/ 		
 /******/ 		__webpack_require__.f.j = function(chunkId, promises) {
@@ -849,7 +854,7 @@
 /******/ 					if(installedChunkData) {
 /******/ 						promises.push(installedChunkData[2]);
 /******/ 					} else {
-/******/ 						if(/^(app(\/(auth\/(coordinator|intern)AuthPage\/page|co(mpany\/(dashboard\/page|layout)|ordinator\/dashboard\/page)|intern\/(companies|dashboard|history|listings)\/page|layout|page)|\-pages\-internals)|main(|\-app)|pages\/_(app|error)|_app\-pages\-browser_node_modules_react\-apexcharts_dist_react\-apexcharts_min_js|react\-refresh)$/.test(chunkId)) {
+/******/ 						if(/^(app(\/(auth\/(company|intern)AuthPage\/page|co(mpany\/(jobs\/(listings|new)\/page|(applicants|dashboard|logbook|profile)\/page|layout)|ordinator\/(((announcem|stud)ent|approval|companie|internship)s|dashboard)\/page)|intern\/(companies|dashboard|history|listings|logbook)\/page|layout|page)|\-pages\-internals)|main(|\-app)|pages\/_(app|error)|\/_error|_app\-pages\-browser_node_modules_react\-apexcharts_dist_react\-apexcharts_min_js|react\-refresh)$/.test(chunkId)) {
 /******/ 							// setup Promise in chunk cache
 /******/ 							var promise = new Promise(function(resolve, reject) { installedChunkData = installedChunks[chunkId] = [resolve, reject]; });
 /******/ 							promises.push(installedChunkData[2] = promise);

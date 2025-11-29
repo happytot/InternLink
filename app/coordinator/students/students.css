@@ -1,399 +1,683 @@
-/* --- Variables & Core Layout --- */
+/*
+|--------------------------------------------------------------------------
+| InternLink Design System - CSS Variables (Dark Mode Default)
+|--------------------------------------------------------------------------
+*/
 :root {
-  --primary-color: #007bff; /* Blue for primary actions/links */
-  --accent-color: #EE7428; /* Orange for headers/search elements */
-  --text-color: #344767;
-  --bg-light: #f5f7fa;
-  --card-bg: #ffffff;
-  --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.05);
-  --border-radius: 10px;
+    /* 1. Core Theme & Colors (Dark Mode Default) */
+    --bg-main: #021217;
+    --bg-card: #0F172A; /* Using a darker shade for card background */
+    --bg-glass: rgba(15, 23, 42, 0.7); /* Card background with transparency for glassmorphism */
+    --bg-section: #0F172A; /* For profile-section in modal */
+    --text-main: #F1F5F9; /* Slate 100 */
+    --text-muted: #94A3B8; /* Slate 400 */
+    
+    --primary-orange: #EE7428; /* Primary Accent - Orange (Dark) */
+    --secondary-cyan: #00d4ff; /* Secondary Accent - Cyan */
+    
+    --border-color: rgba(241, 245, 249, 0.1); /* Subtle white border */
+
+    /* 2. Typography */
+    --font-heading: 'Plus Jakarta Sans', sans-serif;
+    --font-body: 'Inter', sans-serif;
+    
+    /* 3. Shapes & UI Components */
+    --radius-card: 24px;
+    --radius-btn: 12px;
+    --radius-pill: 50px;
+    
+    /* Shadows */
+    --shadow-deep: 0 25px 50px -12px rgba(0, 0, 0, 0.5); /* Deep Shadow for Cards */
+    --shadow-btn: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+
+    --skeleton-base: color-mix(in srgb, var(--bg-card), white 5%);
+    --skeleton-shine: color-mix(in srgb, var(--bg-card), white 15%);
 }
 
+/* Light Mode Override */
+.light-mode {
+    --bg-main: #F8FAFC;
+    --bg-card: #FFFFFF;
+    --bg-glass: rgba(255, 255, 255, 0.7);
+    --bg-section: #F1F5F9;
+    --text-main: #0F172A;
+    --text-muted: #64748B;
+    
+    --primary-orange: #EA580C; /* Primary Accent - Orange (Light) */
+    --secondary-cyan: #3b82f6; /* Secondary Accent - Blue */
+    
+    --border-color: rgba(15, 23, 42, 0.1); /* Subtle dark border */
+    
+    --shadow-deep: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+
+   
+    --skeleton-base: #E2E8F0;
+    --skeleton-shine: #F1F5F9;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Core Layout & Global Styles
+|--------------------------------------------------------------------------
+*/
 .coordinator-page {
-  display: flex;
-  min-height: 100vh;
-  background: var(--bg-light);
-  font-family: 'Poppins', sans-serif;
+    display: flex;
+    min-height: 100vh;
+    background: var(--bg-main);
+    color: var(--text-main);
+    font-family: var(--font-body);
 }
 
 .students-content {
-  flex: 1;
-  padding: 30px;
+    flex: 1;
+    padding: 30px;
+    /* High padding is not suitable for a list/table, so we keep reasonable padding */
 }
 
-/* -------------------------------------- */
-/* --- Header, Search, and Toggle --- */
-/* -------------------------------------- */
+h2, h3 {
+    font-family: var(--font-heading);
+    color: var(--text-main);
+    font-weight: 700;
+}
+
+p, th, td, a {
+    color: var(--text-main);
+    line-height: 1.6;
+}
+
+.text-muted {
+    color: var(--text-muted);
+}
+
+/* Base Card Style */
+.card {
+    background: var(--bg-card);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-deep);
+    border: 1px solid var(--border-color);
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Buttons & Actions
+|--------------------------------------------------------------------------
+*/
+.btn {
+    border: none;
+    padding: 12px 20px;
+    border-radius: var(--radius-btn);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    box-shadow: var(--shadow-btn);
+}
+
+/* Primary Button (Orange) */
+.primary-btn {
+    background-color: var(--primary-orange);
+    color: var(--bg-card); /* Dark text on orange */
+}
+.primary-btn:hover {
+    background-color: color-mix(in srgb, var(--primary-orange), black 10%); /* Subtle darken */
+    transform: translateY(-2px); /* Subtle lift */
+}
+
+/* Secondary Button (Border/Outline) */
+.secondary-btn {
+    background: transparent;
+    border: 1px solid var(--primary-orange);
+    color: var(--primary-orange);
+}
+.secondary-btn:hover {
+    background: var(--primary-orange);
+    color: var(--bg-card);
+    transform: translateY(-2px);
+}
+
+/* Tertiary Button (Text/Close) */
+.tertiary-btn {
+    background: var(--text-muted);
+    color: var(--bg-card);
+}
+.tertiary-btn:hover {
+    background: color-mix(in srgb, var(--text-muted), white 20%);
+    transform: translateY(-2px);
+}
+
+/* Info Button specific adjustments */
+.info-btn {
+    padding: 8px 15px;
+    font-size: 0.9rem;
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Header, Search, and Toggle
+|--------------------------------------------------------------------------
+*/
 .header-section {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: var(--card-bg);
-  padding: 20px 25px;
-  border-radius: var(--border-radius);
-  box-shadow: var(--shadow-sm);
-  margin-bottom: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 25px 35px;
+    margin-bottom: 30px;
 }
 
 .header-section h2 {
-  font-size: 1.8rem;
-  color: var(--text-color);
-  font-weight: 700;
+    font-size: 2rem;
 }
 
 .actions {
-  display: flex;
-  gap: 20px;
-  align-items: center;
+    display: flex;
+    gap: 20px;
+    align-items: center;
 }
 
-/* Search Bar Container */
-.actions > div:first-child {
-  position: relative;
-  display: flex;
-  align-items: center;
-  margin-bottom: 0; /* Override default margin */
-}
-
-/* Search Icon */
 .search-icon {
-  position: absolute;
-  top: 50%;
-  left: 10px; /* Adjusted to be inside the input area */
-  transform: translateY(-50%);
-  color: var(--accent-color);
-  pointer-events: none;
-  font-size: 1rem;
+    position: absolute;
+    top: 50%;
+    left: 15px;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    pointer-events: none;
+    font-size: 1.1rem;
 }
 
 .search-bar {
-  padding: 10px 14px 10px 35px; /* Added left padding for icon */
-  border: 1px solid #e0e6ed;
-  border-radius: 8px;
-  width: 250px;
-  font-size: 0.95rem;
-  transition: all 0.3s ease;
-  background-color: var(--card-bg);
-  color: var(--text-color);
+    padding: 12px 18px 12px 45px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-btn);
+    width: 280px;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    background-color: var(--bg-card);
+    color: var(--text-main);
 }
 
 .search-bar:focus {
-  outline: none;
-  border-color: var(--primary-color);
-  box-shadow: 0 0 6px rgba(0, 123, 255, 0.2);
+    outline: none;
+    border-color: var(--primary-orange);
+    box-shadow: 0 0 10px var(--primary-orange);
 }
 
-/* View Toggle */
 .view-toggle {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: var(--primary-color);
-  font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--secondary-cyan);
+    font-size: 1.3rem;
 }
 
-/* Toggle Switch */
+/* Toggle Switch (Adjusted for new colors) */
 .switch {
-  position: relative;
-  display: inline-block;
-  width: 50px;
-  height: 25px;
+    position: relative;
+    display: inline-block;
+    width: 55px;
+    height: 30px;
 }
 .switch input { opacity: 0; width: 0; height: 0; }
 
 .slider {
-  position: absolute;
-  cursor: pointer;
-  background-color: #b0c4de;
-  border-radius: 25px;
-  top: 0; left: 0; right: 0; bottom: 0;
-  transition: 0.4s;
+    position: absolute;
+    cursor: pointer;
+    background-color: var(--text-muted);
+    border-radius: 30px;
+    top: 0; left: 0; right: 0; bottom: 0;
+    transition: 0.4s;
 }
 
 .slider::before {
-  content: "";
-  position: absolute;
-  height: 17px;
-  width: 17px;
-  left: 4px;
-  bottom: 4px;
-  background-color: white;
-  border-radius: 50%;
-  transition: 0.4s;
+    content: "";
+    position: absolute;
+    height: 22px;
+    width: 22px;
+    left: 4px;
+    bottom: 4px;
+    background-color: var(--bg-card);
+    border-radius: 50%;
+    transition: 0.4s;
 }
 
-input:checked + .slider { background-color: var(--primary-color); }
-input:checked + .slider::before { transform: translateX(24px); }
+input:checked + .slider { background-color: var(--secondary-cyan); }
+input:checked + .slider::before { transform: translateX(25px); }
 
 
-/* -------------------------------------- */
-/* --- Table View --- */
-/* -------------------------------------- */
+/*
+|--------------------------------------------------------------------------
+| Table View
+|--------------------------------------------------------------------------
+*/
+.table-wrapper {
+    /* Uses .card style for general container styling */
+    overflow: hidden; /* Contains the table's corners */
+    margin-top: 20px;
+}
+
 .students-table {
-  width: 100%;
-  border-collapse: separate; /* Use separate for rounded corners */
-  border-spacing: 0;
-  background: var(--card-bg);
-  border-radius: var(--border-radius);
-  overflow: hidden;
-  margin-top: 20px;
-  box-shadow: var(--shadow-sm);
+    width: 100%;
+    border-collapse: collapse;
 }
 
 .students-table th,
 .students-table td {
-  padding: 15px 18px;
-  text-align: left;
-  border-bottom: 1px solid #f0f0f0;
-  color: var(--text-color);
-  font-size: 0.95rem;
+    padding: 18px 25px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 0.95rem;
 }
 
 .students-table th {
-  background: var(--accent-color); /* Orange Header */
-  color: white;
-  font-weight: 600;
-  text-transform: uppercase;
-  font-size: 0.8rem;
+    background: var(--primary-orange);
+    color: var(--bg-card);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    font-family: var(--font-heading);
 }
 
 .students-table tr:nth-child(even) {
-  background: #f8f9fa;
+    background: color-mix(in srgb, var(--bg-card), black 5%); /* Slight color contrast */
 }
 
 .students-table tr:hover {
-  background: #f0f2f5;
+    background: color-mix(in srgb, var(--bg-card), white 5%); /* Highlight row */
 }
 
-/* Info Button */
-.info-btn {
-  background-color: var(--primary-color);
-  color: white;
-  border: none;
-  padding: 8px 15px;
-  border-radius: 6px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.3s, transform 0.2s;
-  display: inline-flex;
-  align-items: center;
-}
 
-.info-btn:hover {
-  background-color: #0056b3;
-  transform: translateY(-1px);
-}
-
-/* -------------------------------------- */
-/* --- Card View --- */
-/* -------------------------------------- */
+/*
+|--------------------------------------------------------------------------
+| Card View
+|--------------------------------------------------------------------------
+*/
 .card-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 25px;
-  margin-top: 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 30px;
+    margin-top: 30px;
+    
 }
 
 .student-card {
-  background: var(--card-bg);
-  border-radius: 12px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-  padding: 25px;
-  text-align: center;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  border-top: 4px solid var(--primary-color); /* Blue accent on top */
+    /* Inherits .card styles for background/radius/shadow */
+    padding: 30px;
+    text-align: center;
+    transition: transform 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease;
+    border-radius: 10px;;
+    background: var(--bg-section);
+     border: 1px solid var(--border-color);
 }
 
+/* Card Hover Effect: Lift + Orange Border Glow + Deep Shadow */
 .student-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    transform: translateY(-8px);
+    box-shadow: 0 30px 60px -15px rgba(0,0,0,0.6), 0 0 25px var(--primary-orange);
+    border-color: var(--primary-orange);
 }
 
 .student-avatar {
-  width: 90px;
-  height: 90px;
-  border-radius: 50%;
-  object-fit: cover;
-  margin-bottom: 15px;
-  border: 3px solid #f0f0f0;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 15px;
+    border: 3px solid white;
+    padding: 5px; 
 }
 
 .student-card h3 {
-  font-size: 1.3rem;
-  color: var(--text-color);
-  margin-bottom: 8px;
+    font-size: 1.4rem;
+    margin-bottom: 15px;
 }
 
 .student-card p {
-  color: #6c757d;
-  font-size: 0.95rem;
-  margin-bottom: 5px;
-  text-align: center; /* Ensure P tags in card are centered */
+    color: var(--text-muted);
+    font-size: 1rem;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+.student-card p strong {
+    color: var(--text-main);
+    font-weight: 600;
 }
 
 .card-actions {
-  margin-top: 15px;
+    margin-top: 20px;
 }
 
-/* -------------------------------------- */
-/* --- Modal Styles --- */
-/* -------------------------------------- */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0,0,0,0.6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 10000;
+/*
+|--------------------------------------------------------------------------
+| Modal & Profile View
+|--------------------------------------------------------------------------
+*/
+
+/* Glassmorphism Effect for Modal Overlay */
+.modal-overlay.glass-bg {
+    background: rgba(0,0,0,0.7); /* Darker backdrop to make glass stand out */
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
 }
 
 .profile-modal {
-  background: var(--card-bg);
-  border-radius: 12px;
-  width: 90%;
-  max-width: 850px;
-  max-height: 90vh;
-  overflow-y: auto;
-  padding: 35px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-  color: var(--text-color);
-  text-align: left;
+    background: var(--bg-card);
+    border-radius: var(--radius-card); /* 24px radius */
+    width: 95%;
+    max-width: 900px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 40px;
+    box-shadow: var(--shadow-deep);
+    border: 1px solid var(--border-color);
+    position: relative; /* For z-index layering if needed */
 }
 
 .modal-title {
-  font-size: 2rem;
-  font-weight: 700;
-  color: var(--text-color);
-  text-align: center;
-  margin-bottom: 25px;
-  padding-bottom: 10px;
-  border-bottom: 2px solid #f0f0f0;
+    font-size: 2.5rem;
+    text-align: center;
+    margin-bottom: 30px;
+    color: var(--primary-orange); /* Orange title */
+}
+
+.profile-picture-section {
+    text-align: center;
+    margin-bottom: 30px;
 }
 
 .profile-picture {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 4px solid var(--accent-color); /* Orange border */
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid white;
+    padding: 5px;
 }
 
 .profile-section {
-  background: #f9fafc;
-  border-radius: 10px;
-  padding: 20px;
-  margin-bottom: 20px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
-  border-left: 5px solid var(--primary-color);
+    background: var(--bg-section);
+    border-radius: var(--radius-card);
+    padding: 25px;
+    margin-bottom: 25px;
+    border: 1px solid var(--border-color);
+    
 }
 
 .profile-section h3 {
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: var(--text-color);
-  margin-bottom: 15px;
-  padding-bottom: 5px;
-  border-bottom: none;
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: var(--text-main);
 }
 
 .info-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Better responsiveness */
-  gap: 15px 25px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 20px 30px;
 }
 
 .info-grid p {
-  margin: 0;
-  color: #555;
-  font-size: 0.95rem;
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 .info-grid p strong {
-  color: var(--text-color);
-  font-weight: 600;
+    color: var(--text-main);
+    font-weight: 600;
 }
 
+.icon-accent {
+    color: var(--primary-orange);
+}
+
+/* Education Items */
+.edu-item {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    gap: 8px;
+}
+.edu-degree {
+    font-weight: 600;
+    color: var(--secondary-cyan);
+}
+.edu-institution {
+    color: var(--text-main);
+}
+.edu-years {
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+/* Skills */
 .skills-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
 }
 
 .skill-tag {
-  background: #eaf3ff;
-  color: var(--primary-color);
-  padding: 8px 15px;
-  border-radius: 20px;
-  font-size: 0.9rem;
-  font-weight: 500;
+    background: color-mix(in srgb, var(--secondary-cyan), transparent 80%);
+    color: var(--secondary-cyan);
+    padding: 10px 18px;
+    border-radius: var(--radius-pill); /* 50px radius */
+    font-size: 0.9rem;
+    font-weight: 500;
+    border: 1px solid var(--secondary-cyan);
 }
 
-.resume-btn {
-  /* Use Primary color for main action */
-  background-color: var(--primary-color);
-  color: white;
-  padding: 10px 20px;
-  border-radius: 6px;
-  font-weight: 600;
-  text-decoration: none;
-  transition: background 0.3s;
+.summary-text {
+    color: var(--text-muted);
 }
 
-.resume-btn:hover {
-  background-color: #0056b3;
+
+/*
+|--------------------------------------------------------------------------
+| Media Queries
+|--------------------------------------------------------------------------
+*/
+@media (max-width: 900px) {
+    .header-section {
+        padding: 20px 25px;
+    }
+    .profile-modal {
+        padding: 30px;
+    }
 }
 
-.close-modal-btn {
-  width: 100%;
-  background: var(--text-color);
-  color: #fff;
-  border: none;
-  padding: 12px;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  margin-top: 20px;
-  transition: background 0.3s;
-}
-
-.close-modal-btn:hover {
-  background: #5a6881;
-}
-
-/* Fix text color consistency */
-p, h3, tbody {
-  color: var(--text-color);
-}
-
-/* Media Queries for Responsiveness */
 @media (max-width: 768px) {
-  .header-section {
+    .header-section {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+    }
+    .actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+    .search-bar {
+        width: 100%;
+    }
+    .students-content {
+        padding: 20px 15px;
+    }
+    .profile-modal {
+        max-width: 95%;
+    }
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+    .students-table th,
+    .students-table td {
+        padding: 15px 18px;
+        font-size: 0.85rem;
+    }
+}
+
+/* Keyframe for the shimmering effect */
+@keyframes shimmer {
+    0% {
+        background-position: -468px 0;
+    }
+    100% {
+        background-position: 468px 0;
+    }
+}
+
+.skeleton-loading .skeleton-line {
+    /* Apply base color, background, and animation */
+    background: var(--skeleton-base);
+    background-image: linear-gradient(
+        to right, 
+        var(--skeleton-base) 0%, 
+        var(--skeleton-shine) 20%, 
+        var(--skeleton-base) 40%
+    );
+    background-repeat: no-repeat;
+    background-size: 800px 104px;
+    animation: shimmer 1.2s linear infinite;
+    
+    height: 16px;
+    border-radius: 4px;
+    margin: 5px 0;
+}
+
+.skeleton-loading .short { width: 40%; }
+.skeleton-loading .medium { width: 60%; }
+.skeleton-loading .long { width: 85%; }
+.skeleton-loading .full { width: 100%; }
+.skeleton-loading .btn-skel { width: 80px; height: 30px; border-radius: 6px; }
+
+/* Table Skeleton */
+.students-table .skeleton-line {
+    margin: 0;
+}
+
+/* Card Skeleton */
+.skeleton-card {
+    text-align: center;
+    display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    gap: 15px;
-  }
-  .actions {
-    width: 100%;
-    justify-content: space-between;
-  }
-  .search-bar {
-    width: 100%;
-  }
-  .students-content {
-    padding: 20px 15px;
-  }
-  .profile-modal {
-    padding: 20px;
-    max-width: 95%;
-  }
-  .info-grid {
-    grid-template-columns: 1fr;
-  }
+    align-items: center;
+    gap: 10px;
+}
+.skeleton-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: var(--skeleton-base);
+    background-image: linear-gradient(to right, var(--skeleton-base) 0%, var(--skeleton-shine) 20%, var(--skeleton-base) 40%);
+    background-repeat: no-repeat;
+    background-size: 800px 104px;
+    animation: shimmer 1.2s linear infinite;
+    margin-bottom: 15px;
+}
+.skeleton-card .center {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| 2. MODAL ANIMATIONS
+|--------------------------------------------------------------------------
+*/
+
+/* Keyframes for opening animation (Fade In + Slide Down) */
+@keyframes modal-fade-slide-in {
+    0% {
+        opacity: 0;
+        transform: translateY(-50px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Keyframes for closing animation (Fade Out + Slide Up) */
+@keyframes modal-fade-slide-out {
+    0% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-50px);
+    }
+}
+
+/* Keyframes for overlay fading */
+@keyframes overlay-fade-in {
+    from { background: rgba(0,0,0,0); }
+    to { background: rgba(0,0,0,0.7); }
+}
+
+@keyframes overlay-fade-out {
+    from { background: rgba(0,0,0,0.7); }
+    to { background: rgba(0,0,0,0); }
+}
+
+/* Animation Classes */
+.modal-overlay.modal-enter {
+    animation: overlay-fade-in 0.3s forwards;
+}
+
+.modal-overlay.modal-exit {
+    animation: overlay-fade-out 0.3s forwards;
+}
+
+.modal-overlay.modal-enter .profile-modal {
+    animation: modal-fade-slide-in 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.modal-overlay.modal-exit .profile-modal {
+    animation: modal-fade-slide-out 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Close 'X' Button in Modal */
+.profile-modal {
+    position: relative; /* Ensure children are positioned relative to the modal */
+    
+}
+
+.close-x-btn {
+    position: absolute;
+    top: 25px;
+    right: 25px;
+    background: none;
+    border: 1px solid var(--border-color);
+    color: var(--text-muted);
+    font-size: 1.2rem;
+    padding: 10px;
+    border-radius: 50%;
+    cursor: pointer;
+    line-height: 1;
+    transition: all 0.2s;
+    z-index: 10;
+}
+
+.close-x-btn:hover {
+    background: var(--primary-orange);
+    color: var(--bg-card);
+    border-color: var(--primary-orange);
+    transform: rotate(90deg);
 }
 

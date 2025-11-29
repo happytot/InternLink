@@ -1,41 +1,82 @@
-// app/components/intern/LogbookEntry.jsx
 'use client';
 
-import styles from './Logbook.module.css'; // 👈 Import CSS Module
-
-const DeleteIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-  </svg>
-);
+import styles from './Logbook.module.css';
 
 export default function LogbookEntry({ log, formatDate, onDelete }) {
-  const isRecent = new Date() - new Date(log.submitted_at) < 7 * 24 * 60 * 60 * 1000; // 7 days
-  const statusClass = log.status === 'submitted' ? styles.statusSubmitted : styles.statusApproved;
+  // 1. Normalize status for consistent styling
+  const status = log.status ? log.status.toLowerCase() : 'pending';
+  const isApproved = status === 'approved';
+  const isPending = status === 'pending' || status === 'submitted';
+
+  // 2. Helper to choose the right status class
+  const getStatusClass = () => {
+    if (isApproved) return styles.statusApproved;
+    if (isPending) return styles.statusPending;
+    return styles.statusRejected;
+  };
+
+  // 3. Helper to clean up the Task Description
+  // This fixes the "undefined" bug robustly
+  const getTaskDescription = () => {
+    const text = log.tasks_completed;
+    
+    // If null, empty, or literally the text "undefined" (case-insensitive)
+    if (!text || String(text).trim().toLowerCase() === 'undefined') {
+      return "No tasks description provided.";
+    }
+    
+    return text;
+  };
 
   return (
     <div className={styles.entryCard}>
+      {/* Header: Date and Status */}
       <div className={styles.entryHeader}>
         <div>
-          <h4 className={styles.entryTitle}>{formatDate(log.date)}</h4>
-          <span className={styles.entryHours}>{log.hours_worked} Hours</span>
-        </div>
-        <div className={styles.entryMeta}>
-          <span className={`${styles.entryStatus} ${statusClass}`}>
-            {log.status === 'submitted' ? 'Pending Review' : 'Approved'}
+          <span className={styles.entryDate}>
+            {formatDate(log.date)}
           </span>
-          {isRecent && log.status === 'submitted' && (
-            <button
+          
+          <div className={styles.entryMeta}>
+            {/* Status Badge */}
+            <span className={`${styles.entryStatus} ${getStatusClass()}`}>
+              {status}
+            </span>
+
+            {/* Attendance Badge */}
+            {log.attendance_status && (
+              <span className={styles.attendanceBadge}>
+                {log.attendance_status}
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Right Side: Hours */}
+        <div className={styles.entryHours}>
+          <span className={styles.hoursValue}>
+            {log.hours_worked} <span style={{fontSize: '0.6em', fontWeight: '500'}}>hrs</span>
+          </span>
+          
+          {/* Delete Button (Only if not approved) */}
+          {!isApproved && onDelete && (
+            <button 
               onClick={() => onDelete(log.id)}
               className={styles.deleteButton}
-              title="Delete entry"
             >
-              <DeleteIcon />
+              Delete Entry
             </button>
           )}
         </div>
       </div>
-      <p className={styles.entryDescription}>{log.description}</p>
+
+      {/* Task Description Box */}
+      <div className={styles.entryDescription}>
+        <span className={styles.entryDescriptionTitle}>
+          Work Accomplished
+        </span>
+        {getTaskDescription()}
+      </div>
     </div>
   );
 }

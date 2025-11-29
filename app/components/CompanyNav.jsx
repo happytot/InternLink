@@ -1,44 +1,65 @@
-'use client';
+"use client";
+import React from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { supabase } from "../../lib/supabaseClient"; 
+import "./CompanyNav.css";
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { FaHome, FaPlusCircle, FaList, FaUsers, FaUserCircle, FaComments } from 'react-icons/fa';
-import './CompanyNav.css';
+import {
+  LayoutDashboard,
+  PlusCircle,
+  List,
+  Users,
+  MessageSquare,
+  UserCircle,
+  BookOpenCheck,
+  LogOut
+} from "lucide-react";
 
-const CompanyNav = ({ visible = true }) => {
+export default function CompanyNav({ visible = true }) {
   const pathname = usePathname();
 
-  const links = [
-    { href: '/company/dashboard', label: 'Dashboard', icon: <FaHome /> },
-    { href: '/company/jobs/new', label: 'Post Job', icon: <FaPlusCircle /> },
-    { href: '/company/jobs/listings', label: 'Listings', icon: <FaList /> },
-    { href: '/company/applicants', label: 'Applicants', icon: <FaUsers /> },
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (!error) window.location.href = "/";
+  };
 
-    // ⭐ NEW: MESSAGES TAB
-    { href: '/company/messages', label: 'Messages', icon: <FaComments /> },
+  const isActive = (href) => pathname === href;
 
-    { href: '/company/profile', label: 'Profile', icon: <FaUserCircle /> },
+  // Company specific navigation items
+  const navItems = [
+    { href: "/company/dashboard", icon: <LayoutDashboard size={20} />, label: "Dashboard" },
+    { href: "/company/jobs/new", icon: <PlusCircle size={20} />, label: "Post Job" },
+    { href: "/company/jobs/listings", icon: <List size={20} />, label: "Listings" },
+    { href: "/company/applicants", icon: <Users size={20} />, label: "Applicants" },
+    { href: "/company/logbook", icon: <BookOpenCheck size={20} />, label: "Logbook" },
+    { href: "/company/messages", icon: <MessageSquare size={20} />, label: "Messages" },
+    { href: "/company/profile", icon: <UserCircle size={20} />, label: "Profile" },
   ];
 
-  return (
-    <nav className={`company-nav ${visible ? '' : 'hidden'}`}>
-      <div className="nav-links-container">
-        {links.map(({ href, label, icon }) => {
-          const isActive = pathname === href;
-          return (
-            <Link
-              key={href}
-              href={href}
-              className={`nav-link ${isActive ? 'active' : ''}`}
-            >
-              <span className="nav-icon">{icon}</span>
-              <span className="nav-label">{label}</span>
-            </Link>
-          );
-        })}
-      </div>
-    </nav>
-  );
-};
+  if (!visible) return null;
 
-export default CompanyNav;
+  return (
+    <aside className="company-sidebar-icon-only">
+      <div className="sidebar-nav">
+        {navItems.map((item, index) => (
+          <Link 
+            key={index} 
+            href={item.href} 
+            className={isActive(item.href) ? "active nav-item" : "nav-item"}
+          >
+            {item.icon}
+            <span className="tooltip">{item.label}</span>
+          </Link>
+        ))}
+      </div>
+
+      <div className="sidebar-bottom">
+        <button onClick={handleLogout} className="logout-btn">
+          <LogOut size={20} />
+          <span className="tooltip">Logout</span>
+        </button>
+      </div>
+    </aside>
+  );
+}
