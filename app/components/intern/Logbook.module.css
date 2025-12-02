@@ -1,37 +1,53 @@
-/* --- IL SYSTEM DESIGN ADAPTATION --- */
-/* Using variables from Dashboard.css for consistency */
+/*
+|--------------------------------------------------------------------------
+| Logbook / Intern Log - Adapted to Globals (1500px Layout)
+|--------------------------------------------------------------------------
+*/
 
 .pageContainer {
-  max-width: 1000px;
+  /* 🟢 MATCHING DASHBOARD DIMENSIONS */
+  width: 100%;
+  max-width: 1500px;
   margin: 0 auto;
-  padding: 32px 24px;
-  font-family: var(--font-body, sans-serif);
+  padding: 40px;
+  
+  /* Theme & Layout */
+  min-height: 100vh;
+  background-color: var(--bg-main);
   color: var(--text-main);
+  font-family: var(--font-body);
+  box-sizing: border-box;
+  animation: fadeIn 0.5s ease-in-out;
 }
 
-/* Typography */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Typography --- */
 .header {
-  font-family: var(--font-heading, sans-serif);
-  font-size: clamp(2rem, 4vw, 2.5rem);
-  font-weight: 700;
+  font-family: var(--font-heading);
+  font-size: 2rem; /* Consistent with other page titles */
+  font-weight: 800;
   color: var(--text-main);
   margin-bottom: 8px;
   letter-spacing: -0.02em;
 }
 
 .subHeader {
-  font-size: 1.1rem;
+  font-size: 1rem;
   color: var(--text-muted);
   margin-bottom: 40px;
   line-height: 1.5;
 }
 
 .subHeader strong {
-  color: var(--text-main);
+  color: var(--primary-orange);
   font-weight: 600;
 }
 
-/* Stats Section */
+/* --- Stats Section --- */
 .statsGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -41,12 +57,12 @@
 
 .statCard {
   background: var(--bg-card);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--border-color);
-  border-radius: var(--card-radius, 20px);
+  border-radius: var(--radius-card);
   padding: 24px;
   box-shadow: var(--shadow-card);
-  backdrop-filter: blur(var(--glass-blur, 16px));
-  -webkit-backdrop-filter: blur(var(--glass-blur, 16px));
   transition: transform 0.2s ease, border-color 0.2s;
   display: flex;
   flex-direction: column;
@@ -56,6 +72,7 @@
 .statCard:hover {
   transform: translateY(-4px);
   border-color: var(--primary-orange);
+  box-shadow: var(--shadow-glow);
 }
 
 .statTitle {
@@ -68,16 +85,17 @@
 }
 
 .statValue {
-  font-family: var(--font-heading, sans-serif);
+  font-family: var(--font-heading);
   font-size: 3rem;
   font-weight: 700;
   color: var(--text-main);
   line-height: 1;
 }
 
+/* Progress Bar */
 .progressContainer {
   width: 100%;
-  background: var(--bg-input); /* Using input bg for track */
+  background: var(--bg-input);
   border-radius: 99px;
   height: 12px;
   margin-top: 16px;
@@ -86,11 +104,11 @@
 }
 
 .progressBar {
-  background: var(--primary-orange);
+  background: linear-gradient(90deg, var(--primary-orange), #ff9f5a);
   height: 100%;
   border-radius: 99px;
   transition: width 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
-  box-shadow: 0 0 10px rgba(238, 116, 40, 0.3); /* Orange glow */
+  box-shadow: 0 0 10px rgba(238, 116, 40, 0.3);
 }
 
 .progressText {
@@ -101,19 +119,19 @@
   margin-top: 8px;
 }
 
-/* Form Section */
+/* --- Form Section --- */
 .formContainer {
   background: var(--bg-card);
+  backdrop-filter: blur(12px);
   border: 1px solid var(--border-color);
-  border-radius: var(--card-radius, 20px);
+  border-radius: var(--radius-card);
   padding: 32px;
   box-shadow: var(--shadow-card);
-  backdrop-filter: blur(var(--glass-blur, 16px));
   margin-bottom: 48px;
 }
 
 .formContainer h3 {
-  font-family: var(--font-heading, sans-serif);
+  font-family: var(--font-heading);
   font-size: 1.5rem;
   font-weight: 600;
   color: var(--text-main);
@@ -127,11 +145,12 @@
 .inputGroup label {
   display: block;
   font-size: 0.9rem;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--text-muted);
   margin-bottom: 8px;
 }
 
+/* Inputs matching NewJobPost style */
 .input,
 .textarea,
 .select {
@@ -142,55 +161,56 @@
   border-radius: 12px;
   font-size: 1rem;
   color: var(--text-main);
-  font-family: inherit;
+  font-family: var(--font-body);
   transition: all 0.2s ease;
   box-sizing: border-box;
+  outline: none;
 }
 
 .input:focus,
 .textarea:focus,
 .select:focus {
-  outline: none;
   border-color: var(--primary-orange);
-  box-shadow: 0 0 0 1px var(--primary-orange);
-  background: var(--bg-card); /* Slightly lighter on focus */
+  box-shadow: 0 0 0 4px rgba(238, 116, 40, 0.15);
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .textarea {
   min-height: 120px;
   resize: vertical;
+  line-height: 1.6;
 }
 
+/* Submit Button */
 .submitButton {
   width: 100%;
   padding: 16px;
-  background: var(--primary-orange);
-  color: #FFFFFF; /* Always white text on button */
+  background: linear-gradient(135deg, var(--primary-orange), #ff9f5a);
+  color: #FFFFFF;
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 700;
   border: none;
-  border-radius: 12px;
+  border-radius: var(--radius-btn);
   cursor: pointer;
   transition: all 0.2s ease;
   margin-top: 8px;
   box-shadow: 0 4px 15px rgba(238, 116, 40, 0.3);
 }
 
-.submitButton:hover {
-  background: var(--primary-orange-hover);
+.submitButton:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(238, 116, 40, 0.4);
+  box-shadow: 0 8px 25px rgba(238, 116, 40, 0.5);
 }
 
 .submitButton:disabled {
   background: var(--bg-input);
   color: var(--text-muted);
   cursor: not-allowed;
-  transform: none;
   box-shadow: none;
+  opacity: 0.7;
 }
 
-/* List Section */
+/* --- List Section --- */
 .listContainer {
   display: flex;
   flex-direction: column;
@@ -198,7 +218,7 @@
 }
 
 .listHeader {
-  font-family: var(--font-heading, sans-serif);
+  font-family: var(--font-heading);
   font-size: 1.5rem;
   font-weight: 700;
   color: var(--text-main);
@@ -210,18 +230,19 @@
 .noEntriesText {
   text-align: center;
   color: var(--text-muted);
-  padding: 40px;
-  background: var(--bg-input);
-  border-radius: 16px;
-  font-size: 1rem;
-  border: 1px dashed var(--border-color);
+  padding: 60px;
+  background: var(--bg-card);
+  border-radius: var(--radius-card);
+  font-size: 1.1rem;
+  border: 1px solid var(--border-color);
 }
 
-/* Entry Card */
+/* --- Entry Card --- */
 .entryCard {
   background: var(--bg-card);
+  backdrop-filter: blur(12px);
   border: 1px solid var(--border-color);
-  border-radius: 16px;
+  border-radius: var(--radius-card);
   padding: 24px;
   box-shadow: var(--shadow-card);
   transition: all 0.2s ease;
@@ -230,6 +251,7 @@
 .entryCard:hover {
   border-color: var(--primary-orange);
   transform: translateY(-2px);
+  box-shadow: var(--shadow-glow);
 }
 
 .entryHeader {
@@ -240,10 +262,10 @@
 }
 
 .entryDate {
-  font-size: 0.95rem;
+  font-size: 1rem;
   font-weight: 600;
   color: var(--text-main);
-  font-family: monospace; /* Preserves the technical feel */
+  font-family: var(--font-heading);
 }
 
 .entryMeta {
@@ -254,11 +276,11 @@
   flex-wrap: wrap;
 }
 
-/* Status Badges */
+/* Status Badges - Using Global Colors */
 .entryStatus {
   font-size: 0.75rem;
   font-weight: 700;
-  padding: 4px 10px;
+  padding: 4px 12px;
   border-radius: 30px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -266,24 +288,23 @@
   align-items: center;
 }
 
-/* Updated Status Colors for Dark Mode Compatibility */
 .statusPending,
 .statusSubmitted {
-  background: rgba(238, 116, 40, 0.15); /* Orange tint */
+  background: rgba(238, 116, 40, 0.15);
   color: var(--primary-orange);
   border: 1px solid rgba(238, 116, 40, 0.3);
 }
 
 .statusApproved {
-  background: rgba(52, 199, 89, 0.15); /* Green tint */
-  color: #34C759;
-  border: 1px solid rgba(52, 199, 89, 0.3);
+  background: rgba(34, 197, 94, 0.15);
+  color: var(--color-success); /* Defined in globals (#22c55e) */
+  border: 1px solid rgba(34, 197, 94, 0.3);
 }
 
 .statusRejected {
-  background: rgba(255, 59, 48, 0.15); /* Red tint */
-  color: #FF3B30;
-  border: 1px solid rgba(255, 59, 48, 0.3);
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--color-danger); /* Defined in globals (#ef4444) */
+  border: 1px solid rgba(239, 68, 68, 0.3);
 }
 
 /* Attendance Badge */
@@ -304,7 +325,7 @@
 .hoursValue {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--text-main);
+  color: var(--primary-orange);
   display: block;
 }
 
@@ -319,7 +340,7 @@
 .entryDescription {
   margin-top: 16px;
   padding: 16px;
-  background: var(--bg-input); /* Darker input bg */
+  background: var(--bg-input);
   border-radius: 12px;
   color: var(--text-main);
   font-size: 0.95rem;
@@ -340,12 +361,12 @@
 
 .deleteButton {
   font-size: 0.85rem;
-  color: #FF3B30; /* System Red */
+  color: var(--color-danger);
   background: none;
   border: none;
   cursor: pointer;
-  margin-top: 8px;
-  font-weight: 500;
+  margin-top: 12px;
+  font-weight: 600;
   opacity: 0.7;
   transition: opacity 0.2s;
   padding: 0;
@@ -360,6 +381,10 @@
 
 /* Mobile Adjustments */
 @media (max-width: 768px) {
+  .pageContainer {
+    padding: 20px;
+  }
+  
   .header {
     font-size: 1.75rem;
   }

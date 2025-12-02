@@ -1,29 +1,22 @@
 // src/app/company/layout.js
 import CompanyNav from '../components/CompanyNav';
-import '../globals.css'
+import '../globals.css';
 
 export default function CompanyLayout({ children }) {
   return (
-    // 1. Flex Container: Aligns Sidebar (left) and Main (right)
-    <div style={{ 
-      display: 'flex', 
-      minHeight: '100vh', 
-      backgroundColor: 'var(--bg-main)', // Matches your global dark theme
-      overflow: 'hidden' // Prevents double scrollbars
-    }}>
+    // 1. The Shell: Locks to the screen size (100vh)
+    <div className="company-shell">
       
-      {/* 2. The Sidebar (Fixed Width) */}
-      <CompanyNav />
+      {/* 2. Sidebar Wrapper: Fixed on the left */}
+      <aside className="company-sidebar-wrapper">
+        <CompanyNav />
+      </aside>
       
-      {/* 3. The Main Content (Fills remaining space) */}
-      <main style={{ 
-        flex: 1, 
-        overflowY: 'auto', // Allows content to scroll independently of sidebar
-        height: '100vh',   // Full viewport height
-        position: 'relative'
-      }}>
+      {/* 3. Main Content: Takes remaining space & scrolls internally */}
+      <main className="company-main-content">
         {children}
       </main>
+      
     </div>
   );
 }

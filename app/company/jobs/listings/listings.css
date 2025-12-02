@@ -1,17 +1,24 @@
 /*
 |--------------------------------------------------------------------------
-| Job Listings - Light Dark Mode Theme
+| Job Listings - Matches Dashboard Layout (1500px)
 |--------------------------------------------------------------------------
 */
 
 /* Container Layout */
 .job-listings-container {
-  padding: 40px;
-  min-height: 100vh;
-  background-color: var(--bg-main); /* Inherits from global layout */
+  /* 🟢 MATCHING DASHBOARD DIMENSIONS */
+  width: 100%;
+  max-width: 1500px;      /* Matches your Dashboard */
+  padding: 40px;          /* Matches your Dashboard */
+  margin: 0 auto;         /* Centers the container */
+  
+  background-color: var(--bg-main);
   color: var(--text-main);
   font-family: 'Inter', sans-serif;
   animation: fadeIn 0.5s ease-in-out;
+  box-sizing: border-box; /* Prevents scrollbars */
+  overflow-x: hidden;
+  min-height: 100vh;
 }
 
 @keyframes fadeIn {
@@ -19,21 +26,93 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Header */
-.header-bar {
-  margin-bottom: 30px;
+/* |--------------------------------------------------------------------------
+| 🍱 NEW BENTO HEADER (Replaces old header-bar)
+|--------------------------------------------------------------------------
+*/
+.bento-header {
+  background: var(--bg-card);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-card);
+  padding: 24px 30px;
+  
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  box-shadow: var(--shadow-card);
+  position: relative;
+  overflow: hidden;
 }
 
-.header-bar h1 {
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 2rem;
-  font-weight: 800;
+/* Subtle Gradient Overlay */
+.bento-header::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(90deg, rgba(238, 116, 40, 0.05) 0%, rgba(0,0,0,0) 50%);
+  pointer-events: none;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  z-index: 2;
+}
+
+.header-icon-box {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, var(--primary-orange), #ff9f5a);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: white;
+  box-shadow: 0 4px 12px rgba(238, 116, 40, 0.3);
+}
+
+.header-info h1 {
+  font-family: var(--font-heading);
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--text-main);
   margin: 0;
   letter-spacing: -0.02em;
+}
+
+.header-info p {
+  color: var(--text-muted);
+  margin: 4px 0 0 0;
+  font-size: 0.95rem;
+}
+
+/* Post Job Button (Inside Header) */
+.post-job-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, var(--primary-orange), #ff9f5a);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: var(--radius-btn);
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(238, 116, 40, 0.3);
+  position: relative; 
+  z-index: 2;
+}
+
+.post-job-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(238, 116, 40, 0.5);
 }
 
 /* Empty State */
@@ -51,11 +130,11 @@
 |--------------------------------------------------------------------------
 */
 .table-view {
-  background: var(--bg-card); /* Slate 800 */
+  background: var(--bg-card);
   border-radius: var(--radius-card);
   border: 1px solid var(--border-color);
   box-shadow: var(--shadow-card);
-  overflow: hidden; /* Rounds the corners of the table */
+  overflow: hidden;
 }
 
 table {
@@ -64,7 +143,7 @@ table {
 }
 
 thead {
-  background: var(--bg-input); /* Slate 700 */
+  background: var(--bg-input);
   border-bottom: 1px solid var(--border-color);
 }
 
@@ -88,7 +167,7 @@ tbody tr:last-child {
 }
 
 tbody tr:hover {
-  background: rgba(255, 255, 255, 0.03); /* Subtle hover highlight */
+  background: var(--bg-card-hover);
 }
 
 td {
@@ -99,7 +178,7 @@ td {
 
 td.font-medium {
   font-weight: 600;
-  color: white;
+  color: var(--text-main);
 }
 
 /*
@@ -134,7 +213,7 @@ td.font-medium {
 .job-card h2 {
   font-size: 1.25rem;
   font-weight: 700;
-  color: white;
+  color: var(--text-main);
   margin: 0 0 8px 0;
 }
 
@@ -163,7 +242,7 @@ button {
 }
 
 .edit-btn {
-  background: rgba(0, 212, 255, 0.5);
+  background: rgba(0, 212, 255, 0.15);
   color: var(--secondary-cyan);
   border: 1px solid rgba(0, 212, 255, 0.2);
   padding: 8px 16px;
@@ -180,7 +259,7 @@ button {
 }
 
 .delete-btn {
-  background: rgba(239, 68, 68, 0.5);
+  background: rgba(239, 68, 68, 0.15);
   color: var(--color-danger);
   border: 1px solid rgba(239, 68, 68, 0.2);
   padding: 8px 16px;
@@ -234,17 +313,9 @@ button {
   align-items: center;
 }
 
-.modal-header h2 {
-  margin: 0;
-  font-size: 1.25rem;
-}
+.modal-header h2 { margin: 0; font-size: 1.25rem; }
 
-.close-btn {
-  background: none;
-  border: none;
-  color: var(--text-muted);
-  font-size: 1.5rem;
-}
+.close-btn { background: none; border: none; color: var(--text-muted); font-size: 1.5rem; }
 .close-btn:hover { color: white; }
 
 .modal-body {
@@ -259,14 +330,14 @@ button {
   font-size: 0.85rem;
   font-weight: 600;
   color: var(--text-muted);
-  margin-bottom: -8px; /* Pull closer to input */
+  margin-bottom: -8px;
 }
 
 .modal-body input,
 .modal-body textarea {
   background: var(--bg-input);
   border: 1px solid var(--border-color);
-  color: white;
+  color: var(--text-main);
   padding: 12px;
   border-radius: 8px;
   font-size: 0.95rem;
@@ -278,10 +349,7 @@ button {
   border-color: var(--primary-orange);
 }
 
-.modal-body textarea {
-  min-height: 100px;
-  resize: vertical;
-}
+.modal-body textarea { min-height: 100px; resize: vertical; }
 
 /* Tag Input Styles */
 .tag-input-container {
@@ -295,7 +363,7 @@ button {
 }
 
 .tag-chip {
-  background: rgba(238, 116, 40, 0.2);
+  background: rgba(238, 116, 40, 0.15);
   color: var(--primary-orange);
   padding: 4px 10px;
   border-radius: 20px;
@@ -303,6 +371,7 @@ button {
   display: flex;
   align-items: center;
   gap: 6px;
+  border: 1px solid rgba(238, 116, 40, 0.3);
 }
 
 .tag-chip button {
@@ -351,12 +420,13 @@ button {
 
 /* Responsive */
 @media (max-width: 768px) {
-  .table-view { display: none; } /* Hide table on mobile */
-  .card-view { display: block; } /* Show cards on mobile */
+  .bento-header { flex-direction: column; align-items: flex-start; gap: 16px; }
+  .table-view { display: none; }
+  .card-view { display: block; }
   .job-grid { grid-template-columns: 1fr; }
 }
 
 @media (min-width: 769px) {
-  .card-view { display: none; } /* Hide cards on desktop */
-  .table-view { display: block; } /* Show table on desktop */
+  .card-view { display: none; }
+  .table-view { display: block; }
 }

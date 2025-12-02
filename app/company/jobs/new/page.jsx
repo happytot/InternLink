@@ -5,8 +5,6 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useRouter } from 'next/navigation';
 import TagInput from '../../../components/TagInput'; 
 import './NewJobPost.css'; 
-// Note: Header import removed because we use Sidebar layout now
-
 import { Briefcase, MapPin, DollarSign, Clock, Layout } from 'lucide-react';
 
 export default function NewJobPost() {
@@ -44,7 +42,6 @@ export default function NewJobPost() {
         created_at: new Date(),
       };
 
-      // 1. Insert Job
       const { data: newJob, error: insertError } = await supabase
         .from('job_posts')
         .insert(payload)
@@ -53,7 +50,7 @@ export default function NewJobPost() {
 
       if (insertError) throw insertError;
 
-      // 2. Create Embedding (Optional - keep existing logic)
+      // Optional Embedding call
       try {
         await fetch(`/api/embedding/job`, {
           method: 'POST',
@@ -85,23 +82,42 @@ export default function NewJobPost() {
         {/* --- CARD 1: CORE INFO (Large, Top Left) --- */}
         <div className="bento-card core-info">
           <div className="card-header">
-            <Briefcase size={20} className="card-icon" />
-            <h3>Core Information</h3>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <Briefcase size={20} className="card-icon" />
+                <h3>Core Information</h3>
+            </div>
           </div>
           
           <div className="form-group">
             <label>Job Title</label>
-            <input name="title" required placeholder="e.g. Junior Frontend Developer" value={formData.title} onChange={handleChange} />
+            <input 
+              name="title" 
+              required 
+              placeholder="e.g. Junior Frontend Developer" 
+              value={formData.title} 
+              onChange={handleChange} 
+            />
           </div>
 
           <div className="row-group">
             <div className="form-group">
               <label><MapPin size={14}/> Location</label>
-              <input name="location" required placeholder="e.g. Manila / Remote" value={formData.location} onChange={handleChange} />
+              <input 
+                name="location" 
+                required 
+                placeholder="e.g. Manila / Remote" 
+                value={formData.location} 
+                onChange={handleChange} 
+              />
             </div>
             <div className="form-group">
               <label><DollarSign size={14}/> Salary / Allowance</label>
-              <input name="salary" placeholder="e.g. ₱500/day (Optional)" value={formData.salary} onChange={handleChange} />
+              <input 
+                name="salary" 
+                placeholder="e.g. ₱500/day (Optional)" 
+                value={formData.salary} 
+                onChange={handleChange} 
+              />
             </div>
           </div>
         </div>
@@ -109,8 +125,10 @@ export default function NewJobPost() {
         {/* --- CARD 2: LOGISTICS (Small, Top Right) --- */}
         <div className="bento-card logistics">
           <div className="card-header">
-            <Clock size={20} className="card-icon" />
-            <h3>Logistics</h3>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <Clock size={20} className="card-icon" />
+                <h3>Logistics</h3>
+            </div>
           </div>
 
           <div className="form-group">

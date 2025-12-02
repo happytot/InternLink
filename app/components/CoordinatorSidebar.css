@@ -1,25 +1,31 @@
-.sidebar-icon-only {
-  width: 70px;
+/* CompanyNav.css */
+
+/* 1. MATCHED CLASS NAME TO JSX */
+.company-sidebar-icon-only {
+  width: 80px; /* Slightly wider for better spacing */
   background: var(--bg-card);
   height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 20px 0;
+  padding: 24px 0;
   border-right: 1px solid var(--border-color);
+  
+  /* 2. POSITIONING & SCROLL LOCK */
   position: sticky;
   top: 0;
-   z-index: 10000;
+  overflow: hidden; /* ⛔️ Disables scrolling */
+  flex-shrink: 0;   /* Prevents sidebar from being squashed */
+  z-index: 50;
 }
 
 .sidebar-nav {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 20px;
+  align-items: center; /* Center items horizontally */
+  gap: 16px;
   flex-grow: 1;
-  width: 100px;
-  
+  width: 100%; /* 3. FIXED WIDTH ISSUE */
 }
 
 .nav-item {
@@ -27,48 +33,61 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  color: var(--text-main);
-  width: 100%;
-  padding: 12px 0;
+  color: var(--text-muted);
+  width: 48px;       /* Fixed square size for hover effect */
+  height: 48px;
+  border-radius: 12px;
   transition: all 0.2s ease;
 }
 
 .nav-item.active {
+  background: rgba(238, 116, 40, 0.15); /* Orange Tint */
   color: var(--primary-orange);
 }
 
 .nav-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-main);
+}
+
+.nav-item.active:hover {
+  background: rgba(238, 116, 40, 0.25);
   color: var(--primary-orange);
 }
 
-/* Tooltip */
+/* Tooltip (Popping out to the right) */
 .tooltip {
   position: absolute;
-  left: 80px;
-  background: var(--primary-orange);
+  left: 60px; /* Push it outside the sidebar */
+  background: var(--bg-card);
   color: var(--text-main);
   padding: 6px 12px;
-  border-radius: 12px;
+  border-radius: 8px;
   white-space: nowrap;
   opacity: 0;
   pointer-events: none;
-  transform: translateY(-50%);
+  transform: translateY(-50%) translateX(10px);
   top: 50%;
-  transition: opacity 0.2s ease;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-  font-size: 0.9rem;
-   z-index: 10001;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  border: 1px solid var(--border-color);
+  font-size: 0.85rem;
+  font-weight: 500;
+  z-index: 10001;
 }
 
+/* Show tooltip on hover */
 .nav-item:hover .tooltip,
 .logout-btn:hover .tooltip {
   opacity: 1;
+  transform: translateY(-50%) translateX(0);
 }
 
 .sidebar-bottom {
+  margin-top: auto;
   display: flex;
-  flex-direction: column;
-  gap: 20px;
+  justify-content: center;
+  width: 100%;
 }
 
 .logout-btn {
@@ -76,16 +95,19 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background: var(--primary-orange);
-  color: var(--bg-main);
-  border: none;
+  background: transparent; /* Cleaner look */
+  color: var(--color-danger); /* Use your danger color red */
+  border: 1px solid var(--border-color);
   border-radius: 12px;
-  padding: 12px;
+  padding: 0;
   cursor: pointer;
-  width: 50px;
-  height: 50px;
+  width: 48px;
+  height: 48px;
+  transition: all 0.2s;
 }
 
 .logout-btn:hover {
-  background: var(--primary-orange-hover);
+  background: var(--color-danger);
+  color: white;
+  border-color: var(--color-danger);
 }

@@ -1,33 +1,36 @@
 /*
 |--------------------------------------------------------------------------
-| Applicants Page - Dark Mode Theme (Full Width)
+| Applicants Page - Matches Dashboard (1500px)
 |--------------------------------------------------------------------------
 */
 :root {
   --bg-main: #021217;
-  --bg-card: #1e293b; /* Slate 800 */
-  --bg-input: #334155; /* Slate 700 */
+  --bg-card: #1e293b; 
+  --bg-input: #334155; 
   --text-main: #F1F5F9;
   --text-muted: #94A3B8;
   --primary-orange: #EE7428; 
   --color-success: #22c55e; 
   --color-danger: #ef4444; 
   --border-color: rgba(255, 255, 255, 0.1); 
-  --radius-card: 16px;
+  --radius-card: 20px; 
+  --radius-btn: 12px;
 }
 
 .applicants-container {
-  /* 🟢 FULL WIDTH CHANGES */
+  /* 🟢 MATCHING DASHBOARD DIMENSIONS */
   width: 100%;
-  max-width: 100%; /* Removes the 1100px limit */
-  padding: 30px 40px; /* Consistent padding */
+  max-width: 1500px;      /* Matches your Dashboard */
+  padding: 40px;          /* Matches your Dashboard */
+  margin: 0 auto;         /* Centers the container */
   
   background-color: var(--bg-main);
   min-height: 100vh;
   color: var(--text-main);
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-body);
   animation: fadeIn 0.5s ease-in-out;
-  box-sizing: border-box; /* Ensures padding doesn't cause scrollbars */
+  box-sizing: border-box; 
+  overflow-x: hidden;
 }
 
 @keyframes fadeIn {
@@ -35,45 +38,99 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* --- Header --- */
-.header-section {
+/* |--------------------------------------------------------------------------
+| 🍱 NEW BENTO HEADER (Replaces old header-section)
+|--------------------------------------------------------------------------
+*/
+.bento-header {
+  background: var(--bg-card);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-card);
+  padding: 24px 30px;
+  
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 30px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  position: relative;
+  overflow: hidden;
 }
-.page-title {
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 2rem;
+
+/* Subtle Gradient Overlay */
+.bento-header::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(90deg, rgba(238, 116, 40, 0.05) 0%, rgba(0,0,0,0) 50%);
+  pointer-events: none;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  z-index: 2;
+}
+
+.header-icon-box {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, var(--primary-orange), #ff9f5a);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  box-shadow: 0 4px 12px rgba(238, 116, 40, 0.3);
+}
+
+.header-info h1 {
+  font-family: var(--font-heading);
+  font-size: 1.8rem;
   font-weight: 800;
+  color: var(--text-main);
   margin: 0;
+  letter-spacing: -0.02em;
 }
-.page-subtitle {
+
+.header-info p {
   color: var(--text-muted);
-  margin-top: 5px;
+  margin: 4px 0 0 0;
+  font-size: 0.95rem;
 }
 
 /* --- Bento Stats --- */
 .bento-stats {
   display: grid;
-  /* Auto-fit columns that fill the space */
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 20px;
+  gap: 24px;
   margin-bottom: 30px;
 }
 
 .stat-card {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
-  padding: 24px; /* Slightly larger padding for better spacing */
+  padding: 24px;
   border-radius: var(--radius-card);
   display: flex;
   align-items: center;
   gap: 20px;
   box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease;
+}
+.stat-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--primary-orange);
 }
 
 .stat-icon {
-  width: 50px;
-  height: 50px;
-  border-radius: 12px;
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -82,31 +139,31 @@
   flex-shrink: 0;
 }
 
-.stat-card.blue .stat-icon { color: #38bdf8; background: rgba(56, 189, 248, 0.1); }
-.stat-card.orange .stat-icon { color: var(--primary-orange); background: rgba(238, 116, 40, 0.1); }
-.stat-card.green .stat-icon { color: var(--color-success); background: rgba(34, 197, 94, 0.1); }
+.stat-card.blue .stat-icon { color: #38bdf8; background: rgba(56, 189, 248, 0.15); }
+.stat-card.orange .stat-icon { color: var(--primary-orange); background: rgba(238, 116, 40, 0.15); }
+.stat-card.green .stat-icon { color: var(--color-success); background: rgba(34, 197, 94, 0.15); }
 
-.stat-card h3 { margin: 0; font-size: 1.8rem; font-weight: 700; line-height: 1.1; }
-.stat-card span { font-size: 0.9rem; color: var(--text-muted); }
+.stat-card h3 { margin: 0; font-size: 1.8rem; font-weight: 800; line-height: 1.1; }
+.stat-card span { font-size: 0.95rem; color: var(--text-muted); font-weight: 500; }
 
 /* --- Filter Bar --- */
 .filter-bar {
   display: flex;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
   width: 100%;
 }
 
 .filter-group {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   background: var(--bg-card);
-  padding: 8px;
-  border-radius: 12px;
+  padding: 6px;
+  border-radius: var(--radius-btn);
   border: 1px solid var(--border-color);
   align-items: center;
 }
 
-.filter-group .text-muted { margin: 0 8px; }
+.filter-group .filter-icon { margin: 0 12px; color: var(--text-muted); }
 
 .filter-group button {
   background: transparent;
@@ -115,19 +172,17 @@
   padding: 8px 20px;
   border-radius: 8px;
   font-size: 0.95rem;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
 }
 
+.filter-group button:hover { color: var(--text-main); }
+
 .filter-group button.active {
   background: var(--bg-input);
-  color: white;
-  font-weight: 600;
-}
-
-.filter-group button:hover:not(.active) {
-  color: white;
+  color: var(--text-main);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 /* --- Desktop Table --- */
@@ -135,26 +190,25 @@
   background: var(--bg-card);
   border-radius: var(--radius-card);
   border: 1px solid var(--border-color);
-  overflow: hidden; /* Rounds corners */
-  overflow-x: auto; /* Handles scroll on small screens */
+  overflow: hidden;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-  width: 100%; /* Ensures table container fills width */
+  width: 100%;
 }
 
 .applicants-table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 800px; /* Ensures table doesn't squish too much */
+  min-width: 800px;
 }
 
 .applicants-table th {
   background: var(--bg-input);
   text-align: left;
   padding: 18px 24px;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   text-transform: uppercase;
   color: var(--text-muted);
-  letter-spacing: 0.05em;
+  font-weight: 700;
   border-bottom: 1px solid var(--border-color);
 }
 
@@ -176,8 +230,8 @@
 }
 
 .avatar-circle {
-  width: 45px;
-  height: 45px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
   background: linear-gradient(135deg, var(--primary-orange), #ff9f5a);
   color: white;
@@ -185,11 +239,11 @@
   align-items: center;
   justify-content: center;
   font-weight: 700;
-  font-size: 1.1rem;
+  font-size: 1rem;
   flex-shrink: 0;
 }
 
-.name { font-weight: 600; color: white; font-size: 1rem; }
+.name { font-weight: 600; color: var(--text-main); font-size: 1rem; }
 .email { font-size: 0.85rem; color: var(--text-muted); }
 
 /* Job Info Cell */
@@ -267,6 +321,7 @@
   color: var(--text-muted);
 }
 .empty-icon { color: var(--bg-input); margin-bottom: 15px; }
+.empty-icon-large { margin-bottom: 16px; opacity: 0.5; }
 
 /* --- Mobile Grid (Hidden on Desktop) --- */
 .mobile-grid { display: none; }

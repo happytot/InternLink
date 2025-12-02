@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import './applicants.css';
 import { updateJobApplicationStatus } from './actions';
-import { toast, Toaster } from 'react-hot-toast';
+import { toast, Toaster } from 'sonner';
 
 // Icons
 import { 
@@ -117,13 +117,24 @@ export default function ApplicantsPage() {
 
   return (
     <div className="applicants-container">
-      <Toaster position="bottom-right" toastOptions={{ style: { borderRadius: '12px', background: '#333', color: '#fff' } }} />
+      {/* 2. ✅ Sonner Toaster (Styling is in globals.css) */}
+      <Toaster position="bottom-right" richColors />
       
-      {/* --- HEADER --- */}
-      <div className="header-section">
-        <h1 className="page-title">Applicant Management</h1>
-        <p className="page-subtitle">Review and manage incoming intern applications.</p>
+      {/* ========================================================
+          🍱 NEW BENTO HEADER BOX
+         ======================================================== */}
+      <div className="bento-header">
+        <div className="header-left">
+          <div className="header-icon-box">
+            <Users size={24} strokeWidth={2.5} />
+          </div>
+          <div className="header-info">
+            <h1>Applicant Management</h1>
+            <p>Review and manage incoming intern applications.</p>
+          </div>
+        </div>
       </div>
+      {/* ======================================================== */}
 
       {/* --- BENTO STATS GRID --- */}
       <div className="bento-stats">
@@ -153,7 +164,7 @@ export default function ApplicantsPage() {
       {/* --- FILTERS --- */}
       <div className="filter-bar">
         <div className="filter-group">
-          <Filter size={16} className="text-muted"/>
+          <Filter size={16} className="filter-icon"/>
           <button className={filterStatus === 'All' ? 'active' : ''} onClick={() => setFilterStatus('All')}>All</button>
           <button className={filterStatus === 'Pending' ? 'active' : ''} onClick={() => setFilterStatus('Pending')}>Pending</button>
           <button className={filterStatus === 'Approved' ? 'active' : ''} onClick={() => setFilterStatus('Approved')}>Approved</button>
@@ -225,7 +236,7 @@ export default function ApplicantsPage() {
                             </button>
                           </>
                         ) : (
-                          <span className="text-muted text-sm">Completed</span>
+                          <span className="text-muted-sm">Completed</span>
                         )}
                       </div>
                     </td>

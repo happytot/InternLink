@@ -7,42 +7,45 @@
 @tailwind components;
 @tailwind utilities;
 
-/* 2. Define Variables (Default = Dark Mode) */
+/* 2. Define Variables (Lighter Dark Mode / Glass Theme) */
 :root {
-    /* --- Backgrounds --- */
-    --bg-main: #021217;
-    --bg-glass: rgba(6, 31, 38, 0.65);
-    --bg-card: rgba(20, 30, 35, 0.7);
-    --bg-input: rgba(255, 255, 255, 0.03);
-    --bg-card-hover: rgba(255, 255, 255, 0.05);
-    --bg-item: #061f26;
+    /* --- Backgrounds (Lighter Slate Palette) --- */
+    --bg-main: #021217; /* Deep background to contrast with lighter cards */
     
+    /* Changed from dark teal to Slate 800/900 for better visibility */
+    --bg-card: rgba(30, 41, 59, 0.75); 
+    --bg-card-hover: rgba(51, 65, 85, 0.8);
+    
+    /* Lighter input background for better contrast */
+    --bg-input: rgba(51, 65, 85, 0.5); 
+    --bg-item: #1e293b; 
+
     /* --- Accents --- */
     --primary-orange: #EE7428;
     --primary-orange-hover: #EA580C;
+    --secondary-cyan: #00d4ff; 
     --accent-blue: #00d4ff;
-    --secondary-cyan: #00d4ff; /* Matches your listing CSS */
-    --color-danger: #ef4444;    /* Standard red for delete buttons */
-    
+    --color-danger: #ef4444; 
+
     /* --- Text --- */
-    --text-main: #F1F5F9;
-    --text-muted: #94A3B8;
+    --text-main: #F8FAFC;  /* Slate 50 (Brighter White) */
+    --text-muted: #CBD5E1; /* Slate 300 (Softer Gray) */
     --text-inverse: #FFFFFF;
     
-    /* --- UI Borders & Radius (ADDED HERE) --- */
-    --border-color: rgba(255, 255, 255, 0.1);
-    --radius-card: 20px;       /* Standard bento/card curve */
-    --radius-btn: 12px;        /* Button curve */
-    --radius-sm: 8px;          /* Inputs/Tags curve */
+    /* --- UI Borders & Radius --- */
+    --border-color: rgba(255, 255, 255, 0.15); /* Slightly more visible border */
+    --radius-card: 20px;
+    --radius-btn: 12px;
+    --radius-sm: 8px;
     
     /* --- Shadows --- */
-    --shadow-card: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    --shadow-card: 0 8px 32px 0 rgba(0, 0, 0, 0.3); /* Glass shadow */
     --shadow-glow: 0 0 20px rgba(238, 116, 40, 0.25); /* Orange glow */
     
     /* --- Orb Colors --- */
     --orb-1: var(--primary-orange);
-    --orb-2: var(--accent-blue);
-    --orb-opacity: 0.15;
+    --orb-2: var(--secondary-cyan);
+    --orb-opacity: 0.25; /* Increased opacity slightly for vibrancy */
 
     /* --- Fonts --- */
     --font-heading: 'Plus Jakarta Sans', sans-serif;
@@ -56,7 +59,7 @@
     --bg-glass: rgba(255, 255, 255, 0.75);
     --bg-card: #FFFFFF;
     --bg-input: #F1F5F9;
-    --bg-card-hover: #F1F5F9;
+    --bg-card-hover: #F8FAFC;
     --bg-item: #FFFFFF;
 
     /* --- Accents --- */
@@ -89,7 +92,6 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
-/* Typography Defaults */
 h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-heading);
     font-weight: 700;
@@ -153,12 +155,15 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 [data-sonner-toaster] [data-sonner-toast] {
-    background: var(--bg-glass) !important;
+    /* Use glass variables for toasts */
+    background: rgba(30, 41, 59, 0.85) !important; 
     backdrop-filter: blur(16px) !important;
     -webkit-backdrop-filter: blur(16px) !important;
+    
     border: 1px solid var(--border-color) !important;
-    border-radius: var(--radius-card) !important; /* Uses new variable */
+    border-radius: var(--radius-card) !important;
     padding: 18px 22px !important;
+    
     color: var(--text-main) !important;
     box-shadow: var(--shadow-card) !important;
     gap: 12px !important;
@@ -202,4 +207,38 @@ h1, h2, h3, h4, h5, h6 {
     background: var(--primary-orange) !important;
     color: white !important;
     border-color: var(--primary-orange) !important;
+}
+
+/* =========================================
+   🔒 APP SHELL LAYOUT (Fixes Sidebar Scroll)
+   ========================================= */
+
+/* 1. The Container */
+.company-shell {
+  display: flex;
+  height: 100vh;        /* Forces app to match screen height exactly */
+  width: 100vw;         /* Forces app to match screen width */
+  overflow: hidden;     /* ⛔️ IMPORTANT: Stops the browser window from scrolling */
+  background-color: var(--bg-main);
+}
+
+/* 2. The Sidebar Wrapper */
+.company-sidebar-wrapper {
+  flex-shrink: 0;       /* Prevents sidebar from getting squashed */
+  height: 100%;         /* Fills the shell height */
+  z-index: 50;          /* Stays above content */
+  border-right: 1px solid var(--border-color);
+  background-color: var(--bg-card); /* Ensures sidebar background is solid */
+}
+
+/* 3. The Main Content Area */
+.company-main-content {
+  flex: 1;              /* Takes all remaining width */
+  height: 100%;         /* Fills the shell height */
+  overflow-y: auto;     /* ✅ This moves the scrollbar INSIDE this box */
+  overflow-x: hidden;   /* Prevents horizontal scrolling */
+  position: relative;
+  
+  /* Makes scrolling smooth */
+  scroll-behavior: smooth;
 }

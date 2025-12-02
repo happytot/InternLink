@@ -1,20 +1,23 @@
 /*
 |--------------------------------------------------------------------------
-| New Job Post - Dark Mode Bento Theme (Complete)
+| New Job Post - Matches Dashboard Layout
 |--------------------------------------------------------------------------
 */
 
-/* --- Base Page Container --- */
+/* --- Base Page Container (Matches .dashboard-content) --- */
 .page-wrapper {
-  max-width: 100%;
-  margin: 0 auto;
-  padding: 40px;
+  padding: 40px;          /* Match Dashboard padding */
+  max-width: 1500px;      /* Match Dashboard width */
+  width: 100%;
+  margin: 0 auto;         /* Centers the content on large screens */
   min-height: 100vh;
-  /* Ensure global background matches if not set elsewhere */
-  background-color: #021217; 
-  color: #F1F5F9;
-  font-family: 'Inter', sans-serif;
+  
+  /* Theme variables */
+  background-color: var(--bg-main); 
+  color: var(--text-main);
+  font-family: var(--font-body);
   animation: fadeIn 0.5s ease-in-out;
+  box-sizing: border-box;
 }
 
 @keyframes fadeIn {
@@ -28,16 +31,16 @@
 }
 
 .page-title {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--font-heading);
   font-size: 2rem;
   font-weight: 800;
-  color: white;
+  color: var(--text-main);
   margin: 0;
   letter-spacing: -0.02em;
 }
 
 .page-subtitle {
-  color: #94A3B8; /* Slate 400 */
+  color: var(--text-muted);
   font-size: 1rem;
   margin-top: 8px;
 }
@@ -45,39 +48,36 @@
 /* --- The Bento Grid Layout --- */
 .bento-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr); /* 3 Columns layout */
+  grid-template-columns: repeat(3, 1fr);
   gap: 24px;
 }
 
 /* --- Base Card Style --- */
 .bento-card {
-  background: #1e293b; /* Slate 800 */
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 20px;
+  background: var(--bg-card);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-card, 20px);
   padding: 24px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--shadow-card);
+  
   display: flex;
   flex-direction: column;
   gap: 16px;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, transform 0.2s;
 }
 
 .bento-card:hover {
-  border-color: rgba(238, 116, 40, 0.5); /* Orange tint on hover */
+  border-color: var(--primary-orange);
+  transform: translateY(-2px);
 }
 
 /* Grid Spanning Logic */
-.core-info {
-  grid-column: span 2; /* Takes 2/3 width */
-}
-
-.logistics {
-  grid-column: span 1; /* Takes 1/3 width */
-}
-
-.full-width {
-  grid-column: span 3; /* Takes full width */
-}
+.core-info { grid-column: span 2; }
+.logistics { grid-column: span 1; }
+.full-width { grid-column: span 3; }
 
 /* --- Card Headers --- */
 .card-header {
@@ -88,10 +88,10 @@
 }
 
 .card-header h3 {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--font-heading);
   font-size: 1.1rem;
   font-weight: 700;
-  color: #F1F5F9;
+  color: var(--text-main);
   margin: 0;
   display: flex;
   align-items: center;
@@ -99,12 +99,12 @@
 }
 
 .card-icon {
-  color: #EE7428; /* Primary Orange */
+  color: var(--primary-orange);
 }
 
 .hint {
   font-size: 0.75rem;
-  color: #94A3B8;
+  color: var(--text-muted);
   font-style: italic;
 }
 
@@ -124,143 +124,95 @@
 label {
   font-size: 0.85rem;
   font-weight: 600;
-  color: #cbd5e1; /* Light Gray Text */
+  color: var(--text-muted);
   display: flex;
   align-items: center;
   gap: 6px;
 }
 
-/* --- INPUTS & VISIBILITY FIXES --- */
+/* --- INPUTS --- */
 input, textarea, select {
   width: 100%;
   padding: 12px 16px;
-  
-  /* Force Dark Background & Light Text */
-  background-color: #334155 !important; /* Slate 700 */
-  color: white !important;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  
+  background-color: var(--bg-input) !important;
+  color: var(--text-main) !important;
+  border: 1px solid var(--border-color);
   border-radius: 12px;
   font-size: 0.95rem;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-body);
   outline: none;
   transition: all 0.2s;
   box-sizing: border-box;
 }
 
-/* Browser Autofill Override (Fixes White Text on White Bg issue) */
+input:focus, textarea:focus, select:focus {
+  border-color: var(--primary-orange);
+  box-shadow: 0 0 0 4px rgba(238, 116, 40, 0.15); 
+  background-color: rgba(255, 255, 255, 0.05) !important; 
+}
+
+/* Browser Autofill Override */
 input:-webkit-autofill,
-input:-webkit-autofill:hover, 
-input:-webkit-autofill:focus, 
 textarea:-webkit-autofill,
-textarea:-webkit-autofill:hover,
-textarea:-webkit-autofill:focus,
-select:-webkit-autofill,
-select:-webkit-autofill:hover,
-select:-webkit-autofill:focus {
-  -webkit-text-fill-color: white !important;
-  -webkit-box-shadow: 0 0 0px 1000px #334155 inset !important;
+select:-webkit-autofill {
+  -webkit-text-fill-color: var(--text-main) !important;
+  -webkit-box-shadow: 0 0 0px 1000px #0f1c23 inset !important; 
   transition: background-color 5000s ease-in-out 0s;
 }
 
-/* Focus State */
-input:focus, textarea:focus, select:focus {
-  border-color: #EE7428;
-  box-shadow: 0 0 0 4px rgba(238, 116, 40, 0.15);
-  background-color: #475569 !important; /* Slightly lighter on focus */
-}
-
 ::placeholder {
-  color: rgba(255, 255, 255, 0.3);
+  color: var(--text-muted);
+  opacity: 0.5;
 }
 
 /* Select Icon Wrapper */
-.select-wrapper {
-  position: relative;
-}
+.select-wrapper { position: relative; }
+.select-wrapper select { padding-left: 40px; appearance: none; cursor: pointer; }
+.input-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none; z-index: 10; }
 
-.select-wrapper select {
-  padding-left: 40px;
-  appearance: none;
-  cursor: pointer;
-  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23cbd5e1%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
-  background-repeat: no-repeat;
-  background-position: right 1rem center;
-  background-size: 0.8rem auto;
-}
-
-.input-icon {
-  position: absolute;
-  left: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #94A3B8;
-  pointer-events: none;
-  z-index: 10;
-}
-
-textarea {
-  resize: vertical;
-  line-height: 1.6;
-}
+textarea { resize: vertical; line-height: 1.6; min-height: 120px; }
 
 /* --- Footer Actions --- */
 .form-actions {
-  grid-column: span 3; /* Footer spans full width */
+  grid-column: span 3;
   display: flex;
   justify-content: flex-end;
   gap: 16px;
   margin-top: 20px;
   padding-top: 20px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid var(--border-color);
 }
 
 .cancel-btn {
   padding: 12px 24px;
   background: transparent;
-  color: #94A3B8;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
+  color: var(--text-muted);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-btn, 12px);
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
 }
-
-.cancel-btn:hover {
-  border-color: white;
-  color: white;
-}
+.cancel-btn:hover { border-color: var(--text-main); color: var(--text-main); }
 
 .post-job-btn {
   padding: 12px 32px;
-  background: linear-gradient(135deg, #EE7428, #ff9f5a);
+  background: linear-gradient(135deg, var(--primary-orange), #ff9f5a);
   color: white;
   border: none;
-  border-radius: 12px;
+  border-radius: var(--radius-btn, 12px);
   font-weight: 700;
   cursor: pointer;
   box-shadow: 0 4px 15px rgba(238, 116, 40, 0.3);
   transition: all 0.3s;
 }
-
-.post-job-btn:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(238, 116, 40, 0.5);
-}
-
-.post-job-btn:disabled {
-  background: #334155;
-  color: #94a3b8;
-  cursor: not-allowed;
-  box-shadow: none;
-  opacity: 0.7;
-}
+.post-job-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(238, 116, 40, 0.5); }
+.post-job-btn:disabled { background: var(--bg-input); color: var(--text-muted); cursor: not-allowed; box-shadow: none; opacity: 0.7; }
 
 /* --- Tag Input Styling Override --- */
-/* Forces your existing TagInput component to match the theme */
 .tag-input-container {
-  background-color: #334155 !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  background-color: var(--bg-input) !important;
+  border: 1px solid var(--border-color) !important;
   border-radius: 12px !important;
   padding: 8px !important;
   display: flex;
@@ -269,47 +221,23 @@ textarea {
 }
 
 .tag-chip {
-  background: rgba(238, 116, 40, 0.2) !important;
-  color: #EE7428 !important;
-  padding: 4px 10px;
+  background: rgba(238, 116, 40, 0.15) !important;
+  color: var(--primary-orange) !important;
+  padding: 4px 12px;
   border-radius: 20px;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   display: flex;
   align-items: center;
   gap: 6px;
+  border: 1px solid rgba(238, 116, 40, 0.3);
 }
 
-.tag-chip button {
-  background: none;
-  border: none;
-  color: #EE7428;
-  font-weight: bold;
-  cursor: pointer;
-  padding: 0;
-  margin-left: 4px;
-}
-
-.tag-input-container input {
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  padding: 4px !important;
-  flex: 1;
-  min-width: 120px;
-  color: white !important;
-}
+.tag-chip button { background: none; border: none; color: var(--primary-orange); font-weight: bold; cursor: pointer; padding: 0; margin-left: 4px; }
+.tag-input-container input { background: transparent !important; border: none !important; box-shadow: none !important; padding: 4px !important; flex: 1; min-width: 120px; color: var(--text-main) !important; }
 
 /* --- Responsive Design --- */
 @media (max-width: 992px) {
-  .bento-grid {
-    grid-template-columns: 1fr; /* Stack everything in 1 column */
-  }
-  
-  .core-info, .logistics, .full-width, .form-actions {
-    grid-column: span 1;
-  }
-  
-  .row-group {
-    flex-direction: column; /* Stack location/salary on mobile */
-  }
+  .bento-grid { grid-template-columns: 1fr; }
+  .core-info, .logistics, .full-width, .form-actions { grid-column: span 1; }
+  .row-group { flex-direction: column; }
 }

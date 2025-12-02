@@ -2,22 +2,21 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { supabase } from "../../lib/supabaseClient"; 
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"; // Updated import
 import "./CompanyNav.css";
 
 import {
   LayoutDashboard,
-  PlusCircle,
   List,
   Users,
-  MessageSquare,
-  UserCircle,
   BookOpenCheck,
+  UserCircle,
   LogOut
 } from "lucide-react";
 
 export default function CompanyNav({ visible = true }) {
   const pathname = usePathname();
+  const supabase = createClientComponentClient();
 
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
@@ -26,15 +25,12 @@ export default function CompanyNav({ visible = true }) {
 
   const isActive = (href) => pathname === href;
 
-  // Company specific navigation items
   const navItems = [
-    { href: "/company/dashboard", icon: <LayoutDashboard size={20} />, label: "Dashboard" },
-    { href: "/company/jobs/new", icon: <PlusCircle size={20} />, label: "Post Job" },
-    { href: "/company/jobs/listings", icon: <List size={20} />, label: "Listings" },
-    { href: "/company/applicants", icon: <Users size={20} />, label: "Applicants" },
-    { href: "/company/logbook", icon: <BookOpenCheck size={20} />, label: "Logbook" },
-    { href: "/company/messages", icon: <MessageSquare size={20} />, label: "Messages" },
-    { href: "/company/profile", icon: <UserCircle size={20} />, label: "Profile" },
+    { href: "/company/dashboard", icon: <LayoutDashboard size={22} />, label: "Dashboard" },
+    { href: "/company/jobs/listings", icon: <List size={22} />, label: "Listings" },
+    { href: "/company/applicants", icon: <Users size={22} />, label: "Applicants" },
+    { href: "/company/logbook", icon: <BookOpenCheck size={22} />, label: "Logbook" },
+    { href: "/company/profile", icon: <UserCircle size={22} />, label: "Profile" },
   ];
 
   if (!visible) return null;

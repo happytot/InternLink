@@ -13,7 +13,8 @@ import {
   LuHistory, 
   LuBuilding, 
   LuMenu, 
-  LuX 
+  LuX ,
+   LuBook 
 } from "react-icons/lu";
 import { FaSun, FaMoon } from 'react-icons/fa';
 
@@ -94,6 +95,15 @@ export default function InternNav({ className }) {
                             <span className="nav-icon"><LuBuilding /></span>
                             <span className="nav-text">Companies</span>
                         </Link>
+
+                        <Link 
+                                href="/intern/logbook"
+                             className={pathname.startsWith('/intern/logbook') ? 'nav-link active' : 'nav-link'}
+>
+                             <span className="nav-icon"><LuBook /></span>
+                             <span className="nav-text">Logbook</span>
+                         </Link>
+
 
                         <Link 
                             href="/intern/profile"

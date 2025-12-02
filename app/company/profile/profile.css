@@ -1,227 +1,309 @@
-/* 🧊 Main Container — Frosted Glass Apple Style */
-.company-profile-container {
-  max-width: 700px;
-  margin: 50px auto;
+/*
+|--------------------------------------------------------------------------
+| Company Profile - Matches Globals (1500px)
+|--------------------------------------------------------------------------
+*/
+
+.profile-container {
+  width: 100%;
+  max-width: 1500px;
+  margin: 0 auto;
   padding: 40px;
-  background: rgba(255, 255, 255, 0.8);
-  border-radius: 24px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
-  backdrop-filter: blur(20px);
-  transition: all 0.3s ease;
-  position: relative; /* Good for positioning children */
+  
+  min-height: 100vh;
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  font-family: var(--font-body);
+  animation: fadeIn 0.5s ease-in-out;
+  box-sizing: border-box;
 }
 
-/* 🧭 Header + Logout container */
-.profile-header-container {
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Header */
+.bento-header {
+  background: var(--bg-card);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-card);
+  padding: 24px 30px;
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  margin-bottom: 2rem;
-  position: relative;
-}
-
-/* ✨ Title */
-.profile-header {
-  font-size: 2em;
-  font-weight: 600;
-  color: #000;
-  text-align: left;
-  margin: 0;
-}
-
-/* 🍎 Logout Button — iOS/macOS Sonoma Style */
-.logout-btn {
-  background: transparent;
-  color: #ff3b30;
-  border: 1px solid #ff3b30;
-  padding: 0.5rem 1.5rem;
-  border-radius: 12px;
-  font-size: 0.95rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.25s ease;
-}
-
-.logout-btn:hover {
-  background: #ff3b30;
-  color: #fff;
-  box-shadow: 0 4px 14px rgba(255, 59, 48, 0.25);
-  transform: translateY(-1px);
-}
-
-/* 🖼️ Logo Upload Section */
-.profile-logo-section {
-  display: flex;
-  flex-direction: column;
   align-items: center;
-  margin-bottom: 25px;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  position: relative;
+  overflow: hidden;
 }
 
-.company-logo {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  object-fit: cover;
-  margin-bottom: 15px;
-  border: 2px solid #ddd;
-  transition: transform 0.2s ease;
+.bento-header::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(90deg, rgba(238, 116, 40, 0.05) 0%, rgba(0,0,0,0) 50%);
+  pointer-events: none;
 }
 
-.company-logo:hover {
-  transform: scale(1.05);
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  z-index: 2;
 }
 
-.company-logo.placeholder {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  background: #f1f1f1;
-  color: #999;
-  font-weight: 500;
+.header-icon-box {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, var(--primary-orange), #ff9f5a);
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-/* 📤 Upload Button */
-.upload-btn {
-  background: linear-gradient(90deg, #007aff, #4a90e2);
   color: white;
+  box-shadow: 0 4px 12px rgba(238, 116, 40, 0.3);
+}
+
+.header-info h1 {
+  font-family: var(--font-heading);
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.header-info p {
+  color: var(--text-muted);
+  margin: 4px 0 0 0;
+  font-size: 0.95rem;
+}
+
+/* 🟢 UPDATED: Renamed to avoid conflict */
+.profile-logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(239, 68, 68, 0.15); /* Red tint */
+  color: var(--color-danger);
+  border: 1px solid rgba(239, 68, 68, 0.3);
   padding: 10px 20px;
-  border-radius: 8px;
+  border-radius: var(--radius-btn);
+  font-weight: 600;
   cursor: pointer;
-  font-weight: 500;
-  transition: background 0.3s, transform 0.2s ease;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 2;
+  
+  /* Reset dimensions from potential global conflicts */
+  width: auto;
+  height: auto;
+  min-width: fit-content;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
-.upload-btn:hover {
-  background: linear-gradient(90deg, #005fcc, #007aff);
-  transform: translateY(-1px);
+.profile-logout-btn:hover {
+  background: var(--color-danger);
+  color: white;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
 }
 
-/* 🧾 Form Styling */
-.profile-form {
+/* Grid Layout */
+.profile-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 24px;
+}
+
+.bento-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-card);
+  padding: 30px;
+  box-shadow: var(--shadow-card);
   display: flex;
   flex-direction: column;
-  gap: 1rem;
 }
 
+.card-header {
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 16px;
+}
+
+.card-header h3 {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  color: var(--text-main);
+}
+
+/* Identity Card */
+.logo-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.logo-preview {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: var(--bg-input);
+  border: 2px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  margin-bottom: 16px;
+  position: relative;
+}
+
+.logo-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.placeholder-logo {
+  color: var(--text-muted);
+}
+
+.upload-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  color: var(--primary-orange);
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 8px 16px;
+  border-radius: 20px;
+  background: rgba(238, 116, 40, 0.1);
+  transition: all 0.2s;
+}
+
+.upload-label:hover {
+  background: var(--primary-orange);
+  color: white;
+}
+
+/* Form Elements */
 .form-group {
   margin-bottom: 20px;
 }
 
 .form-group label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
   font-weight: 600;
-  color: #333;
-  display: block;
+  color: var(--text-muted);
   margin-bottom: 8px;
 }
 
 .form-group input,
 .form-group textarea {
   width: 100%;
-  padding: 12px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  font-size: 16px;
-  transition: border-color 0.3s, box-shadow 0.3s;
+  padding: 14px;
+  border-radius: 12px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  font-family: inherit;
+  font-size: 0.95rem;
+  outline: none;
+  transition: all 0.2s;
+  box-sizing: border-box;
 }
 
 .form-group input:focus,
 .form-group textarea:focus {
-  border-color: #007aff;
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15);
+  border-color: var(--primary-orange);
+  box-shadow: 0 0 0 4px rgba(238, 116, 40, 0.15);
+  background: rgba(255, 255, 255, 0.05);
 }
 
-/* 💾 Save Button */
-.btn-primary {
-  width: 100%;
-  background-color: #007aff;
+.form-actions {
+  margin-top: auto;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.save-btn {
+  background: linear-gradient(135deg, var(--primary-orange), #ff9f5a);
   color: white;
   border: none;
-  padding: 14px;
-  border-radius: 10px;
-  font-weight: 600;
+  padding: 12px 32px;
+  border-radius: var(--radius-btn);
+  font-weight: 700;
   cursor: pointer;
-  transition: background-color 0.3s, transform 0.2s ease;
+  transition: all 0.3s;
+  box-shadow: 0 4px 15px rgba(238, 116, 40, 0.3);
 }
 
-.btn-primary:hover {
-  background-color: #005fcc;
-  transform: translateY(-1px);
+.save-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(238, 116, 40, 0.5);
 }
 
-/* 📱 Responsive Adjustments */
-@media (max-width: 600px) {
-  .company-profile-container {
-    padding: 25px 15px;
-    margin: 20px auto; /* Less margin on mobile */
+.save-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  filter: grayscale(1);
+}
+
+/* |--------------------------------------------------------------------------
+| 🦴 SKELETON LOADING
+|--------------------------------------------------------------------------
+*/
+.skeleton-pulse {
+  animation: pulse-bg 1.5s infinite ease-in-out;
+}
+
+.skeleton-box {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+}
+
+@keyframes pulse-bg {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+
+@keyframes pulse-bg {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .profile-grid {
+    grid-template-columns: 1fr;
   }
-
-  .profile-header-container {
+  
+  .bento-header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 10px;
+    gap: 16px;
   }
-
-  .profile-header {
-    font-size: 1.6em;
-  }
-
-  .logout-btn {
+  
+  .profile-logout-btn {
     align-self: flex-start;
-    padding: 0.4rem 1.2rem;
-    font-size: 0.9rem;
   }
 }
 
-/* ======================================= */
-/* ===== Toast Notification (FIXED) ===== */
-/* ======================================= */
-/*
-  This block has been moved OUTSIDE the media query 
-  so it works on all screen sizes.
-*/
-.toast {
-  position: fixed; /* 'fixed' positions relative to the viewport */
-  top: 30px;
-  left: 50%;
-  transform: translateX(-50%) translateY(-50px); /* start above view */
-  padding: 14px 24px;
-  border-radius: 14px;
-  font-weight: 500;
-  color: #fff;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-  z-index: 9999;
-  opacity: 0;
-  pointer-events: none; /* prevents accidental clicks */
-  animation: slideFade 3s forwards;
-}
-
-.toast.success {
-  background-color: #28a745; /* green */
-}
-
-.toast.error {
-  background-color: #ff3b30; /* red */
-}
-
-@keyframes slideFade {
-  0% {
-    transform: translateX(-50%) translateY(-50px);
-    opacity: 0;
-  }
-  10% { /* Slide in fast */
-    transform: translateX(-50%) translateY(0);
-    opacity: 1;
-  }
-  90% { /* Stay for the duration */
-    transform: translateX(-50%) translateY(0);
-    opacity: 1;
-  }
-  100% { /* Fade out */
-    transform: translateX(-50%) translateY(-50px);
-    opacity: 0;
+@media (max-width: 768px) {
+  .profile-container {
+    padding: 20px;
   }
 }

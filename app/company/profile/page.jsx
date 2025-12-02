@@ -1,79 +1,57 @@
 'use client';
 
-// 1. ✅ Added 'useCallback'
 import { useEffect, useState, useRef, useCallback } from 'react';
-
-// 2. ⛔️ REMOVED your old supabase import
-// import { supabase } from '../../../lib/supabaseClient';
-
-// 3. ✅ ADDED this import instead
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-
 import { useRouter } from 'next/navigation';
+import { Building2, LogOut, Upload, MapPin, FileText, Globe } from 'lucide-react';
+import { toast } from 'sonner';
 import './profile.css';
 
 export default function CompanyProfile() {
-  // 4. ✅ INITIALIZED the client *inside* the component
   const supabase = createClientComponentClient();
+  const router = useRouter();
 
+  const [loading, setLoading] = useState(true); 
+  const [uploading, setUploading] = useState(false);
   const [profile, setProfile] = useState({
     name: '',
     description: '',
     location: '',
     logo_url: '',
   });
-  const [loading, setLoading] = useState(false);
-  const [uploading, setUploading] = useState(false);
-  const [toastMessage, setToastMessage] = useState('');
-  const [toastType, setToastType] = useState('success'); // 'success' or 'error'
-  const router = useRouter();
-  
-  const toastTimeoutRef = useRef(null);
 
-  // NOTE: You need to set your Cloudinary preset!
   const CLOUDINARY_URL = `https://api.cloudinary.com/v1_1/db8ee6vbj/image/upload`;
   const UPLOAD_PRESET = 'YOUR_UPLOAD_PRESET'; 
 
-  const showToast = (message, type = 'success', callback) => {
-    if (toastTimeoutRef.current) {
-      clearTimeout(toastTimeoutRef.current);
-    }
-    setToastMessage(message);
-    setToastType(type);
-    toastTimeoutRef.current = setTimeout(() => {
-      setToastMessage('');
-      toastTimeoutRef.current = null;
-      if (callback) callback();
-    }, 3000);
-  };
-
-  // 5. ✅ Wrapped fetchProfile in useCallback
   const fetchProfile = useCallback(async () => {
-    setLoading(true);
-    
-    // This 'supabase' variable is now the cookie-aware one
-    const { data: { user } } = await supabase.auth.getUser();
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
 
-    if (!user) {
-      alert('Please log in to view your profile.');
-      router.push('/auth/companyAuthPage'); // Corrected login path
+      if (!user) {
+        router.push('/auth/companyAuthPage');
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from('companies')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        console.error(error);
+        toast.error("Error loading profile");
+      } 
+      else if (data) {
+        setProfile(data);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
       setLoading(false);
-      return;
     }
+  }, [supabase, router]);
 
-    const { data, error } = await supabase
-      .from('companies')
-      .select('*')
-      .eq('id', user.id)
-      .single();
-
-    if (error && error.code !== 'PGRST116') console.error(error);
-    else if (data) setProfile(data);
-
-    setLoading(false);
-  }, [supabase, router]); // 6. ✅ Added supabase and router dependencies
-
-  // 7. ✅ Added fetchProfile to the dependency array
   useEffect(() => {
     fetchProfile();
   }, [fetchProfile]);
@@ -85,12 +63,11 @@ export default function CompanyProfile() {
     if (!file) return;
 
     if (UPLOAD_PRESET === 'YOUR_UPLOAD_PRESET') {
-      alert('Error: Cloudinary UPLOAD_PRESET is not set in your code.');
+      toast.error('Cloudinary UPLOAD_PRESET is not set.');
       return;
     }
 
     setUploading(true);
-
     const formData = new FormData();
     formData.append('file', file);
     formData.append('upload_preset', UPLOAD_PRESET);
@@ -98,106 +75,190 @@ export default function CompanyProfile() {
     try {
       const res = await fetch(CLOUDINARY_URL, { method: 'POST', body: formData });
       const data = await res.json();
-      if (data.secure_url) setProfile(prev => ({ ...prev, logo_url: data.secure_url }));
+      if (data.secure_url) {
+        setProfile(prev => ({ ...prev, logo_url: data.secure_url }));
+        toast.success('Logo uploaded successfully!'); 
+      }
     } catch (error) {
       console.error('Upload failed:', error);
-      showToast('❌ Failed to upload image', 'error');
+      toast.error('Failed to upload image');
     } finally {
       setUploading(false);
     }
   };
 
-  // This will now work correctly
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
+    const savingToast = toast.loading("Saving changes...");
 
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
-       showToast('❌ Session expired. Please log in again.', 'error');
-       setLoading(false);
+       toast.dismiss(savingToast);
+       toast.error('Session expired. Please log in again.');
        return;
     }
 
     const updates = { id: user.id, ...profile, updated_at: new Date() };
 
     const { error } = await supabase.from('companies').upsert(updates);
-    if (error) showToast('❌ Failed to update profile', 'error');
-    else showToast('✅ Profile updated successfully!', 'success');
-
-    setLoading(false);
-  };
-
-  // This will also work correctly
-  const handleLogout = async () => {
-    const { error } = await supabase.auth.signOut();
+    
+    toast.dismiss(savingToast);
     if (error) {
-      showToast('❌ Error logging out: ' + error.message, 'error');
+      toast.error('Failed to update profile');
     } else {
-      showToast('Logged out successfully!', 'success', () => {
-        router.push('/auth/companyAuthPage');
-      });
+      toast.success('Profile updated successfully!');
     }
   };
 
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      toast.error('Error logging out: ' + error.message);
+    } else {
+      toast.success('Logged out successfully!');
+      router.push('/auth/companyAuthPage');
+    }
+  };
+
+  // Loading State
+  if (loading) {
+    return (
+      <div className="profile-container">
+        {/* Skeleton Header */}
+        <div className="bento-header skeleton-pulse">
+          <div className="header-left" style={{ width: '100%' }}>
+            <div className="skeleton-box" style={{ width: 48, height: 48, borderRadius: 12 }}></div>
+            <div style={{ marginLeft: 16 }}>
+              <div className="skeleton-box" style={{ width: 200, height: 28, marginBottom: 8 }}></div>
+              <div className="skeleton-box" style={{ width: 300, height: 16 }}></div>
+            </div>
+          </div>
+        </div>
+
+        {/* Skeleton Grid */}
+        <div className="profile-grid">
+          {/* Left Card Skeleton */}
+          <div className="bento-card skeleton-pulse" style={{ height: 400 }}>
+            <div className="skeleton-box" style={{ width: '100%', height: 30, marginBottom: 30 }}></div>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}>
+              <div className="skeleton-box" style={{ width: 140, height: 140, borderRadius: '50%' }}></div>
+            </div>
+            <div className="skeleton-box" style={{ width: '100%', height: 40, marginTop: 20 }}></div>
+          </div>
+
+          {/* Right Card Skeleton */}
+          <div className="bento-card skeleton-pulse" style={{ height: 400 }}>
+            <div className="skeleton-box" style={{ width: '100%', height: 30, marginBottom: 30 }}></div>
+            <div className="skeleton-box" style={{ width: '100%', height: 50, marginBottom: 20 }}></div>
+            <div className="skeleton-box" style={{ width: '100%', height: 150, marginBottom: 20 }}></div>
+            <div className="skeleton-box" style={{ width: 120, height: 40, marginLeft: 'auto' }}></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="company-profile-container">
-      <div className="profile-header-container">
-        <h1 className="profile-header">Company Profile</h1>
-        <button className="logout-btn" onClick={handleLogout}>
-          Logout
+    <div className="profile-container">
+      {/* --- Bento Header --- */}
+      <div className="bento-header">
+        <div className="header-left">
+          <div className="header-icon-box">
+            <Building2 size={24} strokeWidth={2.5} />
+          </div>
+          <div className="header-info">
+            <h1>Company Profile</h1>
+            <p>Manage your company branding and details.</p>
+          </div>
+        </div>
+        
+        {/* 🛠️ FIX: Renamed class to prevent conflict with Sidebar */}
+        <button className="profile-logout-btn" onClick={handleLogout}>
+          <LogOut size={18} />
+          <span>Logout</span>
         </button>
       </div>
 
-      {toastMessage && (
-        <div className={`toast ${toastType}`}>
-          {toastMessage}
-        </div>
-      )}
+      {/* --- Profile Form Grid --- */}
+      <form className="profile-grid" onSubmit={handleSubmit}>
+        
+        {/* Identity Card */}
+        <div className="bento-card identity-card">
+          <div className="card-header">
+            <h3>Identity</h3>
+          </div>
+          
+          <div className="logo-wrapper">
+            <div className="logo-preview">
+              {profile.logo_url ? (
+                <img src={profile.logo_url} alt="Company Logo" />
+              ) : (
+                <div className="placeholder-logo"><Building2 size={40}/></div>
+              )}
+              {uploading && <div className="upload-overlay">...</div>}
+            </div>
+            
+            <label htmlFor="file-upload" className="upload-label">
+              <Upload size={16} />
+              <span>{uploading ? 'Uploading...' : 'Change Logo'}</span>
+            </label>
+            <input
+              id="file-upload"
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              style={{ display: 'none' }}
+            />
+          </div>
 
-      <form className="profile-form" onSubmit={handleSubmit}>
-        <div className="profile-logo-section">
-          {profile.logo_url ? (
-            <img src={profile.logo_url} alt="Company Logo" className="company-logo" />
-          ) : (
-            <div className="company-logo placeholder">Upload Logo</div>
-          )}
-          <label htmlFor="file-upload" className="upload-btn">
-            {uploading ? 'Uploading...' : 'Change Logo'}
-          </label>
-          <input
-            id="file-upload"
-            type="file"
-            accept="image/*"
-            onChange={handleFileChange}
-            style={{ display: 'none' }}
-          />
+          <div className="form-group">
+            <label><Globe size={14} /> Company Name</label>
+            <input 
+              type="text" 
+              name="name" 
+              value={profile.name || ''} 
+              onChange={handleChange} 
+              required 
+              placeholder="e.g. Acme Corp"
+            />
+          </div>
         </div>
 
-        <div className="form-group">
-          <label>Company Name</label>
-          <input type="text" name="name" value={profile.name} onChange={handleChange} required />
+        {/* Details Card */}
+        <div className="bento-card details-card">
+          <div className="card-header">
+            <h3>Details</h3>
+          </div>
+
+          <div className="form-group">
+            <label><MapPin size={14} /> Location</label>
+            <input 
+              type="text" 
+              name="location" 
+              value={profile.location || ''} 
+              onChange={handleChange} 
+              placeholder="City, Country" 
+            />
+          </div>
+
+          <div className="form-group">
+            <label><FileText size={14} /> Description</label>
+            <textarea
+              name="description"
+              rows="6"
+              value={profile.description || ''}
+              onChange={handleChange}
+              placeholder="Tell applicants about your company culture and mission..."
+            ></textarea>
+          </div>
+
+          <div className="form-actions">
+            <button type="submit" className="save-btn" disabled={uploading}>
+              Save Changes
+            </button>
+          </div>
         </div>
 
-        <div className="form-group">
-          <label>Description</label>
-          <textarea
-            name="description"
-            rows="4"
-            value={profile.description}
-            onChange={handleChange}
-            placeholder="Describe your company..."
-          ></textarea>
-        </div>
-
-        <div className="form-group">
-          <label>Location</label>
-          <input type="text" name="location" value={profile.location} onChange={handleChange} placeholder="City, Country" />
-        </div>
-
-        <button type="submit" className="btn-primary" disabled={loading}>
-          {loading ? 'Saving...' : 'Save Changes'}
-        </button>
       </form>
     </div>
   );

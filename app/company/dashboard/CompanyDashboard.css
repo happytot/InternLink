@@ -2,33 +2,12 @@
 |--------------------------------------------------------------------------
 | Company Dashboard - Light Dark Mode Theme
 |--------------------------------------------------------------------------
-*/
-:root {
-  /* 1. Core Theme Colors (Lighter Dark Mode) */
-  --bg-main: #021217;
-  --bg-card: #1e293b; /* Slate 800 (Lighter Card) */
-  --bg-input: #334155; /* Slate 700 (Lighter Input) */
-  
-  --text-main: #f8fafc; /* Slate 50 (Brighter White) */
-  --text-muted: #cbd5e1; /* Slate 300 (Softer Gray) */
-  
-  --primary-orange: #EE7428; 
-  --secondary-cyan: #00d4ff; 
-  
-  /* Lighter Border for better visibility */
-  --border-color: rgba(255, 255, 255, 0.1); 
-  
-  /* Softer Shadows */
-  --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-glow: 0 0 15px rgba(238, 116, 40, 0.2);
 
-  --radius-card: 20px;
-  --radius-btn: 12px;
-}
 
 /* Page Layout */
 .dashboard-content {
   padding: 40px;
+  max-width: 1500px;
   min-height: 100vh;
   background-color: var(--bg-main);
   color: var(--text-main);
@@ -88,7 +67,7 @@
 
 .logo-text {
   font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 1.5rem;
+  font-size: 2.5rem;
   font-weight: 800;
   color: var(--text-main);
   letter-spacing: -0.02em;

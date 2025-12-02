@@ -2,60 +2,72 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '../../../lib/supabaseClient'; 
-import { getCompanyLogbookEntries, approveLogEntry, updateRequiredHours, submitEvaluation } from './actions';
-import { toast, Toaster } from 'sonner';
+import { getCompanyLogbookEntries, approveLogEntry, updateRequiredHours, submitWeeklyEvaluation } from './actions';
+import { toast } from 'sonner';
 import styles from './CompanyLogbook.module.css';
+import '../../globals.css';
+
+import { 
+    BookOpen, CheckCircle2, FileText, Lock, Star, X, PenSquare, 
+    FileCheck, Clock, AlertCircle
+} from 'lucide-react';
 
 export default function CompanyLogbookPage() {
+    const [loading, setLoading] = useState(true); 
     const [interns, setInterns] = useState([]);
-    const [loading, setLoading] = useState(true);
     const [selectedIntern, setSelectedIntern] = useState(null);
-    const [showEvalModal, setShowEvalModal] = useState(false);
     
-    // Track which logs are currently loading
+    // Modals
+    const [showEvalModal, setShowEvalModal] = useState(false);
+    const [showSummaryModal, setShowSummaryModal] = useState(false);
+    
+    // Data
+    const [evaluatingWeek, setEvaluatingWeek] = useState(null);
     const [approvingLogs, setApprovingLogs] = useState(new Set());
 
+    // 1. ✅ Main Data Fetcher (Runs once on mount + Realtime)
     useEffect(() => {
-        loadData();
+        loadData(true); // Pass true to show skeleton on first load
 
-        // REALTIME LISTENER
         const channel = supabase
             .channel('company-logbook-changes')
-            .on(
-                'postgres_changes',
-                { event: '*', schema: 'public', table: 'logbooks' },
-                (payload) => {
-                    if (payload.eventType === 'INSERT') {
-                        toast.info("New logbook entry received!");
-                    }
-                    // When data changes, reload everything
-                    loadData(true); 
-                }
-            )
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'logbooks' }, () => {
+                loadData(false); // Pass false to update in background (no skeleton)
+            })
             .subscribe();
 
-        return () => {
-            supabase.removeChannel(channel);
-        };
-    }, [selectedIntern]); // Add selectedIntern dependency so we can refresh the modal if open
+        return () => { supabase.removeChannel(channel); };
+    }, []); // 👈 Empty array: Only runs on mount
 
-    // Modified loadData to handle modal refreshing
-    async function loadData(isRealtime = false) {
-        const result = await getCompanyLogbookEntries();
-        if (result.success) {
-            const processedInterns = groupLogsByIntern(result.logs || []);
-            setInterns(processedInterns);
-
-            // 🟢 CRITICAL FIX: If the modal is open, refresh its data too!
-            // This ensures if a student adds a log while you are looking at their modal, it pops up.
-            if (isRealtime && selectedIntern) {
-                const currentOpenIntern = processedInterns.find(i => i.id === selectedIntern.id);
-                if (currentOpenIntern) {
-                    setSelectedIntern(currentOpenIntern);
+    // 2. ✅ Sync Selected Intern Data (Runs when data updates, but NO SKELETON)
+    // This ensures if you are looking at a modal and data changes, the modal updates live.
+    useEffect(() => {
+        if (selectedIntern) {
+            const updatedIntern = interns.find(i => i.id === selectedIntern.id);
+            if (updatedIntern) {
+                // Only update if data actually changed to prevent loops
+                if (JSON.stringify(updatedIntern) !== JSON.stringify(selectedIntern)) {
+                    setSelectedIntern(updatedIntern);
                 }
             }
         }
-        setLoading(false);
+    }, [interns]); 
+
+    async function loadData(showSkeleton = false) {
+        if (showSkeleton) setLoading(true);
+        
+        try {
+            const result = await getCompanyLogbookEntries();
+            if (result.success) {
+                const processedInterns = groupLogsByIntern(result.logs || []);
+                setInterns(processedInterns);
+            }
+        } catch (error) {
+            console.error("Error loading logbooks:", error);
+            toast.error("Failed to load logbooks");
+        } finally {
+            if (showSkeleton) setLoading(false);
+        }
     }
 
     const groupLogsByIntern = (logs) => {
@@ -71,7 +83,7 @@ export default function CompanyLogbookPage() {
                     profile: log.profiles,
                     jobTitle: app.job_posts?.title || 'Intern',
                     requiredHours: Number(app.required_hours) || 486, 
-                    isEvaluated: app.supervisor_evaluations?.length > 0, 
+                    weeklyEvaluations: app.weekly_evaluations || [],
                     logs: [],
                     totalHours: 0,
                     pendingCount: 0
@@ -80,12 +92,9 @@ export default function CompanyLogbookPage() {
             groups[internId].logs.push(log);
             
             const status = (log.status || '').toLowerCase(); 
-            
             if (status === 'approved') {
-                const hours = parseFloat(log.hours_worked) || 0;
-                groups[internId].totalHours += hours;
+                groups[internId].totalHours += (parseFloat(log.hours_worked) || 0);
             }
-            
             if (status === 'pending' || status === 'submitted') {
                 groups[internId].pendingCount += 1;
             }
@@ -93,13 +102,46 @@ export default function CompanyLogbookPage() {
         return Object.values(groups);
     };
 
+    const getInternWeeks = (intern) => {
+        if (!intern || !intern.logs) return [];
+        const evaluations = intern.weeklyEvaluations || [];
+        const sortedLogs = [...intern.logs].sort((a, b) => new Date(a.date) - new Date(b.date));
+        const weeks = {};
+
+        sortedLogs.forEach(log => {
+            const date = new Date(log.date);
+            const day = date.getDay();
+            const diff = date.getDate() - day + (day === 0 ? -6 : 1); 
+            const monday = new Date(date.setDate(diff));
+            monday.setHours(0,0,0,0);
+            const key = monday.toISOString();
+
+            if (!weeks[key]) {
+                const sunday = new Date(monday);
+                sunday.setDate(monday.getDate() + 6);
+                const existingEval = evaluations.find(e => 
+                    new Date(e.week_start_date).getTime() === monday.getTime()
+                );
+
+                weeks[key] = {
+                    startDate: monday,
+                    endDate: sunday,
+                    logs: [],
+                    totalHours: 0,
+                    evaluation: existingEval || null
+                };
+            }
+            weeks[key].logs.push(log);
+            if(log.status === 'Approved') weeks[key].totalHours += (parseFloat(log.hours_worked) || 0);
+        });
+
+        return Object.values(weeks).sort((a, b) => b.startDate - a.startDate);
+    };
+
     const handleGoalChange = async (e, intern) => {
         const newGoal = parseInt(e.target.value);
         if (!newGoal || newGoal < 1) return;
-
-        const updatedInterns = interns.map(i => i.id === intern.id ? { ...i, requiredHours: newGoal } : i);
-        setInterns(updatedInterns);
-
+        setInterns(interns.map(i => i.id === intern.id ? { ...i, requiredHours: newGoal } : i));
         await updateRequiredHours(intern.applicationId, newGoal);
         toast.success(`Goal updated to ${newGoal} hours`);
     };
@@ -107,80 +149,95 @@ export default function CompanyLogbookPage() {
     const handleEvaluationSubmit = async (e) => {
         e.preventDefault();
         const formData = new FormData(e.target);
-        const result = await submitEvaluation(formData);
+        const result = await submitWeeklyEvaluation(formData);
         if (result.success) {
-            toast.success("Evaluation Submitted!");
+            toast.success("Weekly Evaluation Submitted!");
             setShowEvalModal(false);
-            loadData(); 
+            setEvaluatingWeek(null);
+            loadData(false); // Refresh without skeleton
         } else {
             toast.error(result.error);
         }
     };
 
     const handleApprove = async (logId, internId) => {
-        // 1. Disable button instantly
         setApprovingLogs(prev => new Set(prev).add(logId));
-
-        // 🟢 2. OPTIMISTIC UPDATE: Update the MODAL immediately (The Fix)
-        // This makes the button turn into text instantly without closing the modal
-        if (selectedIntern && selectedIntern.id === internId) {
-            setSelectedIntern(prev => {
-                const updatedLogs = prev.logs.map(log => 
-                    log.id === logId ? { ...log, status: 'Approved' } : log
-                );
-                // Also update the total hours inside the modal view if you display them there
-                let newTotal = 0;
-                updatedLogs.forEach(l => {
-                    if ((l.status||'').toLowerCase() === 'approved') newTotal += (parseFloat(l.hours_worked) || 0);
-                });
-                return { ...prev, logs: updatedLogs, totalHours: newTotal };
-            });
-        }
-
-        // 3. OPTIMISTIC UPDATE: Update the Main List in background
+        
+        // Optimistic Update
         setInterns(prev => {
             return prev.map(intern => {
                 if (intern.id === internId) {
-                    const updatedLogs = intern.logs.map(log => 
-                        log.id === logId ? { ...log, status: 'Approved' } : log
-                    );
+                    const updatedLogs = intern.logs.map(log => log.id === logId ? { ...log, status: 'Approved' } : log);
                     let newTotal = 0;
-                    updatedLogs.forEach(l => {
-                        if ((l.status||'').toLowerCase() === 'approved') {
-                            newTotal += (parseFloat(l.hours_worked) || 0);
-                        }
-                    });
+                    updatedLogs.forEach(l => { if ((l.status||'').toLowerCase() === 'approved') newTotal += (parseFloat(l.hours_worked) || 0); });
                     return { ...intern, logs: updatedLogs, totalHours: newTotal };
                 }
                 return intern;
             });
         });
 
-        // 4. Send to Server
         const result = await approveLogEntry(logId);
+        setApprovingLogs(prev => { const next = new Set(prev); next.delete(logId); return next; });
         
-        // 5. Re-enable button (though it will now be hidden due to status change)
-        setApprovingLogs(prev => {
-            const next = new Set(prev);
-            next.delete(logId);
-            return next;
-        });
-
-        if (result.success) {
-            toast.success("Approved!");
-        } else {
-            toast.error("Failed to approve");
-            loadData(); // Revert on error
-        }
+        if (result.success) toast.success("Approved!");
+        else { toast.error("Failed to approve"); loadData(false); }
     };
 
-    if (loading) return <div className={styles.container}>Loading...</div>;
+    const getPerformanceSummary = (intern) => {
+        if(!intern || !intern.weeklyEvaluations || intern.weeklyEvaluations.length === 0) return null;
+        const evals = intern.weeklyEvaluations;
+        const totalEvals = evals.length;
+        const avg = (key) => (evals.reduce((sum, e) => sum + e[key], 0) / totalEvals).toFixed(1);
+        
+        return {
+            quality: avg('quality_rating'),
+            productivity: avg('productivity_rating'),
+            reliability: avg('reliability_rating'),
+            teamwork: avg('teamwork_rating'),
+            finalScore: ((evals.reduce((sum, e) => sum + e.quality_rating + e.productivity_rating + e.reliability_rating + e.teamwork_rating, 0) / (totalEvals * 4))).toFixed(1),
+            comments: evals.map(e => ({ date: e.week_start_date, text: e.comments })).filter(c => c.text)
+        };
+    };
+
+    // 🦴 SKELETON LOADING STATE (Only on Initial Load)
+    if (loading) {
+        return (
+            <div className={styles.container}>
+                <div className={`${styles.bentoHeader} ${styles.skeletonPulse}`} style={{height: '100px', marginBottom: '30px'}}></div>
+                <div className={styles.internGrid}>
+                    {[1, 2, 3].map(i => (
+                        <div key={i} className={`${styles.internCard} ${styles.skeletonPulse}`} style={{height: '300px'}}>
+                            <div style={{display:'flex', gap:'15px', marginBottom:'20px'}}>
+                                <div className={styles.skeletonBox} style={{width:56, height:56, borderRadius:'50%'}}></div>
+                                <div style={{flex:1}}>
+                                    <div className={styles.skeletonBox} style={{width:'60%', height:20, marginBottom:8}}></div>
+                                    <div className={styles.skeletonBox} style={{width:'40%', height:14}}></div>
+                                </div>
+                            </div>
+                            <div className={styles.skeletonBox} style={{width:'100%', height:12, marginBottom:30}}></div>
+                            <div className={styles.skeletonBox} style={{width:'100%', height:40}}></div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        );
+    }
+
+    const weeksData = selectedIntern ? getInternWeeks(selectedIntern) : [];
+    const performanceData = selectedIntern ? getPerformanceSummary(selectedIntern) : null;
 
     return (
         <div className={styles.container}>
-            <Toaster richColors position="top-right" />
-            <div className={styles.header}>
-                <h1 className={styles.title}>Intern Management</h1>
+            <div className={styles.bentoHeader}>
+                <div className={styles.headerLeft}>
+                    <div className={styles.headerIconBox}>
+                        <BookOpen size={24} strokeWidth={2.5} />
+                    </div>
+                    <div className={styles.headerInfo}>
+                        <h1>Intern Logbooks</h1>
+                        <p>Track progress, hours, and weekly performance.</p>
+                    </div>
+                </div>
             </div>
 
             <div className={styles.internGrid}>
@@ -196,9 +253,7 @@ export default function CompanyLogbookPage() {
                                     <h3>{intern.profile?.fullname}</h3>
                                     <p className={styles.jobTitle}>{intern.jobTitle}</p>
                                 </div>
-                                {intern.pendingCount > 0 && (
-                                    <div className={styles.pendingIndicator} title={`${intern.pendingCount} Pending Logs`}></div>
-                                )}
+                                {intern.pendingCount > 0 && <div className={styles.pendingIndicator}></div>}
                             </div>
 
                             <div className={styles.progressSection}>
@@ -206,28 +261,26 @@ export default function CompanyLogbookPage() {
                                     <span className={styles.progressLabel}>Progress</span>
                                     <div className={styles.goalContainer}>
                                         <span className={styles.progressValues}>{intern.totalHours.toFixed(1)} / </span>
-                                        <input 
-                                            className={styles.goalInput}
-                                            defaultValue={intern.requiredHours}
-                                            onBlur={(e) => handleGoalChange(e, intern)}
-                                        />
+                                        <input className={styles.goalInput} defaultValue={intern.requiredHours} onBlur={(e) => handleGoalChange(e, intern)} />
                                     </div>
                                 </div>
                                 <div className={styles.progressBarContainer}>
                                     <div className={styles.progressBarFill} style={{ width: `${percent}%` }}></div>
                                 </div>
 
-                                {intern.isEvaluated ? (
-                                    <button className={`${styles.evaluateBtn} ${styles.completed}`} disabled>
-                                        ✅ Evaluation Complete
+                                {isCompleted ? (
+                                    <button 
+                                        className={`${styles.evaluateBtn} ${styles.unlocked}`}
+                                        onClick={() => { setSelectedIntern(intern); setShowSummaryModal(true); }}
+                                    >
+                                        <FileCheck size={18} /> View Automated Report
                                     </button>
                                 ) : (
                                     <button 
-                                        className={`${styles.evaluateBtn} ${isCompleted ? styles.unlocked : styles.locked}`}
-                                        disabled={!isCompleted}
-                                        onClick={() => { setSelectedIntern(intern); setShowEvalModal(true); }}
+                                        className={styles.evaluateBtn} 
+                                        onClick={() => setSelectedIntern(intern)}
                                     >
-                                        {isCompleted ? "⭐ Evaluate Intern" : `Locked (Need ${(intern.requiredHours - intern.totalHours).toFixed(1)} more hrs)`}
+                                        <BookOpen size={18} /> View Logbook & Weeks
                                     </button>
                                 )}
                             </div>
@@ -236,86 +289,181 @@ export default function CompanyLogbookPage() {
                 })}
             </div>
 
-            {/* --- DETAILS MODAL --- */}
-            {selectedIntern && !showEvalModal && (
+            {/* --- DETAILS MODAL (WEEKLY VIEW) --- */}
+            {selectedIntern && !showEvalModal && !showSummaryModal && (
                 <div className={styles.modalOverlay} onClick={() => setSelectedIntern(null)}>
                     <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
                         <div className={styles.modalHeader}>
-                            <h2 className={styles.modalTitle}>Logbook: {selectedIntern.profile?.fullname}</h2>
-                            <button className={styles.closeBtn} onClick={() => setSelectedIntern(null)}>&times;</button>
+                            <div style={{display:'flex', alignItems:'center', gap:'10px'}}>
+                                <BookOpen size={24} className="text-muted" />
+                                <h2 className={styles.modalTitle}>Weekly Logbook: {selectedIntern.profile?.fullname}</h2>
+                            </div>
+                            <button className={styles.closeBtn} onClick={() => setSelectedIntern(null)}>
+                                <X size={24} />
+                            </button>
                         </div>
                         <div className={styles.modalBody}>
-                            <table className={styles.logTable}>
-                                <thead>
-                                    <tr>
-                                        <th>Date</th>
-                                        <th>Attendance</th>
-                                        <th>Task Log</th>
-                                        <th>Hours</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {selectedIntern.logs.map(log => (
-                                        <tr key={log.id}>
-                                            <td>{new Date(log.date).toLocaleDateString()}</td>
-                                            <td><span className={styles.statusBadge}>{log.attendance_status}</span></td>
-                                            <td style={{maxWidth: '250px'}}>{log.tasks_completed}</td>
-                                            <td><strong>{log.hours_worked}</strong></td>
-                                            <td>
-                                                {/* Button Logic: Disappears instantly when status changes in State */}
-                                                {(log.status||'').toLowerCase() === 'approved' ? (
-                                                    <span style={{color:'green', fontWeight:'bold', display:'flex', alignItems:'center', gap:'5px'}}>
-                                                        ✓ Approved
-                                                    </span>
-                                                ) : (
-                                                    <button 
-                                                        className={styles.approveBtn} 
-                                                        disabled={approvingLogs.has(log.id)}
-                                                        style={{
-                                                            opacity: approvingLogs.has(log.id) ? 0.5 : 1,
-                                                            cursor: approvingLogs.has(log.id) ? 'not-allowed' : 'pointer'
-                                                        }}
-                                                        onClick={() => handleApprove(log.id, selectedIntern.id)}
-                                                    >
-                                                        {approvingLogs.has(log.id) ? "Saving..." : "Approve"}
-                                                    </button>
-                                                )}
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                            {weeksData.length === 0 ? (
+                                <div style={{padding:40, textAlign:'center', color:'#888', display:'flex', flexDirection:'column', alignItems:'center', gap:'10px'}}>
+                                    <AlertCircle size={40} />
+                                    <p>No log entries found for this intern yet.</p>
+                                </div>
+                            ) : (
+                                weeksData.map((week, idx) => (
+                                    <div key={idx} className={styles.weekContainer}>
+                                        <div className={styles.weekHeader}>
+                                            <div className={styles.weekTitle}>
+                                                <div style={{display:'flex', alignItems:'center', gap:'8px'}}>
+                                                    <Clock size={16} color="var(--primary-orange)" />
+                                                    Week of {week.startDate.toLocaleDateString()}
+                                                </div>
+                                                <span className={styles.weekHours}>
+                                                    {week.startDate.toLocaleDateString(undefined, {month:'short', day:'numeric'})} - {week.endDate.toLocaleDateString(undefined, {month:'short', day:'numeric'})} • {week.totalHours.toFixed(1)} Hrs
+                                                </span>
+                                            </div>
+                                            
+                                            {week.evaluation ? (
+                                                <div className={styles.weekScoreBadge} style={{display:'flex', alignItems:'center', gap:'6px'}}>
+                                                   <Star size={14} fill="var(--primary-orange)" /> 
+                                                   Avg: {((week.evaluation.quality_rating + week.evaluation.productivity_rating + week.evaluation.reliability_rating + week.evaluation.teamwork_rating)/4).toFixed(1)}/5
+                                                </div>
+                                            ) : (
+                                                <button 
+                                                    className={styles.approveBtn} 
+                                                    style={{backgroundColor: 'var(--primary-orange)', display:'flex', alignItems:'center', gap:'6px'}}
+                                                    onClick={() => { setEvaluatingWeek(week); setShowEvalModal(true); }}
+                                                >
+                                                    <PenSquare size={14} /> Evaluate Week
+                                                </button>
+                                            )}
+                                        </div>
+
+                                        <table className={styles.logTable}>
+                                            <thead>
+                                                <tr>
+                                                    <th>Date</th>
+                                                    <th>Task</th>
+                                                    <th>Hrs</th>
+                                                    <th>Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {week.logs.map(log => (
+                                                    <tr key={log.id}>
+                                                        <td>{new Date(log.date).toLocaleDateString('en-US', {weekday:'short', month:'numeric', day:'numeric'})}</td>
+                                                        <td style={{maxWidth:'300px'}}>{log.tasks_completed}</td>
+                                                        <td>{log.hours_worked}</td>
+                                                        <td>
+                                                            {(log.status||'').toLowerCase() === 'approved' ? (
+                                                                <span style={{color:'var(--color-success)', fontWeight:'bold', display:'flex', alignItems:'center', gap:'4px'}}>
+                                                                    <CheckCircle2 size={16} /> Approved
+                                                                </span>
+                                                            ) : (
+                                                                <button 
+                                                                    className={styles.approveBtn} 
+                                                                    disabled={approvingLogs.has(log.id)}
+                                                                    onClick={() => handleApprove(log.id, selectedIntern.id)}
+                                                                >
+                                                                    {approvingLogs.has(log.id) ? "..." : "Approve"}
+                                                                </button>
+                                                            )}
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                ))
+                            )}
                         </div>
                     </div>
                 </div>
             )}
 
-            {/* --- EVALUATION MODAL --- */}
-            {showEvalModal && selectedIntern && (
+            {/* --- WEEKLY EVALUATION FORM --- */}
+            {showEvalModal && evaluatingWeek && selectedIntern && (
                 <div className={styles.modalOverlay} onClick={() => setShowEvalModal(false)}>
                     <div className={styles.modalContent} onClick={e => e.stopPropagation()} style={{maxWidth: '500px'}}>
                         <div className={styles.modalHeader}>
-                            <h2 className={styles.modalTitle}>Final Evaluation</h2>
-                            <button className={styles.closeBtn} onClick={() => setShowEvalModal(false)}>&times;</button>
+                            <h2 className={styles.modalTitle}>Evaluate Week</h2>
+                            <button className={styles.closeBtn} onClick={() => setShowEvalModal(false)}>
+                                <X size={24} />
+                            </button>
+                        </div>
+                        <div style={{padding:'0 24px', marginBottom:'20px'}}>
+                            <p style={{fontSize:'0.9rem', color:'var(--text-muted)', margin:0, display:'flex', alignItems:'center', gap:'8px'}}>
+                                <Clock size={14} />
+                                {evaluatingWeek.startDate.toLocaleDateString()} — {evaluatingWeek.endDate.toLocaleDateString()}
+                            </p>
                         </div>
                         <form className={styles.evalForm} onSubmit={handleEvaluationSubmit}>
                             <input type="hidden" name="applicationId" value={selectedIntern.applicationId} />
+                            <input type="hidden" name="weekStartDate" value={evaluatingWeek.startDate.toISOString()} />
+                            <input type="hidden" name="weekEndDate" value={evaluatingWeek.endDate.toISOString()} />
+                            
                             {['Quality of Work', 'Productivity', 'Reliability', 'Teamwork'].map((criteria, i) => (
                                 <div key={i} className={styles.evalGroup}>
-                                    <label>{criteria} (1-5)</label>
+                                    <label>{criteria}</label>
                                     <input type="range" min="1" max="5" defaultValue="3" name={criteria.toLowerCase().split(' ')[0]} className={styles.rangeInput} />
-                                    <div style={{display:'flex', justifyContent:'space-between', fontSize:'0.7rem', color:'#888'}}>
-                                        <span>Poor</span><span>Excellent</span>
-                                    </div>
+                                    <div style={{display:'flex', justifyContent:'space-between', fontSize:'0.7rem', color:'#888'}}><span>Poor</span><span>Excellent</span></div>
                                 </div>
                             ))}
                             <div className={styles.evalGroup}>
-                                <label>Final Comments</label>
-                                <textarea name="comments" className={styles.commentBox} required placeholder="Comments..."></textarea>
+                                <label>Weekly Comments</label>
+                                <textarea name="comments" className={styles.commentBox} placeholder="How did they do this week?"></textarea>
                             </div>
-                            <button type="submit" className={styles.approveBtn} style={{width:'100%'}}>Submit Final Grade</button>
+                            <button type="submit" className={styles.approveBtn} style={{width:'100%'}}>Submit Weekly Evaluation</button>
                         </form>
+                    </div>
+                </div>
+            )}
+
+            {/* --- AUTOMATED SUMMARY MODAL --- */}
+            {showSummaryModal && performanceData && (
+                <div className={styles.modalOverlay} onClick={() => setShowSummaryModal(false)}>
+                    <div className={styles.modalContent} onClick={e => e.stopPropagation()} style={{maxWidth: '600px'}}>
+                        <div className={styles.modalHeader} style={{background: 'linear-gradient(135deg, #1e293b, #0f172a)'}}>
+                            <div style={{display:'flex', alignItems:'center', gap:'12px'}}>
+                                <FileText size={24} color="white" />
+                                <div>
+                                    <h2 className={styles.modalTitle} style={{color:'white'}}>Performance Summary</h2>
+                                    <p style={{color:'#94a3b8', fontSize:'0.9rem', margin:0}}>Automated report based on weekly data</p>
+                                </div>
+                            </div>
+                            <button className={styles.closeBtn} onClick={() => setShowSummaryModal(false)} style={{color:'white'}}>
+                                <X size={24} />
+                            </button>
+                        </div>
+                        <div className={styles.modalBody} style={{padding:'30px'}}>
+                            <div style={{textAlign:'center', marginBottom:'30px'}}>
+                                <div style={{fontSize:'3rem', fontWeight:'800', color:'var(--primary-orange)'}}>{performanceData.finalScore}</div>
+                                <div style={{textTransform:'uppercase', letterSpacing:'1px', fontSize:'0.8rem', color:'#888', display:'flex', alignItems:'center', justifyContent:'center', gap:'5px'}}>
+                                    <Star size={14} fill="currentColor" /> Overall Rating / 5.0
+                                </div>
+                            </div>
+                            <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'15px', marginBottom:'30px'}}>
+                                <div className={styles.statBox}><span>Quality</span> <strong>{performanceData.quality}</strong></div>
+                                <div className={styles.statBox}><span>Productivity</span> <strong>{performanceData.productivity}</strong></div>
+                                <div className={styles.statBox}><span>Reliability</span> <strong>{performanceData.reliability}</strong></div>
+                                <div className={styles.statBox}><span>Teamwork</span> <strong>{performanceData.teamwork}</strong></div>
+                            </div>
+                            <h3 style={{fontSize:'1rem', marginBottom:'15px', display:'flex', alignItems:'center', gap:'8px'}}>
+                                <FileText size={16} /> Weekly Remarks
+                            </h3>
+                            <div className={styles.commentsList}>
+                                {performanceData.comments.map((c, i) => (
+                                    <div key={i} style={{marginBottom:'10px', paddingBottom:'10px', borderBottom:'1px dashed #333'}}>
+                                        <div style={{fontSize:'0.75rem', color:'var(--primary-orange)', marginBottom:'4px', display:'flex', alignItems:'center', gap:'5px'}}>
+                                            <Clock size={12} /> {new Date(c.date).toLocaleDateString()}
+                                        </div>
+                                        <div style={{fontStyle:'italic', color:'#ccc'}}>"{c.text}"</div>
+                                    </div>
+                                ))}
+                            </div>
+                            <button className={`${styles.evaluateBtn} ${styles.completed}`} style={{marginTop:'20px'}}>
+                                <CheckCircle2 size={18} /> Evaluation Finalized
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}
