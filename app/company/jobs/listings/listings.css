@@ -1,432 +1,362 @@
-/* 🌿 Modern Apple-like job listings UI (iOS/macOS aesthetic) */
+/*
+|--------------------------------------------------------------------------
+| Job Listings - Light Dark Mode Theme
+|--------------------------------------------------------------------------
+*/
 
-body {
-  background-color: #f5f5f7;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
-  color: #1c1c1e;
-  margin: 0;
-  padding: 0;
-}
-
-/* 🌟 Main container */
+/* Container Layout */
 .job-listings-container {
-  max-width: 1100px;
-  margin: 2rem auto;
-  padding: 2rem;
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(20px);
-  border-radius: 1.5rem;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  transition: all 0.3s ease;
+  padding: 40px;
+  min-height: 100vh;
+  background-color: var(--bg-main); /* Inherits from global layout */
+  color: var(--text-main);
+  font-family: 'Inter', sans-serif;
+  animation: fadeIn 0.5s ease-in-out;
 }
 
-.job-listings-container:hover {
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-/* 🧭 Header */
+/* Header */
 .header-bar {
+  margin-bottom: 30px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.5rem;
-  margin-top: 0.5rem;
-  flex-wrap: wrap;
+  justify-content: space-between;
 }
 
 .header-bar h1 {
-  font-size: 1.8rem;
-  font-weight: 600;
-  color: #000;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 2rem;
+  font-weight: 800;
+  color: white;
+  margin: 0;
+  letter-spacing: -0.02em;
 }
 
-.post-btn {
-  background: linear-gradient(135deg, #007aff, #0a84ff);
-  color: #fff;
-  border: none;
-  padding: 0.6rem 1.4rem;
-  border-radius: 12px;
-  font-weight: 500;
-  box-shadow: 0 2px 8px rgba(10, 132, 255, 0.3);
-  transition: all 0.25s ease;
+/* Empty State */
+.empty-text {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  margin-top: 50px;
+  font-style: italic;
 }
 
-.post-btn:hover {
-  transform: scale(1.05);
-  box-shadow: 0 4px 16px rgba(10, 132, 255, 0.4);
-}
-
-/* 📋 Table styling (desktop) */
+/*
+|--------------------------------------------------------------------------
+| Table View
+|--------------------------------------------------------------------------
+*/
 .table-view {
-  display: block;
-}
-
-.card-view {
-  display: none;
+  background: var(--bg-card); /* Slate 800 */
+  border-radius: var(--radius-card);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-card);
+  overflow: hidden; /* Rounds the corners of the table */
 }
 
 table {
   width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(20px);
-  border-radius: 1rem;
-  overflow: hidden;
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.05);
+  border-collapse: collapse;
 }
 
 thead {
-  background: #f2f2f7;
-  color: #1c1c1e;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
+  background: var(--bg-input); /* Slate 700 */
+  border-bottom: 1px solid var(--border-color);
 }
 
-th,
-td {
-  padding: 1rem 1.2rem;
+th {
+  padding: 16px;
   text-align: left;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 700;
+  letter-spacing: 0.05em;
 }
 
 tbody tr {
-  transition: background 0.25s ease, transform 0.2s ease;
+  border-bottom: 1px solid var(--border-color);
+  transition: background 0.2s ease;
+}
+
+tbody tr:last-child {
+  border-bottom: none;
 }
 
 tbody tr:hover {
-  background-color: rgba(245, 245, 247, 0.8);
-  transform: scale(1.005);
+  background: rgba(255, 255, 255, 0.03); /* Subtle hover highlight */
 }
 
-/* ---------------- TABLE & CARD BUTTONS ---------------- */
-td button,
-.job-actions .edit-btn,
-.job-actions .delete-btn {
-  flex: 1;
-  padding: 0.5rem 0.9rem;
-  border-radius: 0.6rem;
-  font-weight: 500;
-  cursor: pointer;
-  margin-right: 0.6rem;
-  text-align: center;
-  color: #fff;
-  border: none;
-  transition: all 0.25s ease;
-  display: inline-block;
+td {
+  padding: 16px;
+  font-size: 0.95rem;
+  color: var(--text-main);
 }
 
-/* Table buttons spacing fix */
-.table-btn-group {
-  display: flex;
-  gap: 0.6rem;
+td.font-medium {
+  font-weight: 600;
+  color: white;
 }
 
-/* Edit button - Blue */
-td button.edit-btn,
-.job-actions .edit-btn {
-  background: linear-gradient(135deg, #0a84ff, #007aff);
-}
-
-td button.edit-btn:hover,
-.job-actions .edit-btn:hover {
-  opacity: 0.9;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(10, 132, 255, 0.3);
-}
-
-/* Delete button - Red */
-td button.delete-btn,
-.job-actions .delete-btn {
-  background: linear-gradient(135deg, #ff3b30, #ff453a);
-}
-
-td button.delete-btn:hover,
-.job-actions .delete-btn:hover {
-  opacity: 0.9;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(255, 59, 48, 0.35);
-}
-
-/* 📱 Card layout (mobile/tablet) */
+/*
+|--------------------------------------------------------------------------
+| Card View (Grid)
+|--------------------------------------------------------------------------
+*/
 .job-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
 }
 
 .job-card {
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(200, 200, 200, 0.3);
-  border-radius: 20px;
-  padding: 1.5rem;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-card);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
   transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
 }
 
 .job-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  transform: translateY(-5px);
+  border-color: var(--primary-orange);
+  box-shadow: var(--shadow-glow);
 }
 
-.job-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.8rem;
+.job-card h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: white;
+  margin: 0 0 8px 0;
 }
 
-.job-header h2 {
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: #111;
+.job-card p {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin: 0 0 16px 0;
+  line-height: 1.5;
 }
 
-.date {
-  font-size: 0.85rem;
-  color: #888;
-}
-
-.location {
-  color: #444;
-  margin-bottom: 0.5rem;
-  font-size: 0.95rem;
-}
-
-.salary {
-  font-weight: 500;
-  color: #007aff;
-  margin-bottom: 1rem;
-}
-
-/* ---------------- CARD VIEW BUTTONS FLEX ---------------- */
 .job-actions {
+  margin-top: auto;
   display: flex;
-  gap: 0.6rem;
-}
-
-/* 🧊 Empty state message */
-.empty-text {
-  text-align: center;
-  color: #666;
-  font-size: 1rem;
-  padding: 2rem 0;
-}
-
-/* Navbar slide for modal */
-.navbar {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  transition: transform 0.3s ease-in-out;
-  z-index: 50; /* Make sure it's above other content */
-}
-
-/* Hidden state: slide down */
-.navbar.hidden {
-  transform: translateY(100%);
-}
-
-/* ---------- MODAL OVERLAY ---------- */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0,0,0,0.35);
-  backdrop-filter: blur(6px);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease;
-}
-
-.modal-overlay.active {
-  opacity: 1;
-  pointer-events: all;
-}
-
-/* ---------- MODAL BOX ---------- */
-.modal-content {
-  background: #fff;
-  border-radius: 18px;
-  padding: 24px;
-  width: 90%;
-  max-width: 600px;
-  max-height: 85vh;
-  overflow-y: auto;
-  box-shadow: 0 10px 35px rgba(0,0,0,0.2);
-  display: flex;
-  flex-direction: column;
   gap: 12px;
 }
 
-/* ---------- MODAL HEADER ---------- */
+/*
+|--------------------------------------------------------------------------
+| Buttons
+|--------------------------------------------------------------------------
+*/
+button {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.edit-btn {
+  background: rgba(0, 212, 255, 0.5);
+  color: var(--secondary-cyan);
+  border: 1px solid rgba(0, 212, 255, 0.2);
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-right: 5px;
+}
+
+.edit-btn:hover {
+  background: var(--secondary-cyan);
+  color: white;
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+}
+
+.delete-btn {
+  background: rgba(239, 68, 68, 0.5);
+  color: var(--color-danger);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.delete-btn:hover {
+  background: var(--color-danger);
+  color: white;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+}
+
+/*
+|--------------------------------------------------------------------------
+| Edit Modal
+|--------------------------------------------------------------------------
+*/
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  animation: fadeIn 0.2s ease;
+}
+
+.modal-content {
+  background: var(--bg-card);
+  width: 100%;
+  max-width: 600px;
+  max-height: 85vh;
+  border-radius: var(--radius-card);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  color: var(--text-main);
+}
+
 .modal-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border-color);
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
 .modal-header h2 {
-  font-size: 1.4rem;
-  font-weight: 600;
   margin: 0;
-  color: #111;
+  font-size: 1.25rem;
 }
 
 .close-btn {
-  font-size: 1.5rem;
-  font-weight: bold;
-  border: none;
   background: none;
-  cursor: pointer;
-  color: #555;
-  transition: color 0.2s ease;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.5rem;
+}
+.close-btn:hover { color: white; }
+
+.modal-body {
+  padding: 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
-.close-btn:hover {
-  color: #000;
-}
-
-/* ---------- MODAL BODY ---------- */
 .modal-body label {
+  font-size: 0.85rem;
   font-weight: 600;
-  margin-top: 10px;
-  display: block;
+  color: var(--text-muted);
+  margin-bottom: -8px; /* Pull closer to input */
 }
 
 .modal-body input,
 .modal-body textarea {
-  width: 100%;
-  padding: 8px 10px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  color: white;
+  padding: 12px;
   border-radius: 8px;
-  border: 1px solid #ccc;
-  margin-top: 4px;
-  font-size: 1rem;
+  font-size: 0.95rem;
+  outline: none;
 }
 
-/* ---------- TAG DISPLAY ---------- */
+.modal-body input:focus,
+.modal-body textarea:focus {
+  border-color: var(--primary-orange);
+}
+
+.modal-body textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+/* Tag Input Styles */
 .tag-input-container {
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 8px;
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 6px;
+  gap: 8px;
 }
 
 .tag-chip {
-  background: #f2f2f7;
-  padding: 5px 10px;
-  border-radius: 14px;
-  font-size: 0.9rem;
+  background: rgba(238, 116, 40, 0.2);
+  color: var(--primary-orange);
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.8rem;
   display: flex;
   align-items: center;
   gap: 6px;
-  border: 1px solid rgba(0,0,0,0.08);
 }
 
 .tag-chip button {
-  background: #e0e0e5;
-  border: 1px solid rgba(0,0,0,0.1);
-  border-radius: 50%;
-  width: 18px;
-  height: 18px;
-  font-size: 0.85rem;
-  line-height: 16px;
+  background: none;
+  border: none;
+  color: var(--primary-orange);
+  font-weight: bold;
   padding: 0;
-  cursor: pointer;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: #555;
-  transition: all 0.2s ease;
 }
 
-.tag-chip button:hover {
-  background: #ff3b30;
-  color: #fff;
-  border-color: #ff3b30;
+.tag-input-container input {
+  border: none;
+  background: transparent;
+  padding: 4px;
+  flex: 1;
+  min-width: 120px;
 }
+.tag-input-container input:focus { border: none; }
 
-/* ---------- MODAL FOOTER ---------- */
 .modal-actions {
+  padding: 20px 24px;
+  border-top: 1px solid var(--border-color);
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
-  margin-top: 20px;
+  gap: 12px;
 }
 
 .cancel-btn {
-  background: #ccc;
-  border: none;
-  padding: 8px 14px;
+  color: var(--text-muted);
+  border: 1px solid var(--border-color);
+  padding: 10px 20px;
   border-radius: 8px;
-  cursor: pointer;
 }
+.cancel-btn:hover { border-color: white; color: white; }
 
 .save-btn {
-  background: #007aff;
+  background: var(--primary-orange);
   color: white;
   border: none;
-  padding: 8px 14px;
+  padding: 10px 24px;
   border-radius: 8px;
-  cursor: pointer;
+  font-weight: 600;
+}
+.save-btn:hover { background: #ff8a4d; }
+.save-btn:disabled { opacity: 0.7; cursor: not-allowed; }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .table-view { display: none; } /* Hide table on mobile */
+  .card-view { display: block; } /* Show cards on mobile */
+  .job-grid { grid-template-columns: 1fr; }
 }
 
-/* Make modal scrollable if too tall */
-.modal-content::-webkit-scrollbar {
-  width: 6px;
-}
-
-.modal-content::-webkit-scrollbar-thumb {
-  background-color: rgba(0,0,0,0.2);
-  border-radius: 3px;
-}
-
-/* 🌈 Smooth transitions */
-* {
-  transition: all 0.2s ease-in-out;
-}
-
-/* 📱 RESPONSIVE BREAKPOINTS */
-@media (min-width: 901px) {
-  .table-view {
-    display: block;
-  }
-  .card-view {
-    display: none;
-  }
-}
-
-@media (max-width: 900px) {
-  .table-view {
-    display: none;
-  }
-  .card-view {
-    display: block;
-  }
-  .job-listings-container {
-    padding: 1rem;
-  }
-  .header-bar h1 {
-    font-size: 1.5rem;
-  }
-  .post-btn {
-    width: 100%;
-    text-align: center;
-  }
-  .job-grid {
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  }
-  .job-card {
-    padding: 1rem;
-    border-radius: 16px;
-  }
+@media (min-width: 769px) {
+  .card-view { display: none; } /* Hide cards on desktop */
+  .table-view { display: block; } /* Show table on desktop */
 }

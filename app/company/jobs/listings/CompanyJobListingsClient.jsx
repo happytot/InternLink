@@ -1,10 +1,10 @@
 // app/company/jobs/listings/CompanyJobListingsClient.jsx
 'use client';
 
-import { useEffect, useState } from 'react'; // No longer need useCallback
+import { useEffect, useState } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import './listings.css';
-import Header from './../../../components/Header';
+import '../../../globals.css'
 
 // 1. We now accept the 'initialJobs' prop from the server
 export default function CompanyJobListingsClient({ initialJobs }) {
@@ -136,7 +136,6 @@ export default function CompanyJobListingsClient({ initialJobs }) {
 
   return (
     <>
-    <Header />
     <div className="job-listings-container">
       <div className="header-bar">
         <h1>Your Job Listings</h1>

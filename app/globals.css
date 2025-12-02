@@ -14,20 +14,30 @@
     --bg-glass: rgba(6, 31, 38, 0.65);
     --bg-card: rgba(20, 30, 35, 0.7);
     --bg-input: rgba(255, 255, 255, 0.03);
+    --bg-card-hover: rgba(255, 255, 255, 0.05);
+    --bg-item: #061f26;
     
     /* --- Accents --- */
     --primary-orange: #EE7428;
     --primary-orange-hover: #EA580C;
     --accent-blue: #00d4ff;
+    --secondary-cyan: #00d4ff; /* Matches your listing CSS */
+    --color-danger: #ef4444;    /* Standard red for delete buttons */
     
     /* --- Text --- */
     --text-main: #F1F5F9;
     --text-muted: #94A3B8;
     --text-inverse: #FFFFFF;
     
-    /* --- UI --- */
+    /* --- UI Borders & Radius (ADDED HERE) --- */
     --border-color: rgba(255, 255, 255, 0.1);
+    --radius-card: 20px;       /* Standard bento/card curve */
+    --radius-btn: 12px;        /* Button curve */
+    --radius-sm: 8px;          /* Inputs/Tags curve */
+    
+    /* --- Shadows --- */
     --shadow-card: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    --shadow-glow: 0 0 20px rgba(238, 116, 40, 0.25); /* Orange glow */
     
     /* --- Orb Colors --- */
     --orb-1: var(--primary-orange);
@@ -40,28 +50,30 @@
 }
 
 /* 3. Light Mode Overrides */
-/* When the <body> or <html> has class="light-mode" */
 .light-mode {
     /* --- Backgrounds --- */
     --bg-main: #F8FAFC;       
-    --bg-glass: rgba(255, 255, 255, 0.75); /* More opaque for light mode */
+    --bg-glass: rgba(255, 255, 255, 0.75);
     --bg-card: #FFFFFF;
     --bg-input: #F1F5F9;
+    --bg-card-hover: #F1F5F9;
+    --bg-item: #FFFFFF;
 
     /* --- Accents --- */
-    --primary-orange: #EA580C; /* Slightly darker for contrast */
+    --primary-orange: #EA580C;
     
     /* --- Text --- */
-    --text-main: #0F172A;     /* Deep Slate */
+    --text-main: #0F172A;    
     --text-muted: #475569;    
     --text-inverse: #FFFFFF;
     
     /* --- UI --- */
     --border-color: #E2E8F0;  
     --shadow-card: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
+    --shadow-glow: 0 0 15px rgba(234, 88, 12, 0.2);
     
     /* --- Orb Colors --- */
-    --orb-2: #38BDF8; /* Lighter blue */
+    --orb-2: #38BDF8;
     --orb-opacity: 0.1;     
 }
 
@@ -71,91 +83,120 @@ body {
     color: var(--text-main);
     font-family: var(--font-body);
     transition: background-color 0.3s ease, color 0.3s ease;
+    margin: 0;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Typography Defaults */
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    margin-top: 0;
+}
+
+/* =========================================
+   ✨ ANIMATED BACKGROUND
+   ========================================= */
+.homepage-wrapper {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    background-color: var(--bg-main);
+    transition: background-color 0.3s ease;
+    min-height: 100vh;
+}
+
+.bg-gradient-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: var(--orb-opacity);
+    z-index: 0;
+    pointer-events: none;
+}
+
+.orb-1 {
+    width: 500px;
+    height: 500px;
+    background: var(--orb-1);
+    top: -100px;
+    left: -100px;
+}
+
+.orb-2 {
+    width: 600px;
+    height: 600px;
+    background: var(--orb-2);
+    top: 20%;
+    right: -150px;
+}
+
+.orb-float {
+    animation: float-orb 10s ease-in-out infinite;
+}
+
+@keyframes float-orb {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(30px, 50px); }
 }
 
 /* =========================================
    🍞 TOAST NOTIFICATIONS (InternLink Design)
    ========================================= */
-/* Wrapper: Position and Z-Index */
 [data-sonner-toaster] {
     font-family: var(--font-body) !important;
     z-index: 9999 !important;
 }
 
-/* The Glass Toast Card */
 [data-sonner-toaster] [data-sonner-toast] {
     background: var(--bg-glass) !important;
     backdrop-filter: blur(16px) !important;
     -webkit-backdrop-filter: blur(16px) !important;
-    
     border: 1px solid var(--border-color) !important;
-    border-radius: 16px !important; /* Balanced between Button(12) and Card(24) */
+    border-radius: var(--radius-card) !important; /* Uses new variable */
     padding: 18px 22px !important;
-    
     color: var(--text-main) !important;
     box-shadow: var(--shadow-card) !important;
     gap: 12px !important;
-    
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
-/* Hover Effect: Lift + Orange Glow */
 [data-sonner-toaster] [data-sonner-toast]:hover {
     transform: translateY(-4px) !important;
-    box-shadow: 0 20px 40px -10px rgba(0,0,0,0.5), 0 0 20px rgba(238, 116, 40, 0.15) !important;
+    box-shadow: 0 20px 40px -10px rgba(0,0,0,0.5), var(--shadow-glow) !important;
     border-color: var(--primary-orange) !important;
 }
 
-/* Typography */
 [data-sonner-toaster] [data-sonner-toast] [data-title] {
     font-family: var(--font-heading) !important;
     font-weight: 700 !important;
-    font-size: 0.95rem !important;
-    line-height: 1.4 !important;
     color: var(--text-main) !important;
 }
 
 [data-sonner-toaster] [data-sonner-toast] [data-description] {
     font-family: var(--font-body) !important;
-    font-weight: 400 !important;
-    font-size: 0.85rem !important;
-    line-height: 1.6 !important;
     color: var(--text-muted) !important;
-    margin-top: 4px !important;
 }
 
-/* Status Indicators (Left Border Accent) */
-/* Success: Green (Standard) */
-[data-sonner-toast][data-type="success"] {
-    border-left: 4px solid #22c55e !important;
-}
-[data-sonner-toast][data-type="success"] [data-icon] {
-    color: #22c55e !important;
-}
+/* Toast Status Colors */
+[data-sonner-toast][data-type="success"] { border-left: 4px solid #22c55e !important; }
+[data-sonner-toast][data-type="success"] [data-icon] { color: #22c55e !important; }
 
-/* Error: Red (Standard) */
-[data-sonner-toast][data-type="error"] {
-    border-left: 4px solid #ef4444 !important;
-}
-[data-sonner-toast][data-type="error"] [data-icon] {
-    color: #ef4444 !important;
-}
+[data-sonner-toast][data-type="error"] { border-left: 4px solid var(--color-danger) !important; }
+[data-sonner-toast][data-type="error"] [data-icon] { color: var(--color-danger) !important; }
 
-/* Info/Default: Brand Orange */
 [data-sonner-toast][data-type="info"],
-[data-sonner-toast][data-type="default"] {
-    border-left: 4px solid var(--primary-orange) !important;
-}
-[data-sonner-toast][data-type="info"] [data-icon] {
-    color: var(--primary-orange) !important;
-}
+[data-sonner-toast][data-type="default"] { border-left: 4px solid var(--primary-orange) !important; }
+[data-sonner-toast][data-type="info"] [data-icon] { color: var(--primary-orange) !important; }
 
-/* Close Button */
 [data-sonner-toast] [data-close-button] {
     background: var(--bg-input) !important;
     border: 1px solid var(--border-color) !important;
     color: var(--text-muted) !important;
-    transition: all 0.2s !important;
 }
 [data-sonner-toast] [data-close-button]:hover {
     background: var(--primary-orange) !important;

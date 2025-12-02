@@ -119,119 +119,118 @@ export default function CompanyDashboard() {
   const navigateToJobs = () => router.push('/company/jobs/listings');
   const navigateToApplications = (filter) => router.push('/company/applicants'); 
 
-  if (loading) return (
-    <div className="loading-container"><Activity className="spin-icon" size={40} /></div>
-  );
+  
 
   return (
-    <div className="dashboard-content">
-      <Toaster position="bottom-right" toastOptions={{ style: { borderRadius: '12px', background: '#333', color: '#fff' } }} />
+    /* --- ✨ BACKGROUND WRAPPER APPLIED HERE --- */
+      <div className="dashboard-content">
+        <Toaster position="bottom-right" toastOptions={{ style: { borderRadius: '12px', background: '#333', color: '#fff' } }} />
 
-{/* --- 🟢 0. NEW TOP BRAND BAR --- */}
-      <div className="brand-bar-card">
-        <div className="brand-logo">
-          <div className="logo-icon-bg">
-            <Layers size={22} strokeWidth={2.5} />
+        {/* --- 🟢 0. NEW TOP BRAND BAR --- */}
+        <div className="brand-bar-card">
+          <div className="brand-logo">
+            <div className="logo-icon-bg">
+              <Layers size={22} strokeWidth={2.5} />
+            </div>
+            <span className="logo-text">InternLink</span>
           </div>
-          <span className="logo-text">InternLink</span>
-        </div>
-        
-        <div className="brand-date">
-          <Calendar size={18} className="text-gray-400" />
-          <span>
-            {new Date().toLocaleDateString('en-US', { 
-              weekday: 'long', 
-              year: 'numeric', 
-              month: 'long', 
-              day: 'numeric' 
-            })}
-          </span>
-        </div>
-      </div>     
+          
+          <div className="brand-date">
+            <Calendar size={18} className="text-gray-400" />
+            <span>
+              {new Date().toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+              })}
+            </span>
+          </div>
+        </div>     
 
-      {/* --- 2. STATS GRID --- */}
-      <section className="stats-grid">
-        <div className="stat-card" onClick={navigateToJobs}>
-          <div className="icon-wrapper blue"><Briefcase size={24} /></div>
-          <div className="stat-info">
-            <h2>{stats.activeListings}</h2>
-            <span>Active Jobs</span>
+        {/* --- 2. STATS GRID --- */}
+        <section className="stats-grid">
+          <div className="stat-card" onClick={navigateToJobs}>
+            <div className="icon-wrapper blue"><Briefcase size={24} /></div>
+            <div className="stat-info">
+              <h2>{stats.activeListings}</h2>
+              <span>Active Jobs</span>
+            </div>
           </div>
-        </div>
 
-        <div className="stat-card" onClick={() => navigateToApplications('Pending')}>
-          <div className="icon-wrapper orange"><Users size={24} /></div>
-          <div className="stat-info">
-            <h2>{stats.newApplications}</h2>
-            <span>New Applicants</span>
+          <div className="stat-card" onClick={() => navigateToApplications('Pending')}>
+            <div className="icon-wrapper orange"><Users size={24} /></div>
+            <div className="stat-info">
+              <h2>{stats.newApplications}</h2>
+              <span>New Applicants</span>
+            </div>
           </div>
-        </div>
 
-        <div className="stat-card" onClick={() => navigateToApplications('Review')}>
-          <div className="icon-wrapper purple"><Clock size={24} /></div>
-          <div className="stat-info">
-            <h2>{stats.pendingReviews}</h2>
-            <span>Under Review</span>
+          <div className="stat-card" onClick={() => navigateToApplications('Review')}>
+            <div className="icon-wrapper purple"><Clock size={24} /></div>
+            <div className="stat-info">
+              <h2>{stats.pendingReviews}</h2>
+              <span>Under Review</span>
+            </div>
           </div>
-        </div>
 
-        <div className="stat-card" onClick={() => navigateToApplications('Hired')}>
-          <div className="icon-wrapper green"><CheckCircle2 size={24} /></div>
-          <div className="stat-info">
-            <h2>{stats.hiredInterns}</h2>
-            <span>Hired Interns</span>
+          <div className="stat-card" onClick={() => navigateToApplications('Hired')}>
+            <div className="icon-wrapper green"><CheckCircle2 size={24} /></div>
+            <div className="stat-info">
+              <h2>{stats.hiredInterns}</h2>
+              <span>Hired Interns</span>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* --- 3. MAIN CONTENT SPLIT --- */}
-      <section className="dashboard-split">
-        
-        {/* LEFT: Activity Feed */}
-        <div className="feed-card">
-          <div className="card-header">
-            <h3>Recent Activity</h3>
-          </div>
-          <div className="feed-list">
-            {recentActivities.length === 0 ? (
-              <p className="empty-text">No recent activity found.</p>
-            ) : (
-              recentActivities.map((activity) => (
-                <div key={activity.id} className="feed-item">
-                  <div className="feed-icon"><Activity size={16} /></div>
-                  <div className="feed-content">
-                    <h4>{activity.title}</h4>
-                    <p>{activity.content}</p>
+        {/* --- 3. MAIN CONTENT SPLIT --- */}
+        <section className="dashboard-split">
+          
+          {/* LEFT: Activity Feed */}
+          <div className="feed-card">
+            <div className="card-header">
+              <h3>Recent Activity</h3>
+            </div>
+            <div className="feed-list">
+              {recentActivities.length === 0 ? (
+                <p className="empty-text">No recent activity found.</p>
+              ) : (
+                recentActivities.map((activity) => (
+                  <div key={activity.id} className="feed-item">
+                    <div className="feed-icon"><Activity size={16} /></div>
+                    <div className="feed-content">
+                      <h4>{activity.title}</h4>
+                      <p>{activity.content}</p>
+                    </div>
+                    <span className="feed-time">{activity.time}</span>
                   </div>
-                  <span className="feed-time">{activity.time}</span>
-                </div>
-              ))
-            )}
+                ))
+              )}
+            </div>
           </div>
-        </div>
 
-        {/* RIGHT: Quick Actions / Tips */}
-        <div className="tips-card">
-          <div className="card-header">
-            <h3>Quick Actions</h3>
+          {/* RIGHT: Quick Actions / Tips */}
+          <div className="tips-card">
+            <div className="card-header">
+              <h3>Quick Actions</h3>
+            </div>
+            <div className="tips-list">
+              <button className="tip-item" onClick={navigateToJobs}>
+                <span>Manage Listings</span>
+                <ChevronRight size={16} />
+              </button>
+              <button className="tip-item" onClick={() => router.push('/company/profile')}>
+                <span>Update Company Profile</span>
+                <ChevronRight size={16} />
+              </button>
+              <button className="tip-item" onClick={() => router.push('/company/logbook')}>
+                <span>View Logbooks</span>
+                <ChevronRight size={16} />
+              </button>
+            </div>
           </div>
-          <div className="tips-list">
-            <button className="tip-item" onClick={navigateToJobs}>
-              <span>Manage Listings</span>
-              <ChevronRight size={16} />
-            </button>
-            <button className="tip-item" onClick={() => router.push('/company/profile')}>
-              <span>Update Company Profile</span>
-              <ChevronRight size={16} />
-            </button>
-            <button className="tip-item" onClick={() => router.push('/company/logbook')}>
-              <span>View Logbooks</span>
-              <ChevronRight size={16} />
-            </button>
-          </div>
-        </div>
 
-      </section>
-    </div>
+        </section>
+      </div>
   );
 }

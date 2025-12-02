@@ -1,41 +1,45 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-// 1. ⛔️ REMOVED your old supabase import
-// import { supabase } from '../../../lib/supabase';
-
-// 2. ✅ ADDED this import instead
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import Header from '../../components/Header'
 import './applicants.css';
 import { updateJobApplicationStatus } from './actions';
-import { toast, Toaster } from 'react-hot-toast'; // Import Toaster
+import { toast, Toaster } from 'react-hot-toast';
+
+// Icons
+import { 
+  Users, 
+  Mail, 
+  FileText, 
+  CheckCircle2, 
+  XCircle, 
+  Clock, 
+  Briefcase,
+  Search,
+  Filter
+} from 'lucide-react';
 
 export default function ApplicantsPage() {
-  // 3. ✅ INITIALIZED the client *inside* the component
   const supabase = createClientComponentClient();
-
   const [applicants, setApplicants] = useState([]);
   const [loading, setLoading] = useState(true);
   const [companyId, setCompanyId] = useState(null);
+  const [filterStatus, setFilterStatus] = useState('All');
 
-  // 4. ✅ Wrapped in useCallback
+  // Stats for the Top Bento Grid
+  const [stats, setStats] = useState({ total: 0, pending: 0, approved: 0, rejected: 0 });
+
   const fetchApplicants = useCallback(async () => {
     setLoading(true);
     try {
-      // This 'supabase' variable is now the cookie-aware one
       const { data: userData, error: userError } = await supabase.auth.getUser();
-      if (userError) throw userError;
-
-      // 5. ✅ Added this check to be safe
-      if (!userData?.user) {
-        setLoading(false);
-        toast.error("Your session was not found. Please log in again.");
+      if (userError || !userData?.user) {
+        toast.error("Please log in.");
         return;
       }
       
-      const companyId = userData.user.id;
-      setCompanyId(companyId);
+      const cId = userData.user.id;
+      setCompanyId(cId);
 
       const { data, error } = await supabase
         .from("job_applications")
@@ -47,137 +51,183 @@ export default function ApplicantsPage() {
           profiles:profiles!fk_job_applications_intern ( fullname, email ),
           job_posts:job_posts!fk_job_applications_job ( title )
         `)
-        .eq("company_id", companyId)
+        .eq("company_id", cId)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
       
-      setApplicants(data || []);
+      const apps = data || [];
+      setApplicants(apps);
+
+      // Calculate Stats
+      setStats({
+        total: apps.length,
+        pending: apps.filter(a => a.status === 'Pending').length,
+        approved: apps.filter(a => a.status.includes('Approved') || a.status === 'Accepted').length,
+        rejected: apps.filter(a => a.status === 'Rejected').length
+      });
+
     } catch (err) {
-      console.error("❌ Error fetching applicants:", err.message);
-      toast.error("Error fetching applicants: " + err.message);
+      console.error("❌ Error:", err.message);
+      toast.error("Error loading applicants.");
     } finally {
       setLoading(false);
     }
-  }, [supabase]); // 6. ✅ Added supabase dependency
+  }, [supabase]); 
 
-  // 7. ✅ Updated useEffect
   useEffect(() => {
     fetchApplicants();
   }, [fetchApplicants]);
 
-  // --- This is your existing, correct logic ---
   const handleStatusUpdate = async (applicationId, action) => {
-    // ... (your existing handleStatusUpdate function is fine)
-    console.log('Updating application ID:', applicationId, 'Action:', action, 'Company ID:', companyId);
-    
-    const newStatus =
-      action === 'accept'
-        ? 'Company_Approved_Waiting_Coordinator'
-        : 'Rejected';
+    const newStatus = action === 'accept' ? 'Company_Approved_Waiting_Coordinator' : 'Rejected';
 
-    const previousApplicants = applicants; 
+    // Optimistic Update
     setApplicants(prev =>
-      prev.map(app =>
-        app.id === applicationId ? { ...app, status: newStatus } : app
-      )
+      prev.map(app => app.id === applicationId ? { ...app, status: newStatus } : app)
     );
 
     try {
       const result = await updateJobApplicationStatus(applicationId, newStatus, companyId);
-      
-      if (result && result.success === false) {
-        console.error('Failed to update status (server responded with error):', result.error);
-        setApplicants(previousApplicants); 
-        toast.error(`Failed to update status: ${result.error}`);
-      } else if (result && result.success === true) {
-        console.log('Status successfully updated.');
-        toast.success(`Status updated to ${action === 'accept' ? 'Company Approved' : 'Rejected'}`);
+      if (result?.success) {
+        toast.success(`Applicant ${action === 'accept' ? 'Approved' : 'Rejected'}`);
+        // Update stats locally
+        setStats(prev => ({
+            ...prev, 
+            pending: prev.pending - 1, 
+            [action === 'accept' ? 'approved' : 'rejected']: prev[action === 'accept' ? 'approved' : 'rejected'] + 1
+        }));
       } else {
-        throw new Error('Server action returned an unexpected response.');
+        throw new Error(result?.error || 'Unknown error');
       }
-
     } catch (err) {
-      console.error('Exception during status update:', err);
-      setApplicants(previousApplicants); 
-      toast.error(`Error updating status: ${err.message}`);
+      toast.error(`Update failed: ${err.message}`);
+      fetchApplicants(); // Revert on error
     }
   };
 
+  // Filter Logic
+  const filteredApplicants = applicants.filter(app => {
+    if (filterStatus === 'All') return true;
+    if (filterStatus === 'Pending') return app.status === 'Pending';
+    if (filterStatus === 'Approved') return app.status.includes('Approved');
+    if (filterStatus === 'Rejected') return app.status === 'Rejected';
+    return true;
+  });
 
   return (
     <div className="applicants-container">
-          <Header />
-
-  
-      {/* Add Toaster so you can see errors */}
-      <Toaster position="top-right" /> 
+      <Toaster position="bottom-right" toastOptions={{ style: { borderRadius: '12px', background: '#333', color: '#fff' } }} />
       
-      <h1 className="page-header">📋 Job Applicants</h1>
+      {/* --- HEADER --- */}
+      <div className="header-section">
+        <h1 className="page-title">Applicant Management</h1>
+        <p className="page-subtitle">Review and manage incoming intern applications.</p>
+      </div>
 
+      {/* --- BENTO STATS GRID --- */}
+      <div className="bento-stats">
+        <div className="stat-card blue">
+          <div className="stat-icon"><Users size={20} /></div>
+          <div>
+            <h3>{stats.total}</h3>
+            <span>Total Applicants</span>
+          </div>
+        </div>
+        <div className="stat-card orange">
+          <div className="stat-icon"><Clock size={20} /></div>
+          <div>
+            <h3>{stats.pending}</h3>
+            <span>Pending Review</span>
+          </div>
+        </div>
+        <div className="stat-card green">
+          <div className="stat-icon"><CheckCircle2 size={20} /></div>
+          <div>
+            <h3>{stats.approved}</h3>
+            <span>Approved</span>
+          </div>
+        </div>
+      </div>
+
+      {/* --- FILTERS --- */}
+      <div className="filter-bar">
+        <div className="filter-group">
+          <Filter size={16} className="text-muted"/>
+          <button className={filterStatus === 'All' ? 'active' : ''} onClick={() => setFilterStatus('All')}>All</button>
+          <button className={filterStatus === 'Pending' ? 'active' : ''} onClick={() => setFilterStatus('Pending')}>Pending</button>
+          <button className={filterStatus === 'Approved' ? 'active' : ''} onClick={() => setFilterStatus('Approved')}>Approved</button>
+          <button className={filterStatus === 'Rejected' ? 'active' : ''} onClick={() => setFilterStatus('Rejected')}>Rejected</button>
+        </div>
+      </div>
+
+      {/* --- LIST / TABLE --- */}
       {loading ? (
-        <p>Loading applicants...</p>
-      ) : applicants.length === 0 ? (
-        <p>No applicants found for this company.</p>
+        <div className="loading-state">Loading applicants...</div>
+      ) : filteredApplicants.length === 0 ? (
+        <div className="empty-state">
+          <div className="empty-icon"><Users size={40} /></div>
+          <p>No applicants found matching this filter.</p>
+        </div>
       ) : (
         <>
-          {/* Desktop Table View */}
-          <div className="table-view">
-            <table>
+          {/* Desktop Table */}
+          <div className="table-wrapper">
+            <table className="applicants-table">
               <thead>
                 <tr>
-                  <th>Full Name</th>
-                  <th>Email</th>
-                    <th>Resume</th>
+                  <th>Candidate</th>
                   <th>Applied For</th>
+                  <th>Resume</th>
                   <th>Status</th>
                   <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {applicants.map(app => (
+                {filteredApplicants.map(app => (
                   <tr key={app.id}>
-                    <td>{app.profiles?.fullname || 'N/A'}</td>
-                    <td>{app.profiles?.email || 'N/A'}</td>
                     <td>
-                      {app.resume_url && (
-                        <a 
-                          href={app.resume_url} 
-                          target="_blank" 
-                          rel="noopener noreferrer" 
-                          className="resume-link"
-                        >
-                          View Resume
-                        </a>
-                      )}
+                      <div className="candidate-info">
+                        <div className="avatar-circle">{app.profiles?.fullname?.[0] || 'U'}</div>
+                        <div>
+                          <div className="name">{app.profiles?.fullname || 'Unknown'}</div>
+                          <div className="email">{app.profiles?.email || 'N/A'}</div>
+                        </div>
+                      </div>
                     </td>
-                    <td>{app.job_posts?.title}</td> 
                     <td>
-                      <span className={`status ${app.status.toLowerCase()}`}>
-                        {app.status.replace(/_/g, ' ')}
+                      <div className="job-info">
+                        <Briefcase size={14} />
+                        <span>{app.job_posts?.title}</span>
+                      </div>
+                    </td>
+                    <td>
+                      {app.resume_url ? (
+                        <a href={app.resume_url} target="_blank" rel="noopener noreferrer" className="resume-btn">
+                          <FileText size={14} /> View CV
+                        </a>
+                      ) : <span className="text-muted">No CV</span>}
+                    </td>
+                    <td>
+                      <span className={`status-badge ${app.status.toLowerCase().includes('approved') ? 'approved' : app.status.toLowerCase()}`}>
+                        {app.status === 'Company_Approved_Waiting_Coordinator' ? 'Approved' : app.status}
                       </span>
                     </td>
-
                     <td>
-                      {app.status.toLowerCase() === 'pending' && (
-                        <>
-                          <button
-                            className="action-btn accept-btn"
-                            onClick={() => handleStatusUpdate(app.id, 'accept')}
-                          >
-                            Accept
-                          </button>
-                          <button
-                            className="action-btn reject-btn"
-                            onClick={() => handleStatusUpdate(app.id, 'reject')}
-                          >
-                            Reject
-                          </button>
-                        </>
-                      )}
-                      {app.status.toLowerCase() !== 'pending' && (
-                        <span>{app.status.replace(/_/g, ' ')}</span>
-                      )}
+                      <div className="action-row">
+                        {app.status === 'Pending' ? (
+                          <>
+                            <button className="icon-btn accept" onClick={() => handleStatusUpdate(app.id, 'accept')} title="Accept">
+                              <CheckCircle2 size={18} />
+                            </button>
+                            <button className="icon-btn reject" onClick={() => handleStatusUpdate(app.id, 'reject')} title="Reject">
+                              <XCircle size={18} />
+                            </button>
+                          </>
+                        ) : (
+                          <span className="text-muted text-sm">Completed</span>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -185,54 +235,36 @@ export default function ApplicantsPage() {
             </table>
           </div>
 
-          {/* Mobile Card View */}
-          <div className="card-view">
-            {/* ... (your existing mobile view is fine) ... */}
-            <div className="applicant-grid">
-              {applicants.map(app => (
-                <div key={app.id} className="applicant-card">
-                  <div className="applicant-header">
-                    <h3>{app.profiles?.fullname || 'N/A'}</h3>
-                    <p><strong>Email:</strong> {app.profiles?.email || 'N/A'}</p>
-                    <p><strong>Applied for:</strong> {app.job_posts?.title}</p>
+          {/* Mobile Cards (Responsive) */}
+          <div className="mobile-grid">
+            {filteredApplicants.map(app => (
+              <div key={app.id} className="mobile-card">
+                <div className="card-top">
+                  <div className="candidate-info">
+                    <div className="avatar-circle">{app.profiles?.fullname?.[0]}</div>
+                    <div>
+                      <div className="name">{app.profiles?.fullname}</div>
+                      <div className="email">{app.job_posts?.title}</div>
+                    </div>
                   </div>
-
-                  <span className={`status ${app.status.toLowerCase()}`}>
-                    {app.status.replace(/_/g, ' ')}
+                  <span className={`status-badge ${app.status.toLowerCase().includes('approved') ? 'approved' : app.status.toLowerCase()}`}>
+                    {app.status === 'Company_Approved_Waiting_Coordinator' ? 'Approved' : app.status}
                   </span>
-
-                  <div className="action-buttons">
-                    {app.resume_url && (
-                      <a href={app.resume_url} target="_blank" rel="noopener noreferrer" className="resume-link">
-                        View Resume
-                      </a>
-                    )}
-
-                    {app.status.toLowerCase() === 'pending' && (
-                      <>
-                        <button
-                          className="action-btn accept-btn"
-                          onClick={() => handleStatusUpdate(app.id, 'accept')}
-                        >
-                          Accept
-                        </button>
-                        <button
-                          className="action-btn reject-btn"
-                          onClick={() => handleStatusUpdate(app.id, 'reject')}
-                        >
-                          Reject
-                        </button>
-                      </>
-                    )}
-                  </div>
-                  {app.status.toLowerCase() !== 'pending' && (
-                    <div style={{textAlign: 'center', marginTop: '1rem', color: '#333'}}>
-                      Status: {app.status.replace(/_/g, ' ')}
+                </div>
+                
+                <div className="card-actions">
+                  {app.resume_url && (
+                    <a href={app.resume_url} target="_blank" className="resume-btn">View Resume</a>
+                  )}
+                  {app.status === 'Pending' && (
+                    <div className="btn-group">
+                      <button className="mobile-btn accept" onClick={() => handleStatusUpdate(app.id, 'accept')}>Accept</button>
+                      <button className="mobile-btn reject" onClick={() => handleStatusUpdate(app.id, 'reject')}>Reject</button>
                     </div>
                   )}
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
         </>
       )}

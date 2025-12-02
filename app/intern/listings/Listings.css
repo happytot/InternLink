@@ -736,7 +736,7 @@ to trigger on scroll. Here, it will fire immediately. */
   color: var(--text-main);
   font-size: 0.95rem;
   cursor: pointer;
-  width: 12%;
+  width: 15%;
 }
 
 .filter-select:focus {

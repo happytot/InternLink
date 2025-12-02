@@ -1,39 +1,85 @@
 /* src/pages/Profile.css */
 
 /* =========================================
-   1. ROOT VARIABLES
+   1. ROOT VARIABLES (InternLink Design System)
    ========================================= */
 :root {
-    --primary-orange: #EE7428;
-    --primary-dark: #333;
-    --background-light: #f2f2f7; 
-    --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-    --skeleton-light: #e5e5ea;
-    --skeleton-dark: #d4d4d8;
-    --border-color: #e5e7eb;
+    /* --- Core Colors: Dark Mode Default (Tailwind Slate/Zinc/Orange) --- */
+    --primary-orange: #EE7428; /* Primary Accent (Dark) */
+    --secondary-cyan: #00d4ff; /* Secondary Accent */
+    
+    --background-dark: #021217; /* InternLink Dark Background */
+    --surface-card: #0F172A; /* Slate-900 (Used for cards in dark mode) */
+    
+    --text-main: #F1F5F9; /* Slate-100 (Main text in dark mode) */
+    --text-muted: #94A3B8; /* Slate-400 (Muted text) */
+    --primary-dark: #F1F5F9; /* Overriding old dark color with white/light text */
+    
+    --border-color: #334155; /* Slate-700 (Dark mode border) */
+    --card-shadow: 0 10px 20px rgba(0, 0, 0, 0.25); /* Deeper shadow for cards */
+    --input-bg: #1E293B; /* Slate-800 for inputs */
+    --input-disabled-bg: #0F172A;
+
+    /* --- UI Components --- */
+    --radius-card: 24px;
+    --radius-button: 12px;
+    --radius-pill: 50px;
+    
+    /* Skeleton (Adjusted for dark background) */
+    --skeleton-light: #1E293B;
+    --skeleton-dark: #334155;
+    
+    /* Glassmorphism Background (Use a subtle dark color with blur) */
+    --bg-glass: rgba(15, 23, 42, 0.8); /* Slate-900 with transparency */
+}
+
+/* =========================================
+   1.1 LIGHT MODE OVERRIDES
+   ========================================= */
+.light-mode {
+    --primary-orange: #EA580C; /* Primary Accent (Light) */
+    --secondary-cyan: #3b82f6; /* Secondary Accent (Blue for light mode) */
+
+    --background-dark: #F8FAFC; /* InternLink Light Background */
+    --surface-card: #FFFFFF; /* White for cards in light mode */
+
+    --text-main: #0F172A; /* Slate-900 (Main text in light mode) */
+    --text-muted: #64748B; /* Slate-500 (Muted text) */
+    --primary-dark: #0F172A; /* Headings in light mode */
+
+    --border-color: #E2E8F0; /* Slate-200 (Light mode border) */
+    --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* Lighter shadow */
+    --input-bg: #FFFFFF;
+    --input-disabled-bg: #F1F5F9;
+
+    /* Glassmorphism Background */
+    --bg-glass: rgba(255, 255, 255, 0.8);
 }
 
 
-
 /* =========================================
-   2. BASE LAYOUT
+   2. BASE LAYOUT & TYPOGRAPHY
    ========================================= */
 
 .profile-wrapper {
     min-height: 100vh;
-    background-color: var(--background-light);
+    background-color: var(--background-dark); /* Use new variable */
     padding-top: 80px;
     padding-bottom: 90px;
+    color: var(--text-main); /* Ensure base text is main color */
 }
 
 .profile-content-area {
-    max-width: 1400px; /* Wider for 3 columns */
-    margin: 20px auto 0;
-    padding: 0 24px;
+    width: 95%;
+    max-width: none;
+    margin: 20px 0 0;
+    padding: 0 32px;
     display: flex;
     flex-direction: column;
     gap: 20px;
+ 
 }
+
 
 .page-header-row {
     display: flex;
@@ -43,6 +89,7 @@
 }
 
 .page-title {
+    font-family: 'Plus Jakarta Sans', sans-serif; /* Heading Font */
     font-size: 1.75rem;
     font-weight: 800;
     color: var(--primary-dark);
@@ -57,10 +104,10 @@
 
 .profile-bento-grid {
     display: grid;
-    /* Left (Fixed), Center (Fluid), Right (Fixed) */
-    grid-template-columns: 400px 1fr 320px; 
+    grid-template-columns: 380px 1fr 340px;
     gap: 24px;
     align-items: start;
+    width: 100%;
 }
 
 .bento-col {
@@ -77,26 +124,30 @@
     width: 85%;
 }
 
-
-
-/* Make sure cards inside columns fill width */
 .profile-card {
-    background: #fff;
-    border-radius: 16px;
+    background: var(--surface-card); /* Use surface color */
+    border-radius: var(--radius-card); /* Use new radius */
     padding: 24px;
     border: 1px solid var(--border-color);
     box-shadow: var(--card-shadow);
     position: relative;
+    /* Card Hover Effect */
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.profile-card:hover {
+    transform: translateY(-8px); /* Lift */
+    border-color: var(--primary-orange); /* Orange Glow */
+    box-shadow: 0 20px 40px -10px rgba(0,0,0,0.25); /* Deep Shadow */
 }
 
-/* Flex grow for columns that need to fill height if we used stretch, 
-   but for scrolling we keep auto height cards usually */
+
 .h-full { height: 100%; }
 
 .section-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
     font-size: 1.1rem;
     font-weight: 700;
-    color: var(--primary-dark);
+    color: var(--text-main); /* Use main text color */
     margin-top: 0;
     margin-bottom: 16px;
     display: flex;
@@ -114,25 +165,25 @@
     padding-right: 5px; /* Space for scrollbar */
 }
 
-/* Custom Scrollbar */
+/* Custom Scrollbar (Adjusted for dark/light themes) */
 .scrollable-content-area::-webkit-scrollbar {
-    width: 6px;
+    width: 8px; /* Slightly wider */
 }
 .scrollable-content-area::-webkit-scrollbar-track {
-    background: #f1f1f1;
+    background: var(--surface-card);
     border-radius: 4px;
 }
 .scrollable-content-area::-webkit-scrollbar-thumb {
-    background: #ccc;
+    background: var(--border-color); /* Use border color as thumb */
     border-radius: 4px;
 }
 .scrollable-content-area::-webkit-scrollbar-thumb:hover {
-    background: #aaa;
+    background: var(--text-muted);
 }
 
 /* Specific Heights to keep cards constant */
 .education-scroll {
-    max-height: 400px; /* Adjust based on preference */
+    max-height: 400px;
 }
 
 .skills-scroll {
@@ -156,14 +207,20 @@
 .profile-pic-container {
     width: 140px; 
     height: 140px;
-    border-radius: 50%;
-    border: 4px solid #fff;
+    border-radius: var(--radius-pill); /* Use pill radius for circle */
+    border: 4px solid var(--surface-card); /* Border color based on card surface */
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     overflow: hidden;
-    background: #f0f0f0;
+    background: var(--input-bg);
 }
 .profile-avatar { width: 100%; height: 100%; object-fit: cover; }
-.placeholder-avatar { display: flex; align-items: center; justify-content: center; font-size: 3rem; }
+.placeholder-avatar { 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    font-size: 3rem; 
+    color: var(--text-muted); 
+}
 
 .btn-icon-upload {
     position: absolute;
@@ -173,7 +230,7 @@
     background: var(--primary-orange);
     color: white;
     padding: 8px;
-    border-radius: 50%;
+    border-radius: var(--radius-pill);
     cursor: pointer;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     transition: transform 0.2s;
@@ -183,28 +240,41 @@
 .personal-details-stack .form-group {
     margin-bottom: 16px;
 }
+
+.personal-details-stack .form-group label{
+    margin-bottom: 16px;
+}
 .personal-details-stack label {
     font-size: 0.85rem;
-    color:#333;
-    margin-bottom: 4px;
+    color: var(--text-muted); /* Use muted text for labels */
+   padding-bottom: 5px;
 }
 .input-disabled {
-    background-color: #f0f0f0;
-    color: #666;
+    background-color: var(--input-disabled-bg) !important;
+    color: var(--text-muted) !important;
+    cursor: not-allowed;
 }
 
 /* --- CENTER COLUMN: Education & Summary --- */
 
 .summary-textarea {
-    width: 90%;
-    height: 130px;
+    width: 96%;
+    height: 230px;
     padding: 12px;
     border: 1px solid var(--border-color);
-    border-radius: 10px;
+    border-radius: var(--radius-button); /* Use button radius */
     resize: none;
-    background: #fafafa;
+    background: var(--input-bg); /* Use input background */
+    font-size: 0.95rem;
+    font-family: 'Inter', sans-serif; /* Body Font */
+    color: var(--text-main);
+     line-height: 1.5;
 }
-.summary-textarea:focus { outline: 2px solid var(--primary-orange); background: #fff; }
+.summary-textarea:focus { 
+    outline: 2px solid rgba(238, 116, 40, 0.2);
+    border-color: var(--primary-orange); 
+    background: var(--surface-card); /* Brighter surface on focus */
+}
 
 .card-header-flex {
     display: flex;
@@ -229,10 +299,10 @@
 }
 
 .education-item-grid {
-    background: #f9f9f9;
+    background: var(--input-disabled-bg); /* Use a slightly darker background */
     border: 1px solid var(--border-color);
     padding: 40px 15px 15px 15px;
-    border-radius: 12px;
+    border-radius: var(--radius-button); /* Use button radius */
     position: relative;
 }
 
@@ -244,37 +314,54 @@
 .edu-input-group input {
     width: 100%;
     padding: 8px 12px;
-    border: 1px solid #eee;
+    border: 1px solid var(--border-color);
     border-radius: 8px;
     font-size: 0.9rem;
+    background: var(--input-bg);
+    color: var(--text-main);
 }
-.edu-input-group input:focus { border-color: var(--primary-orange); outline: none; }
+.edu-input-group input:focus { 
+    border-color: var(--primary-orange); 
+    outline: none; 
+    background: var(--surface-card);
+}
 
 .btn-icon-danger {
     position: absolute;
     top: 10px;
     right: 10px;
-    color: #ef5350;
+    color: #ef4444; /* Red-500 */
     background: none; border: none; cursor: pointer;
+    transition: color 0.2s;
+}
+.btn-icon-danger:hover {
+    color: #b91c1c; /* Red-700 */
 }
 
 /* --- RIGHT COLUMN: Resume & Skills --- */
 .uploaded-file-mini {
-    background: #f0f9ff;
-    border: 1px solid #bae6fd;
+    background: #064E3B; /* Dark Green/Teal for contrast */
+    border: 1px solid #10B981;
     padding: 12px;
-    border-radius: 10px;
+    border-radius: var(--radius-button);
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+.uploaded-file-mini .light-mode {
+    background: #ECFDF5;
+    border: 1px solid #A7F3D0;
 }
 .file-info-mini {
     display: flex;
     align-items: center;
     gap: 8px;
     font-size: 0.9rem;
-    color: #0369a1;
+    color: #34D399; /* Green text */
     overflow: hidden;
+}
+.uploaded-file-mini .light-mode .file-info-mini {
+    color: #065F46;
 }
 .truncate-text {
     white-space: nowrap;
@@ -284,16 +371,16 @@
 }
 .file-actions-mini { display: flex; gap: 5px; }
 .btn-icon-mini {
-    background: #fff;
-    border: 1px solid #bae6fd;
+    background: var(--surface-card);
+    border: 1px solid var(--border-color);
     padding: 4px;
-    border-radius: 6px;
+    border-radius: 8px;
     cursor: pointer;
-    color: #0284c7;
+    color: var(--text-muted);
 }
-.btn-icon-mini:hover { background: #e0f2fe; }
-.btn-icon-mini.danger { color: #ef5350; border-color: #fecaca; }
-.btn-icon-mini.danger:hover { background: #fef2f2; }
+.btn-icon-mini:hover { background: var(--input-bg); }
+.btn-icon-mini.danger { color: #ef4444; border-color: #fca5a5; }
+.btn-icon-mini.danger:hover { background: #fee2e2; }
 
 .skill-input-group {
     display: flex;
@@ -304,6 +391,8 @@
     padding: 8px 12px;
     border: 1px solid var(--border-color);
     border-radius: 8px;
+    background: var(--input-bg);
+    color: var(--text-main);
 }
 .btn-primary-icon {
     background: var(--primary-orange);
@@ -315,7 +404,9 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    transition: transform 0.2s;
 }
+.btn-primary-icon:hover { transform: translateY(-2px); } /* Button Hover */
 
 .skill-tags {
     display: flex;
@@ -323,14 +414,19 @@
     gap: 8px;
 }
 .skill-badge {
-    background: #fff7ed;
-    color: #c2410c;
+     background: var(--input-bg);
+    color: white;
     padding: 6px 12px;
-    border-radius: 20px;
+    border-radius: var(--radius-pill);
     font-size: 0.85rem;
     display: flex;
     align-items: center;
     gap: 6px;
+   
+}
+.skill-tags .light-mode .skill-badge {
+    background: #fff7ed;
+    color: #c2410c;
     border: 1px solid #ffedd5;
 }
 .remove-skill { cursor: pointer; opacity: 0.6; }
@@ -343,14 +439,16 @@
     width: 90%;
     padding: 15px 12px;
     border: 1px solid var(--border-color);
-    border-radius: 10px;
+    border-radius: var(--radius-button);
     font-size: 0.95rem;
-    background: #fafafa;
+    background: var(--input-bg);
+    color: var(--text-main);
+    font-family: 'Inter', sans-serif;
 }
 .form-group input:focus, .form-group select:focus {
     outline: 2px solid rgba(238, 116, 40, 0.2);
     border-color: var(--primary-orange);
-    background: #fff;
+    background: var(--surface-card);
 }
 
 .form-group label {
@@ -363,19 +461,20 @@
     gap: 6px;
     padding: 8px 16px;
     border: 1px solid #fca5a5;
-    color: #dc2626;
-    background: #fff;
-    border-radius: 20px;
+    color: #ef4444; /* Red-500 */
+    background: var(--surface-card); /* Card Surface for background */
+    border-radius: var(--radius-pill);
     font-size: 0.9rem;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
 }
-.btn-danger-outline:hover { background: #fef2f2; }
+.btn-danger-outline:hover { background: #fee2e2; } /* Light Red hover */
+.light-mode .btn-danger-outline:hover { background: #fef2f2; }
 
 .btn-sm-primary {
-    background: #ebf5ff;
-    color: #0066cc;
+    background: var(--secondary-cyan);
+    color: var(--background-dark); /* Dark text on light button */
     border: none;
     padding: 6px 12px;
     border-radius: 8px;
@@ -385,27 +484,36 @@
     align-items: center;
     gap: 4px;
     cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
 }
-.btn-sm-primary:hover { background: #dbeafe; }
+.btn-sm-primary:hover { 
+    background: color-mix(in srgb, var(--secondary-cyan) 80%, white);
+    transform: translateY(-1px);
+}
 
 .btn-secondary {
-    background: #f3f4f6;
-    border: 1px solid #e5e7eb;
-    color: #374151;
+    background: var(--input-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
     padding: 8px 16px;
-    border-radius: 10px;
+    border-radius: var(--radius-button);
     font-weight: 600;
     font-size: 0.9rem;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: background 0.2s;
 }
-.full-width-btn { width: 100%; }
+.btn-secondary:hover {
+    background: color-mix(in srgb, var(--input-bg) 80%, var(--primary-orange));
+}
+.full-width-btn { width: 88%; 
+margin-top: 10px;}
 .visually-hidden { display: none; }
 
 /* =========================================
-   7. TOAST & MODALS (Clean Dark Style)
+   7. FLOATING SAVE TOAST (Glassmorphism)
    ========================================= */
 
 .floating-save-toast {
@@ -414,13 +522,16 @@
     left: 50%;
     transform: translateX(-50%) translateY(-160%);
     
-    /* Dark Minimalist "System" Look (Matches standard toasts) */
-    background: #18181b; /* Zinc-900 / Almost Black */
-    color: #fff;
-    padding: 8px 8px 8px 16px; /* Less padding for compact look */
-    border-radius: 50px; /* Pill shape */
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    border: 1px solid #27272a;
+    /* --- Glassmorphism Styling --- */
+    background: var(--bg-glass);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    
+    color: var(--text-main);
+    padding: 8px 8px 8px 16px;
+    border-radius: var(--radius-pill); /* Pill shape */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    border: 1px solid var(--border-color);
     
     display: flex;
     align-items: center;
@@ -446,7 +557,7 @@
 .toast-message {
     font-size: 0.9rem;
     font-weight: 500;
-    color: #f4f4f5; /* Zinc-100 */
+    color: var(--text-main);
     white-space: nowrap;
 }
 
@@ -462,26 +573,26 @@
 
 .btn-toast-cancel {
     background: transparent;
-    color: #a1a1aa; /* Zinc-400 */
+    color: var(--text-muted);
     border: none;
     padding: 8px 12px;
-    border-radius: 20px;
+    border-radius: var(--radius-pill);
     font-size: 0.85rem;
     font-weight: 500;
     cursor: pointer;
-    transition: color 0.2s;
+    transition: color 0.2s, background 0.2s;
 }
 .btn-toast-cancel:hover {
-    color: #fff;
-    background: rgba(255,255,255,0.1);
+    color: var(--text-main);
+    background: rgba(255,255,255,0.1); /* Light surface hover */
 }
 
 .btn-toast-save {
-    background: #fff; /* White button on dark background */
-    color: #000;
+    background: var(--primary-orange);
+    color: white;
     border: none;
     padding: 8px 16px;
-    border-radius: 20px;
+    border-radius: var(--radius-pill);
     font-size: 0.85rem;
     font-weight: 600;
     cursor: pointer;
@@ -491,7 +602,7 @@
     transition: background 0.2s;
 }
 .btn-toast-save:hover {
-    background: #e4e4e7; /* Light Gray hover */
+    background: color-mix(in srgb, var(--primary-orange) 90%, black);
 }
 
 .btn-toast-save.btn-success-state {
@@ -509,16 +620,19 @@
     display: flex; justify-content: center; align-items: center; z-index: 2000;
 }
 .modal-content {
-    background: white; padding: 24px; border-radius: 12px;
+    background: var(--surface-card); padding: 24px; border-radius: var(--radius-card);
     width: 90%; max-width: 500px; position: relative;
+    border: 1px solid var(--border-color);
 }
 .modal-close-btn {
     position: absolute; top: 16px; right: 16px;
     background: none; border: none; cursor: pointer;
+    color: var(--text-muted);
 }
 .resume-viewer-placeholder {
     margin-top: 20px; text-align: center; padding: 20px;
-    background: #f9f9f9; border-radius: 8px;
+    background: var(--input-disabled-bg); border-radius: 8px;
+    color: var(--text-muted);
 }
 
 /* =========================================
@@ -543,22 +657,22 @@
     .profile-wrapper { padding-top: 20px; }
     .profile-content-area { padding: 20px 16px; }
 
-    /* --- MOBILE TOAST ADJUSTMENTS --- */
+    /* --- MOBILE TOAST ADJUSTMENTS (Glassmorphism on mobile) --- */
     .floating-save-toast {
         /* 1. Size & Position */
-        width: 90%;       /* Fit within the screen width */
+        width: 90%;
         max-width: 400px;
-        top: 20px;        /* Slight gap from top */
+        top: 20px;
         left: 50%;
         
         /* 2. Layout: Stack vertically */
         flex-direction: column;
-        align-items: flex-start; /* Align text to left */
+        align-items: flex-start;
         gap: 12px;
         
         /* 3. Visuals */
         padding: 16px;
-        border-radius: 16px; /* Card-like corners on mobile */
+        border-radius: var(--radius-button); /* Card-like corners on mobile */
     }
 
     /* Make the text area fill width */
@@ -584,6 +698,6 @@
     /* Make cancel button slightly more visible on mobile */
     .btn-toast-cancel {
         background: rgba(255,255,255,0.1);
-        color: #e4e4e7;
+        color: var(--text-main);
     }
 }

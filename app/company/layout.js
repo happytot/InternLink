@@ -1,5 +1,6 @@
 // src/app/company/layout.js
 import CompanyNav from '../components/CompanyNav';
+import '../globals.css'
 
 export default function CompanyLayout({ children }) {
   return (
