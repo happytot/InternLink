@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react'; // 1. Added Suspense here
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import './Listings.css';
 import InternNav from '../../components/InternNav';
@@ -8,7 +8,9 @@ import { toast } from 'sonner';
 import { useSearchParams } from "next/navigation";
 import FloatingAIChatWithCharts from '../../components/chatbot';
 
-export default function Listings() {
+// 2. Renamed your original component to 'ListingsContent'
+// This component keeps all your logic and useSearchParams
+function ListingsContent() {
   const supabase = createClientComponentClient();
 
   const [user, setUser] = useState(null);
@@ -409,7 +411,7 @@ export default function Listings() {
       {/* 📱 Mobile Details Component (Overlay) */}
       <div className={`mobile-details-overlay ${showMobileDetail ? 'active' : ''}`}>
         <button className="mobile-back-btn" onClick={() => setShowMobileDetail(false)}>
-           ← Back to Listings
+            ← Back to Listings
         </button>
         {/* Re-using the same component, but inside the mobile wrapper */}
         <JobDetailsPane 
@@ -463,5 +465,19 @@ export default function Listings() {
       {user?.id && <FloatingAIChatWithCharts studentId={user.id} />}
       <InternNav />
     </>
+  );
+}
+
+// 3. This is the new Export that satisfies Next.js 13+ Build requirements
+export default function Listings() {
+  return (
+    // You can customize this fallback to match your app's loading style
+    <Suspense fallback={
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        Loading Application...
+      </div>
+    }>
+      <ListingsContent />
+    </Suspense>
   );
 }
