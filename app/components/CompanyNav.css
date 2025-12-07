@@ -1,124 +1,141 @@
-/* Core Sidebar Container */
-.company-sidebar-icon-only {
-  width: 70px;
-  background: var(--bg-card); /* Ensure this var exists in your globals */
-  height: 100vh;
+/* components/CompanyNav.css */
+
+.company-sidebar {
+  width: 230px;
+  height: 95%;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding: 20px 0;
+  padding: 24px;
+  background-color: var(--bg-card);
   border-right: 1px solid var(--border-color);
-  position: sticky;
-  top: 0;
-  z-index: 10000;
-  /* Fallback colors if vars aren't defined */
-  --bg-card-fallback: #0F172A;
-  --text-main-fallback: #F1F5F9;
-  --primary-orange-fallback: #EE7428;
-  --bg-main-fallback: #021217;
 }
 
-/* Nav Link Container */
+/* --- Header Section --- */
+.sidebar-header {
+  margin-bottom: 40px;
+  padding-left: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.brand {
+  font-size: 24px;
+  color: var(--text-main);
+  font-family: var(--font-heading);
+  margin: 0;
+  line-height: 1;
+}
+
+.brand span {
+  color: var(--primary-orange);
+}
+
+.sub-brand {
+  font-size: 12px;
+  display: block;
+  color: var(--text-muted);
+  font-weight: 400;
+  margin-top: 4px;
+}
+
+.theme-btn {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  transition: all 0.2s ease;
+}
+
+.theme-btn:hover {
+  color: var(--primary-orange);
+  border-color: var(--primary-orange);
+}
+
+/* --- Navigation Section --- */
 .sidebar-nav {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  align-items: center; /* Changed from flex-start to center for better icon alignment */
-  gap: 20px;
-  flex-grow: 1;
-  width: 100%;
+  gap: 8px;
+  overflow-y: auto;
+  min-height: 0;
+  margin-bottom: 20px;
+  
+  /* Hide Scrollbar */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
-/* Individual Nav Item */
-.nav-item {
-  position: relative;
+.sidebar-nav::-webkit-scrollbar {
+  display: none;
+}
+
+/* --- BUTTON STYLES --- */
+.nav-button {
+  /* Reset */
+  background: transparent;
+  border: none;
+  font-family: inherit;
+  font-size: inherit;
+  cursor: pointer;
+  
+  /* Layout */
   display: flex;
-  justify-content: center;
   align-items: center;
-  color: var(--text-main, #F1F5F9);
+  gap: 12px;
+  padding: 12px 16px;
   width: 100%;
-  padding: 12px 0;
+  text-align: left;
+  
+  /* Style */
+  border-radius: 12px !important; /* Force Radius */
+  color: var(--text-muted);
+  font-weight: 500;
   transition: all 0.2s ease;
-  border-left: 3px solid transparent; /* Added active indicator bar */
+  flex-shrink: 0;
+}
+
+.nav-button:hover {
+  background: var(--bg-input);
+  color: var(--text-main);
+  border-radius: 12px !important;
 }
 
 /* Active State */
-.nav-item.active {
-  color: var(--primary-orange, #EE7428);
-  border-left: 3px solid var(--primary-orange, #EE7428);
-  background: rgba(238, 116, 40, 0.1); /* Subtle background tint */
-}
-
-.nav-item:hover {
-  color: var(--primary-orange, #EE7428);
-}
-
-/* Tooltip (Hover Label) */
-.tooltip {
-  position: absolute;
-  left: 60px; /* Adjusted slightly closer */
-  background: var(--primary-orange, #EE7428);
-  color: white;
-  padding: 6px 12px;
-  border-radius: 8px;
-  white-space: nowrap;
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(-50%) translateX(-10px);
-  top: 50%;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-  font-size: 0.85rem;
+.nav-button.active {
+  background-color: var(--primary-orange);
+  color: #FFFFFF;
   font-weight: 600;
-  z-index: 10001;
+  border-radius: 12px !important;
 }
 
-/* Tooltip Arrow */
-.tooltip::before {
-  content: '';
-  position: absolute;
-  left: -4px;
-  top: 50%;
-  transform: translateY(-50%);
-  border-width: 5px 5px 5px 0;
-  border-style: solid;
-  border-color: transparent var(--primary-orange, #EE7428) transparent transparent;
+.nav-button.active:hover {
+  background-color: var(--primary-orange-hover);
+  color: #FFFFFF;
 }
 
-.nav-item:hover .tooltip,
-.logout-btn:hover .tooltip {
-  opacity: 1;
-  transform: translateY(-50%) translateX(0);
+/* --- Footer / Logout --- */
+.sidebar-footer {
+  border-top: 1px solid var(--border-color);
+  padding-top: 20px;
+  flex-shrink: 0;
 }
 
-/* Bottom Section */
-.sidebar-bottom {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  margin-top: auto;
-  padding-bottom: 40px;
-}
-
-/* Logout Button */
 .logout-btn {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: var(--bg-input, #1e293b);
-  color: var(--text-muted, #94A3B8);
-  border: 1px solid var(--border-color, rgba(255,255,255,0.1));
-  border-radius: 12px;
-  padding: 10px;
-  cursor: pointer;
-  width: 45px;
-  height: 45px;
-  transition: all 0.2s ease;
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--color-danger);
+  justify-content: flex-start;
+  border-radius: 12px !important;
 }
 
 .logout-btn:hover {
-  background: var(--primary-orange, #EE7428);
-  color: white;
-  border-color: var(--primary-orange, #EE7428);
-  box-shadow: 0 0 15px rgba(238, 116, 40, 0.4);
+  background: var(--color-danger);
+  color: #FFFFFF;
 }

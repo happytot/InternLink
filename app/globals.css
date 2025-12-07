@@ -155,8 +155,10 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 [data-sonner-toaster] [data-sonner-toast] {
-    /* Use glass variables for toasts */
-    background: rgba(30, 41, 59, 0.85) !important; 
+    /* 🛠️ FIX: Use var(--bg-card) so it changes to White in light mode / Dark in dark mode */
+    background: var(--bg-card) !important; 
+    
+    /* Keep glass effect (works if the variable has transparency) */
     backdrop-filter: blur(16px) !important;
     -webkit-backdrop-filter: blur(16px) !important;
     
@@ -164,7 +166,9 @@ h1, h2, h3, h4, h5, h6 {
     border-radius: var(--radius-card) !important;
     padding: 18px 22px !important;
     
+    /* 🛠️ FIX: Use var(--text-main) so text turns black in light mode */
     color: var(--text-main) !important;
+    
     box-shadow: var(--shadow-card) !important;
     gap: 12px !important;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
@@ -172,22 +176,22 @@ h1, h2, h3, h4, h5, h6 {
 
 [data-sonner-toaster] [data-sonner-toast]:hover {
     transform: translateY(-4px) !important;
-    box-shadow: 0 20px 40px -10px rgba(0,0,0,0.5), var(--shadow-glow) !important;
+    box-shadow: 0 20px 40px -10px rgba(0,0,0,0.1), var(--shadow-glow) !important; /* Softened shadow opacity */
     border-color: var(--primary-orange) !important;
 }
 
 [data-sonner-toaster] [data-sonner-toast] [data-title] {
     font-family: var(--font-heading) !important;
     font-weight: 700 !important;
-    color: var(--text-main) !important;
+    color: var(--text-main) !important; /* Adapts to theme */
 }
 
 [data-sonner-toaster] [data-sonner-toast] [data-description] {
     font-family: var(--font-body) !important;
-    color: var(--text-muted) !important;
+    color: var(--text-muted) !important; /* Adapts to theme */
 }
 
-/* Toast Status Colors */
+/* Toast Status Colors (These look good on both backgrounds) */
 [data-sonner-toast][data-type="success"] { border-left: 4px solid #22c55e !important; }
 [data-sonner-toast][data-type="success"] [data-icon] { color: #22c55e !important; }
 
@@ -198,14 +202,15 @@ h1, h2, h3, h4, h5, h6 {
 [data-sonner-toast][data-type="default"] { border-left: 4px solid var(--primary-orange) !important; }
 [data-sonner-toast][data-type="info"] [data-icon] { color: var(--primary-orange) !important; }
 
+/* Close Button */
 [data-sonner-toast] [data-close-button] {
-    background: var(--bg-input) !important;
+    background: var(--bg-input) !important; /* Adapts to theme */
     border: 1px solid var(--border-color) !important;
     color: var(--text-muted) !important;
 }
 [data-sonner-toast] [data-close-button]:hover {
     background: var(--primary-orange) !important;
-    color: white !important;
+    color: white !important; /* Always white on orange background */
     border-color: var(--primary-orange) !important;
 }
 

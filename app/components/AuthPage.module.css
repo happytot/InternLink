@@ -148,7 +148,7 @@
 }
 
 .inputGroup input {
-    width: 100%;
+    width: 90%;
     padding: 14px 16px;
     background: var(--bg-input); /* Dynamic background */
     border: 1px solid var(--border-color);

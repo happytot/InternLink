@@ -1,10 +1,11 @@
 'use client';
+
 import './Dashboard.css';
-import InternNav from '../../components/InternNav';
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import Link from 'next/link';
-import { toast } from 'sonner';
+// 1. Import toast (No Toaster needed, it's in layout)
+import { toast } from 'sonner'; 
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { useSearchParams } from 'next/navigation';
 import FloatingAIChatWithCharts from '../../components/chatbot';
@@ -19,18 +20,14 @@ import {
   ClipboardList,
   User,
   ExternalLink,
-  ChevronRight,
-  Loader2,
-  Sun,   // Added for Theme Toggle
-  Moon   // Added for Theme Toggle
 } from 'lucide-react';
-
 
 const isNewAnnouncement = (createdAt) => {
     const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
     const announcementDate = new Date(createdAt);
     return announcementDate > twentyFourHoursAgo;
 };
+
 // --- Helper: Get Date for Welcome Box ---
 const getCurrentDate = () => {
   const date = new Date();
@@ -40,7 +37,7 @@ const getCurrentDate = () => {
   };
 };
 
-// --- SKELETON COMPONENTS (Unchanged) ---
+// --- SKELETON COMPONENTS ---
 const SkeletonBox = ({ width = '100%', height = '20px', className = '' }) => (
   <div className={`skeleton-box ${className}`} style={{ width, height }}></div>
 );
@@ -115,7 +112,7 @@ const WidgetSkeleton = () => (
   </div>
 );
 
-// --- 1. Stats Summary (Unchanged) ---
+// --- 1. Stats Summary ---
 const StatsSummary = ({ applications }) => {
   const totalApplied = applications.length;
   const interviews = applications.filter(a => a.status && a.status.toLowerCase().includes('interview')).length;
@@ -155,7 +152,7 @@ const StatsSummary = ({ applications }) => {
   );
 };
 
-// --- 2. Reusable Slider (Unchanged) ---
+// --- 2. Reusable Slider ---
 const HorizontalSlider = ({ title, children, pageCount }) => {
   const [currentPage, setCurrentPage] = useState(0);
   const sliderRef = useRef(null);
@@ -184,7 +181,7 @@ const HorizontalSlider = ({ title, children, pageCount }) => {
 
   useEffect(() => { slideTo(0); }, [pageCount]);
 
-return (
+  return (
     <section className="card dashboard-slider-card">
       <div className="slider-header">
         <h2>{title}</h2>
@@ -201,12 +198,11 @@ return (
           <button key={i} className={`dot ${i === currentPage ? 'active' : ''}`} onClick={() => slideTo(i)} />
         ))}
       </div>
-      
     </section>
   );
 };
 
-// --- 3. Application Slider (Unchanged) ---
+// --- 3. Application Slider ---
 const ApplicationSlider = ({ applications }) => {
   const isMobile = useMediaQuery('(max-width: 600px)');
   const pageSize = isMobile ? 1 : 2;
@@ -229,16 +225,15 @@ const ApplicationSlider = ({ applications }) => {
   }
 
   return (
-    <>
     <HorizontalSlider 
       title={<><Calendar size={20} className="card-title-icon"/> Application History</>} 
       viewAllLink="/intern/history" 
       pageCount={pages.length}
     >
       {pages.map((page, pageIndex) => (
-        <div  className="slider-page" key={pageIndex}>
+        <div className="slider-page" key={pageIndex}>
           {page.map(app => (
-            <div  key={app.id} className="app-card">
+            <div key={app.id} className="app-card">
               <span className={`status-badge status-${(app.status || 'pending').toLowerCase().replace(/\s/g, '-')}`}>
                 {app.status || 'Pending'}
               </span>
@@ -253,30 +248,27 @@ const ApplicationSlider = ({ applications }) => {
         </div>
       ))}
     </HorizontalSlider>
-   
-    </>
   );
 };
 
-// --- 4. Recommended Matches (Unchanged) ---
+// --- 4. Recommended Matches ---
 const RecommendedMatches = ({ user, openModal }) => {
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
   const isMobile = useMediaQuery('(max-width: 600px)');
   const pageSize = isMobile ? 1 : 2;
   const searchParams = useSearchParams();
-const jobId = searchParams.get("jobId");
+  const jobId = searchParams.get("jobId");
 
-useEffect(() => {
-  if (!jobId) return;
+  useEffect(() => {
+    if (!jobId) return;
 
-  const el = document.getElementById(`job-${jobId}`);
-  if (el) {
-    el.scrollIntoView({ behavior: "smooth", block: "center" });
-    el.classList.add('highlight-job');
-  }
-}, [jobId, matches]);
-
+    const el = document.getElementById(`job-${jobId}`);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
+      el.classList.add('highlight-job');
+    }
+  }, [jobId, matches]);
 
   useEffect(() => {
     if (!user?.id) return;
@@ -294,7 +286,7 @@ useEffect(() => {
   }, [user]);
 
   if (loading) {
-     return (
+      return (
         <section className="card dashboard-slider-card">
             <div className="slider-header">
                 <h2><Star size={20} className="card-title-icon"/> Recommended for You</h2>
@@ -313,7 +305,7 @@ useEffect(() => {
                 </div>
             </div>
         </section>
-     );
+      );
   }
 
   const pages = matches.reduce((acc, _, i) => {
@@ -330,35 +322,28 @@ useEffect(() => {
       {!loading && matches.length === 0 && <div className="slider-page"><p>No matches found yet.</p></div>}
       {pages.map((page, idx) => (
         <div className="slider-page" key={idx}>
-         {page.map(job => (
-        <div id={`job-${job.id}`} key={job.id} className="job-card">
-   <div>
-      <h3>{job.title}</h3>
-      <p className="job-location">{job.company}</p>
-
-      {/* NEW: Date Posted */}
-      <small className="job-posted-date">
-        Posted on: {new Date(job.created_at).toLocaleDateString()}
-      </small>
-
-      <span className="match-score">
-        {(job.similarity * 100).toFixed(0)}% Match
-      </span>
-    </div>
-    
-  </div>
-))}
-
-           {page.length < pageSize && <div className="app-card-empty" />}
+          {page.map(job => (
+            <div id={`job-${job.id}`} key={job.id} className="job-card">
+              <div>
+                <h3>{job.title}</h3>
+                <p className="job-location">{job.company}</p>
+                <small className="job-posted-date">
+                  Posted on: {new Date(job.created_at).toLocaleDateString()}
+                </small>
+                <span className="match-score">
+                  {(job.similarity * 100).toFixed(0)}% Match
+                </span>
+              </div>
+            </div>
+          ))}
+          {page.length < pageSize && <div className="app-card-empty" />}
         </div>
       ))}
     </HorizontalSlider>
-    
   );
-  
 };
 
-// --- 5. Announcements (Unchanged) ---
+// --- 5. Announcements ---
 const Announcements = () => {
   const supabase = createClientComponentClient();
   const [announcements, setAnnouncements] = useState([]);
@@ -388,12 +373,10 @@ const Announcements = () => {
     return (
       <section className="card dashboard-announcements skeleton-widget">
         <SkeletonBox width="180px" height="26px" className="mb-3" />
-
         <div className="announcement-list">
           {[...Array(3)].map((_, i) => (
             <div key={i} className="announcement-card">
               <SkeletonBox width="60px" height="60px" className="rounded-sm" />
-
               <div className="announcement-content">
                 <SkeletonBox width="80%" height="18px" className="mb-1" />
                 <SkeletonBox width="95%" height="14px" className="mb-1" />
@@ -402,12 +385,7 @@ const Announcements = () => {
             </div>
           ))}
         </div>
-
-        <SkeletonBox
-          width="100px"
-          height="16px"
-          className="view-all-link-skeleton mt-3 ml-auto"
-        />
+        <SkeletonBox width="100px" height="16px" className="view-all-link-skeleton mt-3 ml-auto" />
       </section>
     );
   }
@@ -417,7 +395,6 @@ const Announcements = () => {
       <h2>
         <MessageSquare size={20} className="card-title-icon" /> Announcements
       </h2>
-
       <div className="announcement-list">
         {announcements.length === 0 ? (
           <p>No announcements.</p>
@@ -425,13 +402,8 @@ const Announcements = () => {
           announcements.map((ann) => (
             <div key={ann.id} className="announcement-card">
               {ann.image_url && (
-                <img
-                  src={ann.image_url}
-                  alt={ann.title}
-                  className="announcement-image"
-                />
+                <img src={ann.image_url} alt={ann.title} className="announcement-image" />
               )}
-
               <div className="announcement-content">
                 <div className="announcement-title-row">
                   <h3>{ann.title}</h3>
@@ -439,11 +411,8 @@ const Announcements = () => {
                     <span className="new-badge">NEW</span>
                   )}
                 </div>
-
                 <p>{ann.content}</p>
-                <small>
-                  {new Date(ann.created_at).toLocaleDateString()}
-                </small>
+                <small>{new Date(ann.created_at).toLocaleDateString()}</small>
               </div>
             </div>
           ))
@@ -453,8 +422,7 @@ const Announcements = () => {
   );
 };
 
-
-// --- 6. Profile Widget (Unchanged) ---
+// --- 6. Profile Widget ---
 const ProfileWidget = ({ loading }) => (
   <section className="card profile-card">
     <h3><User size={20} className="card-title-icon"/> Your Profile</h3>
@@ -474,7 +442,7 @@ const ProfileWidget = ({ loading }) => (
   </section>
 );
 
-// --- 7. Main Component (UPDATED with Theme Logic) ---
+// --- 7. Main Component ---
 export default function InternDashboard() {
   const supabase = createClientComponentClient();
   const [user, setUser] = useState(null);
@@ -484,31 +452,6 @@ export default function InternDashboard() {
   const [selectedJob, setSelectedJob] = useState(null);
   const [animateClose, setAnimateClose] = useState(false);
   
-  // --- NEW: Theme State Logic ---
-  const [theme, setTheme] = useState('dark');
-
-  useEffect(() => {
-    // Load saved theme on mount
-    const saved = localStorage.getItem('theme') || 'dark';
-    setTheme(saved);
-  }, []);
-
-  useEffect(() => {
-    // Apply class to HTML tag (required for CSS to switch modes)
-    const root = document.documentElement;
-    if (theme === 'light') {
-      root.classList.add('light');
-    } else {
-      root.classList.remove('light');
-    }
-    localStorage.setItem('theme', theme);
-  }, [theme]);
-
-  const toggleTheme = () => {
-    setTheme(prev => prev === 'light' ? 'dark' : 'light');
-  };
-  // -------------------------------
-
   const dateInfo = getCurrentDate();
 
   const fetchProfile = useCallback(async (userId) => {
@@ -581,61 +524,71 @@ export default function InternDashboard() {
     }
   };
 
+  // ✅ UPDATED: Apply with Loading Toast
   const applyToJob = async (jobId) => {
     if (!user) return;
     
-    const { data: profile } = await supabase.from('profiles').select('resume_url').eq('id', user.id).single();
-    if (!profile?.resume_url) {
-      toast.error("Please upload a resume first.");
-      return;
-    }
+    // 1. Show Loading
+    const toastId = toast.loading("Submitting application...");
 
-    const { error } = await supabase
-      .from('job_applications')
-      .insert({
-        job_id: jobId,
-        intern_id: user.id,
-        company_id: selectedJob.company_id,
-        resume_url: profile.resume_url,
-        status: 'Pending'
-      });
+    try {
+        const { data: profile } = await supabase.from('profiles').select('resume_url').eq('id', user.id).single();
+        
+        if (!profile?.resume_url) {
+            toast.error("Please upload a resume first.", { id: toastId });
+            return;
+        }
 
-    if (error) {
-      if(error.code === "23505") toast.info("You already applied here.");
-      else toast.error("Failed to apply.");
-    } else {
-      toast.success("Applied successfully!");
-      fetchApplications(user.id);
-      closeModal();
+        const { error } = await supabase
+        .from('job_applications')
+        .insert({
+            job_id: jobId,
+            intern_id: user.id,
+            company_id: selectedJob.company_id,
+            resume_url: profile.resume_url,
+            status: 'Pending'
+        });
+
+        if (error) {
+            if(error.code === "23505") {
+                toast.info("You already applied here.", { id: toastId });
+            } else {
+                throw error;
+            }
+        } else {
+            // 2. Success
+            toast.success("Applied successfully!", { id: toastId });
+            fetchApplications(user.id);
+            closeModal();
+        }
+    } catch(err) {
+        toast.error("Failed to apply.", { id: toastId });
     }
   };
 
   // --- Loading Return ---
   if (loading) {
     return (
-      <>
-        <div className="dashboard-container">
-          <section className="welcome-banner skeleton-banner">
-            <div className="welcome-text">
-              <SkeletonBox width="250px" height="30px" className="mb-2" />
-              <SkeletonBox width="400px" height="20px" />
-            </div>
-            <div className="welcome-date">
-              <SkeletonBox width="80px" height="20px" className="mb-1 ml-auto" />
-              <SkeletonBox width="100px" height="24px" />
-            </div>
-          </section>
-          <StatsSkeleton />
-          <div className="dashboard-grid">
-            <main className="dashboard-main">
-              <SliderSkeleton />
-              <SliderSkeleton />
-            </main>
-            <WidgetSkeleton />
+      <div className="dashboard-container">
+        <section className="welcome-banner skeleton-banner">
+          <div className="welcome-text">
+            <SkeletonBox width="250px" height="30px" className="mb-2" />
+            <SkeletonBox width="400px" height="20px" />
           </div>
+          <div className="welcome-date">
+            <SkeletonBox width="80px" height="20px" className="mb-1 ml-auto" />
+            <SkeletonBox width="100px" height="24px" />
+          </div>
+        </section>
+        <StatsSkeleton />
+        <div className="dashboard-grid">
+          <main className="dashboard-main">
+            <SliderSkeleton />
+            <SliderSkeleton />
+          </main>
+          <WidgetSkeleton />
         </div>
-        <InternNav />
-      </>
+      </div>
     );
   }
 
@@ -649,17 +602,9 @@ export default function InternDashboard() {
             <p>Ready to manage your journey and find your next role?</p>
           </div>
           
-          {/* UPDATED: Wrapper for Date + Toggle Button */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            
-            {/* Theme Toggle Button */}
-          
-
-            <div className="welcome-date">
-              <span className="date-day">{dateInfo.day}</span>
-              <span className="date-full">{dateInfo.dateStr}</span>
-            </div>
-
+          <div className="welcome-date">
+            <span className="date-day">{dateInfo.day}</span>
+            <span className="date-full">{dateInfo.dateStr}</span>
           </div>
         </section>
 
@@ -677,9 +622,10 @@ export default function InternDashboard() {
           </aside>
         </div>
       </div>
-      {user?.id && <FloatingAIChatWithCharts studentId={user.id} />}
-      <InternNav className={selectedJob ? 'hidden' : ''} />
 
+      {user?.id && <FloatingAIChatWithCharts studentId={user.id} />}
+
+      {/* --- Modal --- */}
       {selectedJob && (
         <div className={`modal-overlay active ${animateClose ? 'modal-closing-overlay' : ''}`} onClick={closeModal}>
           <div className={`modal-content ${animateClose ? 'modal-closing' : ''}`} onClick={e => e.stopPropagation()}>

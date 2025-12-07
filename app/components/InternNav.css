@@ -1,196 +1,254 @@
+/* components/InternSidebar.css */
+
 /* =========================================
-   🧭 INTERNLINK NAVIGATION SYSTEM
+   1. SHARED STYLES (MATCHING ADMIN)
    ========================================= */
 
-/* --- 1. Main Header Container (Always Visible) --- */
-.intern-header {
+/* Sidebar Base */
+.intern-sidebar {
+  width: 230px;
+  height: 95%;
+  background-color: var(--bg-card);
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  
+  /* Smooth Slide for Mobile Drawer */
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1000; /* Above content */
+}
+
+/* Header */
+.sidebar-header {
+  margin-bottom: 40px;
+  padding-left: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.brand {
+  font-size: 24px;
+  color: var(--text-main);
+  font-family: var(--font-heading);
+  margin: 0;
+  line-height: 1;
+}
+
+.brand span { color: var(--primary-orange); }
+
+.sub-brand {
+  font-size: 12px;
+  display: block;
+  color: var(--text-muted);
+  font-weight: 400;
+  margin-top: 4px;
+}
+
+/* Theme Button */
+.theme-btn {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  transition: all 0.2s ease;
+}
+.theme-btn:hover {
+  color: var(--primary-orange);
+  border-color: var(--primary-orange);
+}
+
+/* Nav Section */
+.sidebar-nav {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  min-height: 0;
+  margin-bottom: 20px;
+  scrollbar-width: none; /* Hide Scrollbar */
+}
+.sidebar-nav::-webkit-scrollbar { display: none; }
+
+/* Buttons */
+.nav-button {
+  background: transparent;
+  border: none;
+  font-family: inherit;
+  font-size: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  width: 100%;
+  text-align: left;
+  border-radius: 12px !important;
+  color: var(--text-muted);
+  font-weight: 500;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.nav-button:hover {
+  background: var(--bg-input);
+  color: var(--text-main);
+  border-radius: 12px !important;
+}
+
+.nav-button.active {
+  background-color: var(--primary-orange);
+  color: #FFFFFF;
+  font-weight: 600;
+  border-radius: 12px !important;
+}
+
+/* Footer */
+.sidebar-footer {
+  border-top: 1px solid var(--border-color);
+  padding-top: 20px;
+  flex-shrink: 0;
+}
+
+.logout-btn {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--color-danger);
+  justify-content: flex-start;
+  border-radius: 12px !important;
+}
+.logout-btn:hover {
+  background: var(--color-danger);
+  color: #FFFFFF;
+}
+
+/* =========================================
+   2. MOBILE HEADER (ONLY VISIBLE ON MOBILE)
+   ========================================= */
+.mobile-header {
+  display: none; /* Hidden by default */
+  height: 60px;
+  width: 100%;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border-color);
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1001; /* Above Overlay */
+  backdrop-filter: blur(12px);
+}
+
+.brand-mobile {
+  font-size: 20px;
+  font-weight: 700;
+  font-family: var(--font-heading);
+  color: var(--text-main);
+}
+.brand-mobile span { color: var(--primary-orange); }
+
+.mobile-toggle-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-main);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Overlay */
+.sidebar-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 999;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+.sidebar-overlay.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* =========================================
+   3. RESPONSIVE LOGIC
+   ========================================= */
+
+/* 📱 MOBILE VIEW (< 1024px) */
+@media (max-width: 1023px) {
+  .intern-sidebar {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 70px; /* Fixed height for header */
-    z-index: 1000;
+    height: 100vh; /* Full height */
+    width: 280px;  /* Slightly wider for better mobile touch */
+    transform: translateX(-100%); /* Hide off-screen */
     
-    background: var(--bg-main); /* Or var(--bg-glass) */
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--border-color);
+    /* 🛠️ FIX: Ensure this is HIGHER than the header (which is usually 1001) */
+    z-index: 2000; 
+    box-shadow: 0 0 40px rgba(0,0,0,0.5);
+  }
+
+  .intern-sidebar.open {
+    transform: translateX(0); /* Slide in */
+  }
+
+  /* 🛠️ FIX: Overlay must also cover the header */
+  .sidebar-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: rgba(0, 0, 0, 0.6); /* Darker dim */
+    backdrop-filter: blur(4px);
     
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 5%;
-}
-
-/* --- 2. Logo (Always Visible) --- */
-.logo-container {
-    font-size: 24px;
-    font-family: var(--font-heading);
-    font-weight: 800;
-    letter-spacing: -0.03em;
-    z-index: 1003; /* Ensure above drawer */
-}
-
-.intern-text { color: var(--text-main); }
-.link-text { color: var(--primary-orange); }
-
-/* --- 3. Base Link Styles --- */
-.nav-link {
-    font-family: 'inter', sans-serif;
-    color: var(--text-muted);
-    text-decoration: none;
-    font-weight: 500;
-    font-size: 1rem;
-    transition: color 0.2s;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.nav-link:hover { color: var(--text-main); }
-.nav-link.active { color: var(--primary-orange); }
-.nav-icon { font-size: 1.2rem; display: flex; align-items: center;}
-
-/* Theme Button */
-.theme-toggle-btn {
-    background: transparent;
-    border: 1px solid var(--border-color);
-    color: var(--text-main);
-    width: 36px; height: 36px;
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer;
-    transition: all 0.3s;
-}
-.theme-toggle-btn:hover {
-    background: var(--primary-orange);
-    color: white;
-    border-color: var(--primary-orange);
-}
-
-/* =========================================================
-   📱 MOBILE VIEW (< 550px)
-   ========================================================= */
-@media (max-width: 550px) {
+    /* Higher than header (1001), lower than sidebar (2000) */
+    z-index: 1500; 
     
-    /* Hamburger Button */
-    .nav-toggle {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: transparent;
-        border: none;
-        color: var(--text-main);
-        font-size: 28px;
-        cursor: pointer;
-        z-index: 1003;
-    }
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+  }
+  
+  .sidebar-overlay.visible {
+    opacity: 1;
+    visibility: visible;
+  }
 
-    /* The Drawer (Hidden by default) */
-    .nav-menu {
-        position: fixed;
-        top: 70px; /* Push down by header height */
-        right: 0;
-        width: 35%;
-        height: calc(100vh - 70px);
-        background: rgba(2, 18, 23, 0.95);        backdrop-filter: blur(20px);
-        border-left: 1px solid var(--border-color);
-        
-        display: flex;
-        flex-direction: column;
-        padding: 40px 24px;
-        gap: 30px;
-        
-        transform: translateX(100%);
-        transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-        z-index: 1002;
-    }
-
-    .nav-menu.open {
-        transform: translateX(0);
-    }
-
-    .nav-links {
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-    }
-
-    .nav-link {
-        font-size: 1.2rem; /* Larger text on mobile */
-    }
-
-    /* Overlay for Mobile */
-    .nav-overlay {
-        position: fixed;
-        top: 70px; /* Start below header */
-        left: 0;
-        width: 100vw; height: 100vh;
-        background: rgba(0, 0, 0, 0.1);
-        z-index: 1001;
-        opacity: 0;
-        visibility: hidden;
-        transition: all 0.3s;
-    }
-    .nav-overlay.visible {
-        opacity: 1;
-        visibility: visible;
-    }
+  .mobile-header {
+    display: flex; 
+    z-index: 1001; /* Stays below the overlay and sidebar now */
+  }
 }
 
-/* =========================================================
-   💻 TABLET & DESKTOP SHARED (>= 551px)
-   ========================================================= */
-@media (min-width: 551px) {
-    /* Hide Mobile Elements */
-    .nav-toggle, .nav-overlay {
-        display: none !important;
-    }
+/* 🖥️ DESKTOP VIEW (>= 1024px) */
+@media (min-width: 1024px) {
+  .intern-sidebar {
+    position: static; 
+    transform: none !important;
+    width: 260px;
+    height: 100%;
+    z-index: 1; /* Reset z-index for desktop context */
+    box-shadow: none;
+  }
 
-    /* Horizontal Menu Layout */
-    .nav-menu {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        gap: 30px;
-        transform: none !important; /* Reset slide effect */
-        height: auto;
-        background: transparent;
-        padding: 0;
-        position: static;
-        width: auto;
-    }
+  .mobile-header {
+    display: none; 
+  }
 
-    .nav-links {
-        display: flex;
-        flex-direction: row;
-        gap: 25px;
-    }
-}
-
-/* =========================================================
-   📏 TABLET VIEW (551px - 900px) -> ICONS ONLY
-   ========================================================= */
-@media (min-width: 551px) and (max-width: 900px) {
-    .nav-text {
-        display: none; /* Hide the text */
-    }
-    
-    .nav-icon {
-        font-size: 1.5rem; /* Make icons slightly larger */
-    }
-
-    .nav-link {
-        justify-content: center;
-        padding: 8px;
-    }
-}
-
-/* =========================================================
-   🖥️ LARGE DESKTOP VIEW (> 900px) -> FULL NAVBAR
-   ========================================================= */
-@media (min-width: 901px) {
-    .nav-text {
-        display: inline-block; /* Show text */
-    }
+  .sidebar-overlay {
+    display: none !important; 
+  }
 }

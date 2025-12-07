@@ -2,7 +2,6 @@
 
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import React, { useState, useEffect, useCallback } from 'react';
-import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import './CompanyDashboard.css';
 import '../../globals.css';

@@ -3,8 +3,6 @@
 import { useState, useEffect, Suspense } from 'react'; // 1. Added Suspense here
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import './Listings.css';
-import InternNav from '../../components/InternNav';
-import { toast } from 'sonner';
 import { useSearchParams } from "next/navigation";
 import FloatingAIChatWithCharts from '../../components/chatbot';
 
@@ -463,7 +461,6 @@ function ListingsContent() {
       )}
       
       {user?.id && <FloatingAIChatWithCharts studentId={user.id} />}
-      <InternNav />
     </>
   );
 }

@@ -1,40 +1,72 @@
 {
   "pages": {
-    "/admin/users/page": [
+    "/company/jobs/listings/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/css/css-app_admin_users_Users_module_css.css",
-      "static/chunks/app/admin/users/page.js"
+      "static/css/css-app_company_jobs_listings_listings_css.css",
+      "static/chunks/app/company/jobs/listings/page.js"
     ],
-    "/admin/layout": [
+    "/company/layout": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/css/css-app_globals_css-app_index_css-app_components_AdminSidebar_module_css.css",
-      "static/chunks/app/admin/layout.js"
+      "static/css/css-app_components_CompanyNav_css-app_globals_css.css",
+      "static/chunks/app/company/layout.js"
     ],
     "/layout": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/css/css-app_globals_css-app_index_css-app_components_AdminSidebar_module_css.css",
+      "static/css/css-app_index_css.css",
       "static/chunks/app/layout.js"
     ],
-    "/admin/page": [
+    "/company/dashboard/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/css/css-app_admin_AdminDashboard_module_css.css",
-      "static/chunks/app/admin/page.js"
-    ],
-    "/admin/jobs/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/css/css-app_admin_jobs_Jobs_module_css.css",
-      "static/chunks/app/admin/jobs/page.js"
+      "static/css/css-app_company_dashboard_CompanyDashboard_css.css",
+      "static/css/css-app_components_CompanyNav_css-app_globals_css.css",
+      "static/chunks/app/company/dashboard/page.js"
     ],
     "/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/css/css-app_LandingPage_css.css",
       "static/chunks/app/page.js"
+    ],
+    "/auth/companyAuthPage/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/css-app_components_AuthPage_module_css.css",
+      "static/chunks/app/auth/companyAuthPage/page.js"
+    ],
+    "/auth/coordinatorAuthPage/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/css-app_components_AuthPage_module_css.css",
+      "static/chunks/app/auth/coordinatorAuthPage/page.js"
+    ],
+    "/auth/internAuthPage/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/css-app_components_AuthPage_module_css.css",
+      "static/chunks/app/auth/internAuthPage/page.js"
+    ],
+    "/intern/listings/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/css-app_intern_listings_Listings_css.css",
+      "static/chunks/app/intern/listings/page.js"
+    ],
+    "/intern/dashboard/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/css-app_intern_dashboard_Dashboard_css.css",
+      "static/chunks/app/intern/dashboard/page.js"
+    ],
+    "/intern/layout": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/css-app_components_InternNav_css.css",
+      "static/css/css-app_components_CompanyNav_css-app_globals_css.css",
+      "static/chunks/app/intern/layout.js"
     ]
   }
 }

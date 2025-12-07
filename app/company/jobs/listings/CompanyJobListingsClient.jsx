@@ -4,12 +4,11 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import './listings.css';
-// import '../../../globals.css' // No need to import this if it's in layout.js
 import { 
   Briefcase, Plus, 
   Edit, Trash2, X, CheckCircle2 
 } from 'lucide-react';
-import toast, { Toaster } from 'react-hot-toast';
+
 
 export default function CompanyJobListingsClient({ initialJobs }) {
   const router = useRouter();
@@ -39,15 +38,21 @@ export default function CompanyJobListingsClient({ initialJobs }) {
 
   // --- ACTIONS ---
   const handleDelete = async (id) => {
+    // You can also use a Sonner toast for confirmation if you want a custom UI,
+    // but native confirm is fine for now.
     if (!confirm('Are you sure you want to delete this job post?')) return;
+    
+    const toastId = toast.loading("Deleting job post...");
+
     try {
       const { error } = await supabase.from('job_posts').delete().eq('id', id);
       if (error) throw error;
+      
       setJobs((prev) => prev.filter((job) => job.id !== id));
-      toast.success('Job post deleted.');
+      toast.success('Job post deleted.', { id: toastId });
     } catch (err) {
       console.error('Delete error:', err.message);
-      toast.error('Failed to delete job post.');
+      toast.error('Failed to delete job post.', { id: toastId });
     }
   };
 
@@ -76,15 +81,19 @@ export default function CompanyJobListingsClient({ initialJobs }) {
 
   const submitEdit = async () => {
     setLoading(true); 
+    const toastId = toast.loading("Saving changes...");
+
     try {
       const { error } = await supabase.from('job_posts').update(formData).eq('id', editJob.id);
       if (error) throw error;
+      
       setJobs((prev) => prev.map((job) => (job.id === editJob.id ? { ...job, ...formData } : job)));
       closeEditModal();
-      toast.success('Job updated successfully.');
+      
+      toast.success('Job updated successfully.', { id: toastId });
     } catch (err) {
       console.error('Edit error:', err.message);
-      toast.error('Failed to update job.');
+      toast.error('Failed to update job.', { id: toastId });
     } finally {
       setLoading(false);
     }
@@ -95,17 +104,8 @@ export default function CompanyJobListingsClient({ initialJobs }) {
   return (
     <>
     <div className="job-listings-container">
-      {/* Updated Toaster to use CSS variables for background/color */}
-      <Toaster 
-        position="bottom-right" 
-        toastOptions={{ 
-            style: { 
-                background: 'var(--bg-card)', 
-                color: 'var(--text-main)', 
-                border: '1px solid var(--border-color)' 
-            } 
-        }} 
-      />
+      {/* 2. ✅ RENDER TOASTER WITH YOUR STYLES */}
+
 
       {/* ========================================================
           🍱 NEW BENTO HEADER BOX

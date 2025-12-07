@@ -1,14 +1,5 @@
 {
-  "node": {
-    "dc0c7ff1f374bfb7d6d07ebbacf4bc95dba5aa0a": {
-      "workers": {
-        "app/admin/users/page": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22C%3A%5C%5CUsers%5C%5Cace%5C%5CDocuments%5C%5Cintern-link-next-complete%5C%5Capp%5C%5Cadmin%5C%5Cusers%5C%5Cactions.js%22%2C%5B%22deleteUserAsAdmin%22%5D%5D%5D&__client_imported__=true!"
-      },
-      "layer": {
-        "app/admin/users/page": "action-browser"
-      }
-    }
-  },
+  "node": {},
   "edge": {},
-  "encryptionKey": "XcbGg97f5iXdg/Hlk2PC/UA/3fzbZSyXQNBu3BFk518="
+  "encryptionKey": "M8spODxaugX5RfeHXo0gFYNOENX0vElUb4NNdt+psC4="
 }
