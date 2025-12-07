@@ -255,3 +255,27 @@ h1, h2, h3, h4, h5, h6 {
   scroll-behavior: smooth;
 }
 
+/* =========================================
+   🌗 THEME TRANSITION (Circular Reveal)
+   ========================================= */
+
+/* 1. Disable the default cross-fade animation */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+/* 2. Ensure the "new" theme sits on top during animation */
+::view-transition-new(root) {
+  z-index: 9999; 
+}
+
+/* 3. Ensure the "old" theme stays put underneath */
+::view-transition-old(root) {
+  z-index: 1;
+}
+
+/* Note: The actual 'circle' animation is handled 
+   inside the AdminSidebar.jsx JavaScript! 
+*/

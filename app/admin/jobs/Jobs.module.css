@@ -1,0 +1,244 @@
+/* app/admin/jobs/Jobs.module.css */
+
+.container {
+  width: 100%;
+}
+
+.header {
+  margin-bottom: 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.title {
+  font-size: 32px;
+  margin-bottom: 8px;
+  color: var(--text-main);
+  font-family: var(--font-heading);
+}
+
+.subtitle {
+  color: var(--text-muted);
+  font-size: 16px;
+}
+
+/* --- Controls --- */
+.controls {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  background: var(--bg-card);
+  backdrop-filter: blur(12px);
+  padding: 8px;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+}
+
+.searchWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 12px;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.searchInput {
+  background: transparent;
+  border: none;
+  color: var(--text-main);
+  padding: 10px 10px 10px 40px;
+  font-size: 14px;
+  outline: none;
+  width: 250px;
+}
+
+.searchInput::placeholder { color: var(--text-muted); opacity: 0.7; }
+
+/* --- Jobs Grid --- */
+.jobsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+.jobCard {
+  background: var(--bg-card);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-card);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+  min-height: 220px;
+  box-shadow: var(--shadow-card);
+}
+
+.jobCard:hover {
+  transform: translateY(-4px);
+  border-color: var(--primary-orange);
+  box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.companyName {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--primary-orange); /* Highlight Company Name */
+  font-weight: 700;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.jobTitle {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-main);
+  line-height: 1.3;
+  font-family: var(--font-heading);
+}
+
+.jobMeta {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.metaItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tag {
+  background: var(--bg-input);
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
+}
+
+.cardFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--border-color);
+  padding-top: 16px;
+  margin-top: 20px;
+}
+
+.date {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.deleteBtn {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--color-danger);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+}
+
+.deleteBtn:hover {
+  background: var(--color-danger);
+  color: white;
+}
+
+.loading {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 40px;
+  color: var(--text-muted);
+}
+
+/* =========================================
+   🛑 MODAL STYLES (Copied from Users)
+   ========================================= */
+.modalOverlay {
+  position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+  background: rgba(2, 18, 23, 0.8); backdrop-filter: blur(8px);
+  z-index: 9999; display: flex; justify-content: center; align-items: center;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.modalContent {
+  background: var(--bg-card); backdrop-filter: blur(16px);
+  border: 1px solid var(--border-color); border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card); padding: 32px; width: 90%; max-width: 400px;
+  text-align: center; color: var(--text-main);
+  animation: scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.modalTitle {
+  font-family: var(--font-heading); font-size: 24px; font-weight: 700;
+  color: var(--text-main); margin-top: 16px; margin-bottom: 8px;
+}
+
+.modalText {
+  font-family: var(--font-body); color: var(--text-muted);
+  font-size: 15px; line-height: 1.6; margin-bottom: 32px;
+}
+
+.modalText strong { color: var(--primary-orange); font-weight: 600; }
+
+.iconWrapper {
+  width: 60px; height: 60px; border-radius: 50%;
+  background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2);
+  display: flex; align-items: center; justify-content: center; margin: 0 auto;
+  color: var(--color-danger); box-shadow: 0 0 20px rgba(239, 68, 68, 0.15);
+}
+
+.modalActions { display: flex; gap: 16px; justify-content: center; }
+
+.btnCancel, .btnConfirm {
+  flex: 1; padding: 12px 20px; border-radius: var(--radius-btn);
+  font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s ease;
+  font-family: var(--font-heading);
+}
+
+.btnCancel {
+  background: transparent; border: 1px solid var(--border-color); color: var(--text-muted);
+}
+.btnCancel:hover {
+  background: rgba(255, 255, 255, 0.05); color: var(--text-main); border-color: var(--text-muted);
+}
+
+.btnConfirm {
+  background: var(--color-danger); border: 1px solid var(--color-danger); color: #fff;
+  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+}
+.btnConfirm:hover {
+  transform: translateY(-2px); background: #dc2626; box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4);
+}
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes scaleIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }

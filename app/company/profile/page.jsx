@@ -92,7 +92,7 @@ const [profile, setProfile] = useState({
     }
   };
 
-  const handleSubmit = async (e) => {
+const handleSubmit = async (e) => {
     e.preventDefault();
     const savingToast = toast.loading("Saving changes...");
 
@@ -103,13 +103,26 @@ const [profile, setProfile] = useState({
        return;
     }
 
-    const updates = { id: user.id, ...profile, updated_at: new Date() };
-
-    const { error } = await supabase.from('companies').upsert(updates);
+    // 1. Update the 'companies' table (Your existing logic)
+    const companyUpdates = { id: user.id, ...profile, updated_at: new Date() };
     
+    // 2. Update the 'profiles' table (The FIX)
+    // We map the company 'name' to the profile 'fullname'
+    const profileUpdates = { fullname: profile.name };
+
+    // Run both updates simultaneously using Promise.all
+    const [companyResult, profileResult] = await Promise.all([
+      supabase.from('companies').upsert(companyUpdates),
+      supabase.from('profiles').update(profileUpdates).eq('id', user.id)
+    ]);
+
     toast.dismiss(savingToast);
-    if (error) {
-      toast.error('Failed to update profile');
+
+    // Check for errors in either operation
+    if (companyResult.error || profileResult.error) {
+      console.error("Company Error:", companyResult.error);
+      console.error("Profile Error:", profileResult.error);
+      toast.error('Failed to update profile details.');
     } else {
       toast.success('Profile updated successfully!');
     }

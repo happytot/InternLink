@@ -1,0 +1,335 @@
+/* app/admin/users/Users.module.css */
+
+.container {
+  width: 100%;
+}
+
+.header {
+  margin-bottom: 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.title {
+  font-size: 32px;
+  margin-bottom: 8px;
+  color: var(--text-main);
+  font-family: var(--font-heading);
+}
+
+.subtitle {
+  color: var(--text-muted);
+  font-size: 16px;
+}
+
+/* --- Controls (Search & Filter) --- */
+.controls {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  background: var(--bg-card);
+  backdrop-filter: blur(12px);
+  padding: 8px;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+}
+
+.searchWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 12px;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.searchInput {
+  background: transparent;
+  border: none;
+  color: var(--text-main);
+  padding: 10px 10px 10px 40px; /* Space for icon */
+  font-size: 14px;
+  outline: none;
+  width: 250px;
+}
+
+.searchInput::placeholder {
+  color: var(--text-muted);
+  opacity: 0.7;
+}
+
+.filterSelect {
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  outline: none;
+}
+
+/* --- Table Styles --- */
+.tableContainer {
+  background: var(--bg-card);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-card);
+  overflow: hidden; /* Rounds the corners of the table */
+  box-shadow: var(--shadow-card);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.table thead {
+  background: rgba(0, 0, 0, 0.2); /* Slightly darker header */
+  border-bottom: 1px solid var(--border-color);
+}
+
+.table th {
+  padding: 18px 24px;
+  color: var(--text-muted);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+.table td {
+  padding: 20px 24px;
+  color: var(--text-main);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 14px;
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.table tr:hover td {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+/* --- Badges --- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.roleStudent {
+  background: rgba(0, 212, 255, 0.15);
+  color: #38bdf8;
+  border: 1px solid rgba(0, 212, 255, 0.2);
+}
+
+.roleAdmin {
+  background: rgba(238, 116, 40, 0.15);
+  color: #fb923c;
+  border: 1px solid rgba(238, 116, 40, 0.2);
+}
+
+.roleCompany {
+  background: rgba(168, 85, 247, 0.15);
+  color: #c084fc;
+  border: 1px solid rgba(168, 85, 247, 0.2);
+}
+
+/* --- Actions --- */
+.actions {
+  display: flex;
+  gap: 12px;
+}
+
+.btnIcon {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btnDelete {
+  color: var(--text-muted);
+}
+
+.btnDelete:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+.userAvatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--bg-input);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: var(--primary-orange);
+  margin-right: 12px;
+}
+
+.userCell {
+  display: flex;
+  align-items: center;
+}
+
+.loading {
+  padding: 40px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+/* --- The Dark Overlay --- */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  /* Dark backdrop to make the glass card pop */
+  background: rgba(2, 18, 23, 0.8); 
+  backdrop-filter: blur(8px);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* --- The Glass Card --- */
+.modalContent {
+  /* 1. Use your exact global card variable */
+  background: var(--bg-card); 
+  
+  /* 2. Glass effects */
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  
+  /* 3. Borders & Radius from globals */
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-card); /* 20px */
+  box-shadow: var(--shadow-card);
+  
+  padding: 32px;
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+  color: var(--text-main);
+  
+  animation: scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* --- Title & Text --- */
+.modalTitle {
+  font-family: var(--font-heading); /* Plus Jakarta Sans */
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-top: 16px;
+  margin-bottom: 8px;
+}
+
+.modalText {
+  font-family: var(--font-body); /* Inter */
+  color: var(--text-muted);
+  font-size: 15px;
+  line-height: 1.6;
+  margin-bottom: 32px;
+}
+
+.modalText strong {
+  color: var(--primary-orange); /* Highlight the name */
+  font-weight: 600;
+}
+
+/* --- Icon Wrapper --- */
+.iconWrapper {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  /* Subtle red glow background */
+  background: rgba(239, 68, 68, 0.1); 
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  color: var(--color-danger);
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.15);
+}
+
+/* --- Buttons --- */
+.modalActions {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+}
+
+.btnCancel, .btnConfirm {
+  flex: 1;
+  padding: 12px 20px;
+  border-radius: var(--radius-btn); /* 12px */
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: var(--font-heading);
+}
+
+.btnCancel {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+}
+
+.btnCancel:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-main);
+  border-color: var(--text-muted);
+}
+
+.btnConfirm {
+  background: var(--color-danger);
+  border: 1px solid var(--color-danger);
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+}
+
+.btnConfirm:hover {
+  transform: translateY(-2px);
+  background: #dc2626;
+  box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}

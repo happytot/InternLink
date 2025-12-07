@@ -23,7 +23,6 @@ export default function InternAuthPage() {
   const supabase = createClientComponentClient();
 
   // --- THEME & UI STATE ---
-  // resolvedTheme is useful to know what the 'system' preference actually is (light/dark)
   const { theme, setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -48,7 +47,6 @@ export default function InternAuthPage() {
   };
 
   const toggleTheme = () => {
-    // If the theme is currently dark (or system defaults to dark), switch to light
     if (resolvedTheme === 'dark') {
       setTheme('light');
     } else {
@@ -56,7 +54,7 @@ export default function InternAuthPage() {
     }
   };
 
-  // --- LOGIN LOGIC ---
+  // --- LOGIN LOGIC (UPDATED FOR ADMIN) ---
   const handleLogin = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -69,36 +67,45 @@ export default function InternAuthPage() {
 
       if (error) throw error;
 
-      // 2. ✅ LOGIC FIX: Refresh BEFORE logic logic to prime the router
-      // This ensures the middleware cookie is set before we push.
+      // 2. ✅ LOGIC FIX: Refresh BEFORE logic to prime the router
       router.refresh(); 
 
-      // Check User Type
+      // 3. 🔍 FETCH PROFILE TO CHECK ROLE & TYPE
+      // We need to fetch both 'user_type' (for students) and 'role' (for admins)
+      const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('user_type') // <--- Added 'role' here
+          .eq('id', data.user.id)
+          .single();
+
+      // Handle cases where profile might not exist immediately (rare but possible)
+      if (profileError && profileError.code !== 'PGRST116') {
+          console.error("Profile fetch error:", profileError);
+      }
+
+      // --- 👑 ADMIN CHECK ---
+      if (profile?.user_type === 'admin') {
+          toast.success("Welcome, Admin!");
+          router.replace('/admin'); // Redirect to Admin Dashboard
+          return; // Stop execution here
+      }
+
+      // --- 🎓 STUDENT CHECK ---
+      // Check Metadata first (Fast) or Database (Safe)
       const metaType = data.user?.user_metadata?.user_type;
       let isStudent = false;
 
-      // Check Metadata first (Fast)
       if (metaType === 'student') {
         isStudent = true;
-      } 
-      // Fallback to Database (Safe)
-      else {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('user_type')
-          .eq('id', data.user.id)
-          .single();
-        
-        if (profile?.user_type === 'student') {
-          isStudent = true;
-        }
+      } else if (profile?.user_type === 'student') {
+        isStudent = true;
       }
 
       if (isStudent) {
-        // Use replace instead of push so they can't click "Back" to login page
-        router.replace('/intern/dashboard');
-        // toast.success("Welcome back!"); // Optional
+        router.replace('/intern/listings'); // Or /intern/dashboard
+        toast.success("Welcome back!");
       } else {
+        // If they are not an Admin AND not a Student, kick them out
         await supabase.auth.signOut();
         toast.error('Access Denied', { description: 'This account is not registered as an Intern.' });
       }
@@ -110,7 +117,7 @@ export default function InternAuthPage() {
     }
   };
 
-  // --- SIGNUP LOGIC ---
+  // --- SIGNUP LOGIC (UNCHANGED) ---
   const handleSignup = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -122,21 +129,18 @@ export default function InternAuthPage() {
         options: {
           data: {
             fullname: formData.fullname,
-            user_type: 'student', // Critical for your RLS policies
+            user_type: 'student', // Defaults to student
           },
         },
       });
 
       if (error) throw error;
 
-      // 3. ✅ UX IMPROVEMENT: Handle Auto-Login vs Email Verification
-      // If Email Verification is OFF in Supabase, data.session will exist.
       if (data.session) {
           router.refresh();
-          router.replace('/intern/dashboard');
+          router.replace('/intern/listings');
           toast.success('Account Created!', { description: 'Welcome to the platform.' });
       } else {
-          // If Email Verification is ON
           toast.success('Signup Successful!', { description: 'Please check your email to verify your account.' });
           setFormData({ fullname: '', email: '', password: '' });
           setIsLoginView(true);

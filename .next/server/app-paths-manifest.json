@@ -1,10 +1,6 @@
 {
-  "/intern/profile/page": "app/intern/profile/page.js",
-  "/auth/internAuthPage/page": "app/auth/internAuthPage/page.js",
   "/page": "app/page.js",
-  "/auth/companyAuthPage/page": "app/auth/companyAuthPage/page.js",
-  "/intern/dashboard/page": "app/intern/dashboard/page.js",
-  "/api/match/[internId]/route": "app/api/match/[internId]/route.js",
-  "/intern/listings/page": "app/intern/listings/page.js",
-  "/company/dashboard/page": "app/company/dashboard/page.js"
+  "/admin/users/page": "app/admin/users/page.js",
+  "/admin/jobs/page": "app/admin/jobs/page.js",
+  "/admin/page": "app/admin/page.js"
 }
