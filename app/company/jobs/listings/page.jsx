@@ -4,7 +4,8 @@
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import CompanyJobListingsClient from './CompanyJobListingsClient'; // Import our client file
+import CompanyJobListingsClient from './CompanyJobListingsClient';
+import '../../../globals.css'
 
 // This page is now 'async'
 export default async function CompanyJobListingsPage() {

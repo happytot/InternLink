@@ -216,29 +216,42 @@ h1, h2, h3, h4, h5, h6 {
 /* 1. The Container */
 .company-shell {
   display: flex;
-  height: 100vh;        /* Forces app to match screen height exactly */
-  width: 100vw;         /* Forces app to match screen width */
-  overflow: hidden;     /* ⛔️ IMPORTANT: Stops the browser window from scrolling */
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden; /* This keeps the whole app from scrolling the window */
   background-color: var(--bg-main);
 }
 
 /* 2. The Sidebar Wrapper */
 .company-sidebar-wrapper {
-  flex-shrink: 0;       /* Prevents sidebar from getting squashed */
-  height: 100%;         /* Fills the shell height */
-  z-index: 50;          /* Stays above content */
+  flex-shrink: 0;
+  height: 100%;
   border-right: 1px solid var(--border-color);
-  background-color: var(--bg-card); /* Ensures sidebar background is solid */
+  background-color: var(--bg-card);
+  
+  /* ✅ Z-INDEX & OVERFLOW FIXES */
+  position: relative;   
+  z-index: 9999 !important; /* Force top layer */
+  
+  /* This allows tooltips to "spill out" of the box */
+  overflow: visible !important; 
+}
+
+/* ⚠️ CRITICAL: Ensure the Nav component INSIDE the wrapper doesn't clip either */
+.company-sidebar-wrapper > * {
+  overflow: visible !important;
 }
 
 /* 3. The Main Content Area */
 .company-main-content {
-  flex: 1;              /* Takes all remaining width */
-  height: 100%;         /* Fills the shell height */
-  overflow-y: auto;     /* ✅ This moves the scrollbar INSIDE this box */
-  overflow-x: hidden;   /* Prevents horizontal scrolling */
+  flex: 1;
+  height: 100%;
+  overflow-y: auto;     
+  overflow-x: hidden;   
   position: relative;
   
-  /* Makes scrolling smooth */
+  /* Push this layer down so Sidebar floats over it */
+  z-index: 1;           
   scroll-behavior: smooth;
 }
+

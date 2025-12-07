@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import styles from '../../components/AuthPage.module.css';
+import styles from '../../components/AuthPage.module.css'; 
 import { useRouter } from 'next/navigation';
 import { Toaster, toast } from 'sonner';
 import { FaEye, FaEyeSlash, FaSun, FaMoon } from 'react-icons/fa';
@@ -19,11 +19,11 @@ const translateSupabaseError = (error) => {
 export default function CoordinatorAuthPage() {
   const router = useRouter();
   const supabase = createClientComponentClient();
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   const [isLoginView, setIsLoginView] = useState(true);
-  const [isLoading, setIsLoading] = useState(false); // Added loading state
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({ 
     fullName: '', 
     email: '', 
@@ -31,6 +31,7 @@ export default function CoordinatorAuthPage() {
   });
   const [showPassword, setShowPassword] = useState(false);
 
+  // Prevent hydration mismatch for themes
   useEffect(() => setMounted(true), []);
 
   const handleChange = (e) => {
@@ -49,7 +50,7 @@ export default function CoordinatorAuthPage() {
 
       if (error) throw error;
 
-      // Efficient: Check metadata first, avoid DB call if possible
+      // Check metadata
       const metaType = data.user?.user_metadata?.user_type;
       
       if (metaType === 'coordinator') {
@@ -100,6 +101,7 @@ export default function CoordinatorAuthPage() {
       toast.success('Account Created', { description: 'Please check your email to confirm your account.' });
       setFormData({ fullName: '', email: '', password: '' });
       setIsLoginView(true);
+    
     } catch (err) {
       toast.error('Signup Failed', { description: translateSupabaseError(err) });
     } finally {
@@ -111,19 +113,20 @@ export default function CoordinatorAuthPage() {
 
   return (
     <div className={styles.bodyContainer}>
-      {/* 🍞 Global CSS handles the glassmorphism style now */}
-
       <button
         className={styles.themeToggle}
-        onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+        onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
         aria-label="Toggle Theme"
+        type="button"
       >
-        {theme === 'dark' ? <FaSun /> : <FaMoon />}
+        {resolvedTheme === 'dark' ? <FaSun /> : <FaMoon />}
       </button>
 
       <div className={styles.container}>
         <div className={styles.formContainer}>
-          <button className={styles.backButton} onClick={() => router.push('/')}>&times;</button>
+          <button className={styles.backButton} onClick={() => router.push('/')} aria-label="Go back">
+            &times;
+          </button>
 
           {/* LOGIN VIEW */}
           <div className={`${styles.formBox} ${!isLoginView ? styles.hidden : ''}`}>

@@ -13,7 +13,7 @@ export async function POST(req) {
     // ✨ FIXED: Must use supabaseAdmin to fetch data (bypasses RLS)
     const { data: job, error } = await supabaseAdmin
       .from("job_posts")
-      .select("title, description, requirements, responsibilities")
+      .select("title, description, requirements, responsibilities, created_at")
       .eq("id", job_id)
       .single();
 

@@ -1,11 +1,11 @@
 'use client';
-
+import './profile.css';
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useRouter } from 'next/navigation';
-import { Building2, LogOut, Upload, MapPin, FileText, Globe } from 'lucide-react';
+import { Building2, LogOut, Upload, MapPin, FileText, Globe,User } from 'lucide-react';
 import { toast } from 'sonner';
-import './profile.css';
+
 
 export default function CompanyProfile() {
   const supabase = createClientComponentClient();
@@ -13,12 +13,17 @@ export default function CompanyProfile() {
 
   const [loading, setLoading] = useState(true); 
   const [uploading, setUploading] = useState(false);
-  const [profile, setProfile] = useState({
-    name: '',
-    description: '',
-    location: '',
-    logo_url: '',
-  });
+const [profile, setProfile] = useState({
+  name: '',
+  ceo: '',
+  description: '',
+  location: '',
+  logo_url: '',
+  email: '',
+  phone: '',
+});
+
+
 
   const CLOUDINARY_URL = `https://api.cloudinary.com/v1_1/db8ee6vbj/image/upload`;
   const UPLOAD_PRESET = 'YOUR_UPLOAD_PRESET'; 
@@ -222,6 +227,19 @@ export default function CompanyProfile() {
               placeholder="e.g. Acme Corp"
             />
           </div>
+          
+<div className="form-group">
+  <label><User size={14} /> CEO Name</label>
+  <input 
+    type="text"
+    name="ceo"
+    value={profile.ceo || ''}
+    onChange={handleChange}
+    placeholder="e.g. John Smith"
+  />
+</div>
+
+
         </div>
 
         {/* Details Card */}
@@ -229,6 +247,27 @@ export default function CompanyProfile() {
           <div className="card-header">
             <h3>Details</h3>
           </div>
+<div className="form-group">
+  <label><Globe size={14} /> Company Email</label>
+  <input 
+    type="email"
+    name="email"
+    value={profile.email || ''}
+    onChange={handleChange}
+    placeholder="e.g. hr@acmecorp.com"
+  />
+</div>
+
+<div className="form-group">
+  <label><MapPin size={14} /> Phone Number</label>
+  <input 
+    type="text"
+    name="phone"
+    value={profile.phone || ''}
+    onChange={handleChange}
+    placeholder="e.g. +63 912 345 6789"
+  />
+</div>
 
           <div className="form-group">
             <label><MapPin size={14} /> Location</label>

@@ -1,7 +1,7 @@
 /* =========================================
    🖼️ MAIN LAYOUT & BACKGROUND
    ========================================= */
-.bodyContainer {
+   .bodyContainer {
     position: relative;
     width: 100%;
     min-height: 100vh;
@@ -13,6 +13,7 @@
     font-family: var(--font-body);
     overflow: hidden;
     color: var(--text-main);
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Creating the Ambient Orbs using Pseudo-elements */
@@ -26,22 +27,22 @@
     animation: floatOrb 10s infinite ease-in-out alternate;
 }
 
-/* Orange Orb (Top Left) */
+/* Orb 1: Uses Global Var */
 .bodyContainer::before {
     width: 600px;
     height: 600px;
-    background: var(--primary-orange);
-    opacity: 0.15;
+    background: var(--orb-1);
+    opacity: var(--orb-opacity);
     top: -200px;
     left: -200px;
 }
 
-/* Blue/Cyan Orb (Bottom Right) */
+/* Orb 2: Uses Global Var */
 .bodyContainer::after {
     width: 500px;
     height: 500px;
-    background: var(--accent-blue);
-    opacity: 0.1;
+    background: var(--orb-2);
+    opacity: var(--orb-opacity);
     bottom: -150px;
     right: -100px;
     animation-delay: -5s;
@@ -67,7 +68,8 @@
     position: relative;
     width: 100%;
     max-width: 440px;
-    background: var(--bg-glass);
+    /* Uses global glass variables */
+    background: var(--bg-glass); 
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border: 1px solid var(--border-color);
@@ -79,6 +81,7 @@
     opacity: 0;
     transform: translateY(20px);
     animation: revealUp 0.6s ease-out forwards;
+    transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 @keyframes revealUp {
@@ -111,6 +114,7 @@
     border-color: var(--primary-orange);
     color: var(--primary-orange);
     transform: translateY(-2px);
+    background: var(--bg-input);
 }
 
 .formBox h2 {
@@ -120,6 +124,7 @@
     text-align: center;
     margin-bottom: 32px;
     letter-spacing: -0.02em;
+    /* Gradient Text handles both themes if text-main/muted switch correctly */
     background: linear-gradient(135deg, var(--text-main) 30%, var(--text-muted) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -143,9 +148,9 @@
 }
 
 .inputGroup input {
-    width: 90%;
+    width: 100%;
     padding: 14px 16px;
-    background: var(--bg-input);
+    background: var(--bg-input); /* Dynamic background */
     border: 1px solid var(--border-color);
     border-radius: 12px;
     color: var(--text-main);
@@ -158,17 +163,18 @@
 .inputGroup input:focus {
     border-color: var(--primary-orange);
     box-shadow: 0 0 0 3px rgba(238, 116, 40, 0.1);
-    background: rgba(255, 255, 255, 0.05);
+    /* Slightly lighten/darken on focus based on theme */
+    filter: brightness(1.1);
 }
 
-/* Autofill Fix for Dark Mode */
+/* ✅ FIXED: Autofill now respects the theme variable */
 .inputGroup input:-webkit-autofill,
 .inputGroup input:-webkit-autofill:hover, 
 .inputGroup input:-webkit-autofill:focus {
     -webkit-text-fill-color: var(--text-main);
-    -webkit-box-shadow: 0 0 0px 1000px #061f26 inset;
+    /* This creates an inset shadow using the variable color to 'paint' the background */
+    box-shadow: 0 0 0px 1000px var(--bg-input) inset !important; 
     transition: background-color 5000s ease-in-out 0s;
-    
 }
 
 .passwordWrapper {
@@ -197,7 +203,6 @@
 /* =========================================
    🔘 BUTTONS & LINKS
    ========================================= */
-/* 🟢 FIXED: Changed from button[type="submit"] to .submitButton */
 .submitButton {
     width: 100%;
     margin-top: 12px;
@@ -211,6 +216,7 @@
     font-size: 1rem;
     cursor: pointer;
     transition: all 0.2s ease;
+    /* Soft shadow */
     box-shadow: 0 4px 12px rgba(238, 116, 40, 0.2);
 }
 
@@ -222,6 +228,12 @@
 
 .submitButton:active {
     transform: translateY(0);
+}
+
+.submitButton:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
 }
 
 .formBox p {
@@ -249,7 +261,7 @@
 }
 
 /* =========================================
-   🌓 THEME TOGGLE BUTTON (NEW)
+   🌓 THEME TOGGLE BUTTON
    ========================================= */
 .themeToggle {
     position: absolute;
@@ -257,7 +269,8 @@
     right: 20px;
     width: 40px;
     height: 40px;
-    background: rgba(255, 255, 255, 0.05);
+    /* Changed from fixed rgba to variable for better light mode visibility */
+    background: var(--bg-glass);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid var(--border-color);
@@ -270,10 +283,11 @@
     font-size: 1.2rem;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     z-index: 10; 
+    box-shadow: var(--shadow-card);
 }
 
 .themeToggle:hover {
-    background: rgba(238, 116, 40, 0.1); 
+    background: var(--bg-card-hover); 
     border-color: var(--primary-orange);
     color: var(--primary-orange);
     transform: rotate(15deg) scale(1.05); 
@@ -295,7 +309,8 @@
         padding: 32px 24px;
         border-radius: 20px;
         border: none;
-        background: var(--bg-main);
+        /* Mobile adjustment */
+        background: var(--bg-card);
     }
     
     .backButton {

@@ -1,68 +1,72 @@
-/*
-|--------------------------------------------------------------------------
-| Logbook / Intern Log - Adapted to Globals (1500px Layout)
-|--------------------------------------------------------------------------
-*/
+/* ==========================================================================
+   1. EXISTING CSS (Your provided styles)
+   ========================================================================== */
 
+/* --- IL SYSTEM DESIGN ADAPTATION (Dark/Light Mode Compatible) --- */
+/* Dark Mode Variables */
+.darkMode {
+  --bg-main: #021217;
+  --text-main: #f1f5f9;
+  --text-muted: #94a3b8;
+  --bg-card: #0f172a;
+  --bg-input: #1e293b;
+  --border-color: #334155;
+  --primary-orange: #fb923c;
+  --text-inverse: #ffffff;
+  --color-danger: #ff3b30;
+  --shadow-card: 0 2px 8px rgba(0,0,0,0.3);
+  --shadow-glow: 0 0 12px rgba(251,146,60,0.4);
+}
+
+/* Page Container */
 .pageContainer {
-  /* 🟢 MATCHING DASHBOARD DIMENSIONS */
   width: 100%;
-  max-width: 1500px;
-  margin: 0 auto;
-  padding: 40px;
-  
-  /* Theme & Layout */
-  min-height: 100vh;
-  background-color: var(--bg-main);
+  max-width: 1900px;
+  padding: 32px 24px;
+  font-family: var(--font-body, sans-serif);
   color: var(--text-main);
-  font-family: var(--font-body);
-  box-sizing: border-box;
-  animation: fadeIn 0.5s ease-in-out;
+  padding-top: 100px;
+  background-color: var(--bg-main);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* --- Typography --- */
+/* Typography */
 .header {
-  font-family: var(--font-heading);
-  font-size: 2rem; /* Consistent with other page titles */
-  font-weight: 800;
+  font-family: var(--font-heading, sans-serif);
+  font-size: clamp(2rem, 4vw, 2.5rem);
+  font-weight: 700;
   color: var(--text-main);
   margin-bottom: 8px;
   letter-spacing: -0.02em;
 }
 
 .subHeader {
-  font-size: 1rem;
+  font-size: 1.1rem;
   color: var(--text-muted);
   margin-bottom: 40px;
   line-height: 1.5;
 }
 
 .subHeader strong {
-  color: var(--primary-orange);
+  color: var(--text-main);
   font-weight: 600;
 }
 
-/* --- Stats Section --- */
+/* Stats Section */
 .statsGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 24px;
-  margin-bottom: 40px;
 }
 
 .statCard {
   background: var(--bg-card);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-card);
   padding: 24px;
   box-shadow: var(--shadow-card);
+  backdrop-filter: blur(var(--glass-blur, 16px));
+  -webkit-backdrop-filter: blur(var(--glass-blur, 16px));
   transition: transform 0.2s ease, border-color 0.2s;
   display: flex;
   flex-direction: column;
@@ -72,7 +76,6 @@
 .statCard:hover {
   transform: translateY(-4px);
   border-color: var(--primary-orange);
-  box-shadow: var(--shadow-glow);
 }
 
 .statTitle {
@@ -85,7 +88,7 @@
 }
 
 .statValue {
-  font-family: var(--font-heading);
+  font-family: var(--font-heading, sans-serif);
   font-size: 3rem;
   font-weight: 700;
   color: var(--text-main);
@@ -104,11 +107,11 @@
 }
 
 .progressBar {
-  background: linear-gradient(90deg, var(--primary-orange), #ff9f5a);
+  background: var(--primary-orange);
   height: 100%;
   border-radius: 99px;
   transition: width 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
-  box-shadow: 0 0 10px rgba(238, 116, 40, 0.3);
+  box-shadow: var(--shadow-glow);
 }
 
 .progressText {
@@ -119,19 +122,20 @@
   margin-top: 8px;
 }
 
-/* --- Form Section --- */
+/* Form Section */
 .formContainer {
   background: var(--bg-card);
-  backdrop-filter: blur(12px);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-card);
   padding: 32px;
   box-shadow: var(--shadow-card);
+  backdrop-filter: blur(var(--glass-blur, 16px));
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
   margin-bottom: 48px;
 }
 
 .formContainer h3 {
-  font-family: var(--font-heading);
+  font-family: var(--font-heading, sans-serif);
   font-size: 1.5rem;
   font-weight: 600;
   color: var(--text-main);
@@ -145,12 +149,11 @@
 .inputGroup label {
   display: block;
   font-size: 0.9rem;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--text-muted);
   margin-bottom: 8px;
 }
 
-/* Inputs matching NewJobPost style */
 .input,
 .textarea,
 .select {
@@ -158,59 +161,58 @@
   padding: 14px 16px;
   background: var(--bg-input);
   border: 1px solid var(--border-color);
-  border-radius: 12px;
+  border-radius: var(--radius-btn);
   font-size: 1rem;
   color: var(--text-main);
-  font-family: var(--font-body);
+  font-family: inherit;
   transition: all 0.2s ease;
   box-sizing: border-box;
-  outline: none;
 }
 
 .input:focus,
 .textarea:focus,
 .select:focus {
+  outline: none;
   border-color: var(--primary-orange);
-  box-shadow: 0 0 0 4px rgba(238, 116, 40, 0.15);
-  background: rgba(255, 255, 255, 0.05);
+  box-shadow: 0 0 0 1px var(--primary-orange);
+  background: var(--bg-card);
 }
 
 .textarea {
   min-height: 120px;
   resize: vertical;
-  line-height: 1.6;
 }
 
-/* Submit Button */
 .submitButton {
   width: 100%;
   padding: 16px;
-  background: linear-gradient(135deg, var(--primary-orange), #ff9f5a);
-  color: #FFFFFF;
+  background: var(--primary-orange);
+  color: var(--text-inverse);
   font-size: 1rem;
-  font-weight: 700;
+  font-weight: 600;
   border: none;
   border-radius: var(--radius-btn);
   cursor: pointer;
   transition: all 0.2s ease;
   margin-top: 8px;
-  box-shadow: 0 4px 15px rgba(238, 116, 40, 0.3);
+  box-shadow: var(--shadow-glow);
 }
 
-.submitButton:hover:not(:disabled) {
+.submitButton:hover {
+  background: var(--primary-orange-hover);
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(238, 116, 40, 0.5);
+  box-shadow: 0 6px 20px rgba(238, 116, 40, 0.4);
 }
 
 .submitButton:disabled {
   background: var(--bg-input);
   color: var(--text-muted);
   cursor: not-allowed;
+  transform: none;
   box-shadow: none;
-  opacity: 0.7;
 }
 
-/* --- List Section --- */
+/* List Section */
 .listContainer {
   display: flex;
   flex-direction: column;
@@ -218,7 +220,7 @@
 }
 
 .listHeader {
-  font-family: var(--font-heading);
+  font-family: var(--font-heading, sans-serif);
   font-size: 1.5rem;
   font-weight: 700;
   color: var(--text-main);
@@ -230,28 +232,27 @@
 .noEntriesText {
   text-align: center;
   color: var(--text-muted);
-  padding: 60px;
-  background: var(--bg-card);
-  border-radius: var(--radius-card);
-  font-size: 1.1rem;
-  border: 1px solid var(--border-color);
+  padding: 40px;
+  background: var(--bg-input);
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  border: 1px dashed var(--border-color);
 }
 
-/* --- Entry Card --- */
+/* Entry Card */
 .entryCard {
   background: var(--bg-card);
-  backdrop-filter: blur(12px);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-card);
   padding: 24px;
   box-shadow: var(--shadow-card);
   transition: all 0.2s ease;
+  margin-top: 5px;
 }
 
 .entryCard:hover {
   border-color: var(--primary-orange);
   transform: translateY(-2px);
-  box-shadow: var(--shadow-glow);
 }
 
 .entryHeader {
@@ -262,10 +263,10 @@
 }
 
 .entryDate {
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 600;
   color: var(--text-main);
-  font-family: var(--font-heading);
+  font-family: monospace;
 }
 
 .entryMeta {
@@ -276,11 +277,11 @@
   flex-wrap: wrap;
 }
 
-/* Status Badges - Using Global Colors */
+/* Status Badges */
 .entryStatus {
   font-size: 0.75rem;
   font-weight: 700;
-  padding: 4px 12px;
+  padding: 4px 10px;
   border-radius: 30px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -288,6 +289,7 @@
   align-items: center;
 }
 
+/* Status Colors Using Variables */
 .statusPending,
 .statusSubmitted {
   background: rgba(238, 116, 40, 0.15);
@@ -296,15 +298,15 @@
 }
 
 .statusApproved {
-  background: rgba(34, 197, 94, 0.15);
-  color: var(--color-success); /* Defined in globals (#22c55e) */
-  border: 1px solid rgba(34, 197, 94, 0.3);
+  background: rgba(52, 199, 89, 0.15);
+  color: #34C759;
+  border: 1px solid rgba(52, 199, 89, 0.3);
 }
 
 .statusRejected {
-  background: rgba(239, 68, 68, 0.15);
-  color: var(--color-danger); /* Defined in globals (#ef4444) */
-  border: 1px solid rgba(239, 68, 68, 0.3);
+  background: rgba(255, 59, 48, 0.15);
+  color: var(--color-danger);
+  border: 1px solid rgba(255, 59, 48, 0.3);
 }
 
 /* Attendance Badge */
@@ -313,11 +315,12 @@
   background: var(--bg-input);
   color: var(--text-muted);
   padding: 4px 10px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   border: 1px solid var(--border-color);
   font-weight: 600;
 }
 
+/* Hours Section */
 .entryHours {
   text-align: right;
 }
@@ -325,7 +328,7 @@
 .hoursValue {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--primary-orange);
+  color: var(--text-main);
   display: block;
 }
 
@@ -341,7 +344,7 @@
   margin-top: 16px;
   padding: 16px;
   background: var(--bg-input);
-  border-radius: 12px;
+  border-radius: var(--radius-btn);
   color: var(--text-main);
   font-size: 0.95rem;
   line-height: 1.6;
@@ -359,14 +362,15 @@
   letter-spacing: 0.05em;
 }
 
+/* Delete Button */
 .deleteButton {
   font-size: 0.85rem;
   color: var(--color-danger);
   background: none;
   border: none;
   cursor: pointer;
-  margin-top: 12px;
-  font-weight: 600;
+  margin-top: 8px;
+  font-weight: 500;
   opacity: 0.7;
   transition: opacity 0.2s;
   padding: 0;
@@ -381,10 +385,6 @@
 
 /* Mobile Adjustments */
 @media (max-width: 768px) {
-  .pageContainer {
-    padding: 20px;
-  }
-  
   .header {
     font-size: 1.75rem;
   }
@@ -399,5 +399,439 @@
   
   .statValue {
     font-size: 2.5rem;
+  }
+}
+
+/* FULL WIDTH PAGE */
+.pageWrapper {
+  width: 100%;
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 32px;
+  padding-top: 100px;
+}
+
+/* BENTO GRID LAYOUT */
+.bentoGrid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 32px;
+  width: 100%;
+}
+
+/* LEFT (STATS + FORM) */
+.leftPane {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+/* RIGHT (ENTRIES) */
+.rightPane {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-card);
+  padding: 24px;
+  box-shadow: var(--shadow-card);
+  height: fit-content;
+  display: flex;
+  flex-direction: column;
+}
+
+/* SCROLLABLE LIST (Desktop) */
+.entriesScroll {
+  margin-top: 12px;
+  overflow-y: auto;
+  padding-right: 6px;
+  max-height: 975px;
+}
+
+.entriesScroll::-webkit-scrollbar {
+  width: 8px;
+}
+.entriesScroll::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 10px;
+}
+
+/* MOBILE RESPONSIVE STACK */
+@media (max-width: 900px) {
+  .bentoGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .rightPane {
+    height: auto;
+    /* Limit height on mobile (approx 3 cards) and ensure it scrolls */
+  }
+
+  /* Force scrollable area for entries on mobile */
+  .entriesScroll {
+    max-height: 600px;
+    overflow-y: auto;
+  }
+}
+
+/* Skeleton Loading */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(30, 41, 59, 0.1) 25%,
+    rgba(30, 41, 59, 0.2) 50%,
+    rgba(30, 41, 59, 0.1) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.timeInOut {
+  display: flex;
+  gap: 8px;
+  font-size: 0.75em;
+  color: #94a3b8; /* muted color */
+  margin-top: 4px;
+  flex-direction: column;
+}
+
+/* --- Logbook.module.css: Enforced Row and Column Layout --- */
+
+/* Weekly Evaluations Container */
+.evaluationsTableContainer {
+  overflow-x: auto;
+  width: 100%;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-card, 12px);
+  box-shadow: var(--shadow-card);
+  margin-top: 16px;
+  
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+/* Inner Table Grid */
+.evaluationsTable {
+  min-width: 950px; /* Increased min-width to accommodate wider columns */
+  display: flex;
+  flex-direction: column;
+}
+
+/* FIX: Updated Grid Template Columns for Better Alignment 
+   - Start Date (100px)
+   - End Date (100px)
+   - Quality (90px)
+   - Productivity (130px - Wider for long title)
+   - Reliability (120px - Wider for long title)
+   - Teamwork (110px)
+   - Avg (80px - Added specific column for Average)
+   - Comments (1fr)
+*/
+.tableHeader {
+  display: grid;
+grid-template-columns: 120px 110px 140px 160px 150px 120px 90px 1fr;  gap: 16px;
+  padding: 16px 24px;
+  background: var(--bg-input);
+  color: var(--text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  border-bottom: 1px solid var(--border-color);
+  align-items: center;
+}
+
+/* Table Row (Data Entry) - Matching Header Grid */
+.tableRow {
+  display: grid;
+grid-template-columns: 80px 170px 130px 160px 195px 90px 260px 1fr;  padding: 16px 24px;
+  border-bottom: 1px solid var(--border-color);
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+  align-items: start;
+}
+
+.tableRow:last-child {
+  border-bottom: none;
+}
+
+.tableRow:hover {
+  background-color: var(--bg-input);
+}
+
+/* Styling for Rating Spans */
+/* Targeting specifically the rating columns */
+.tableRow > span:nth-child(3),
+.tableRow > span:nth-child(4),
+.tableRow > span:nth-child(5),
+.tableRow > span:nth-child(6) {
+  font-weight: 700;
+  color: var(--primary-orange);
+  text-align: center;
+}
+
+/* Comments column */
+.tableRow > span:last-child {
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: 0.9rem;
+  color: var(--text-main);
+  padding-top: 5px;
+}
+
+/* Hide all mobile-specific elements from previous attempts */
+@media (max-width: 900px) {
+  .mobile-only {
+    display: none !important;
+  }
+}
+
+.listHeader {
+  font-family: var(--font-heading, sans-serif);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-main);
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 16px;
+  margin-bottom: 16px; 
+}
+
+
+/* ==========================================================================
+   2. NEW STYLES (Performance Summary & Full Responsiveness)
+   ========================================================================== */
+
+/* SMOOTH TRANSITIONS FOR RESIZING 
+   Applied to major layout containers 
+*/
+.pageWrapper, .bentoGrid, .leftPane, .rightPane, .performanceBoard, .evaluationsTableContainer {
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* --- Performance Board (Bento Style) --- */
+.performanceBoard {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-card);
+  padding: 30px;
+  box-shadow: var(--shadow-card);
+  display: grid;
+  grid-template-columns: 1fr 1.5fr; /* Desktop: Score | Metrics */
+  gap: 40px;
+  align-items: center;
+  margin-bottom: 30px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Decoration */
+.performanceBoard::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; width: 6px; height: 100%;
+  background: var(--primary-orange);
+}
+
+/* Left Side: Score */
+.boardLeft {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding-right: 40px;
+  border-right: 1px solid var(--border-color);
+}
+
+.overallScoreCircle {
+  background: var(--bg-input);
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 4px solid var(--primary-orange);
+  box-shadow: 0 0 20px rgba(238, 116, 40, 0.2);
+  margin-bottom: 16px;
+}
+
+.bigScore { font-size: 3.5rem; font-weight: 800; color: var(--text-main); line-height: 1; }
+.smallScore { font-size: 0.9rem; color: var(--text-muted); font-weight: 600; }
+
+.boardInfo h3 { font-size: 1.2rem; color: var(--text-main); margin: 0 0 4px 0; font-weight: 700; }
+.boardInfo p { font-size: 0.85rem; color: var(--text-muted); margin: 0; display: flex; align-items: center; justify-content: center; }
+
+/* Right Side: Metrics Grid */
+.boardRight {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* 2x2 Grid */
+  gap: 20px;
+}
+
+.compactMetric {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--bg-input);
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.iconBg {
+  background: rgba(238, 116, 40, 0.15);
+  color: var(--primary-orange);
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.metricDetails { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+.metricLabel { font-size: 0.75rem; text-transform: uppercase; font-weight: 600; color: var(--text-muted); }
+.metricBarBg { width: 100%; height: 6px; background: rgba(255, 255, 255, 0.1); border-radius: 4px; overflow: hidden; }
+.metricBarFill { height: 100%; background: var(--primary-orange); border-radius: 4px; }
+.metricScore { font-size: 1.1rem; font-weight: 700; color: var(--text-main); }
+
+/* --- Summary Table Row Styles (New) --- */
+.dateGroup { display: flex; align-items: center; gap: 8px; font-family: monospace; font-weight: 600; color: var(--text-main); }
+.dateArrow { color: var(--text-muted); font-size: 0.8rem; }
+.ratingNum { text-align: center; color: var(--text-muted); }
+.ratingAvg { display: flex; align-items: center; gap: 4px; font-weight: 700; color: var(--primary-orange); background: rgba(238, 116, 40, 0.1); padding: 4px 8px; border-radius: 6px; justify-content: center; width: fit-content; margin: 0 auto; }
+.commentText { color: var(--text-muted); font-style: italic; font-size: 0.9rem; line-height: 1.4; white-space: pre-wrap; }
+.loadingContainer { text-align: center; padding: 40px; color: var(--text-muted); }
+
+
+/* ==========================================================================
+   📱 FULLY RESPONSIVE MEDIA QUERIES (Max Width 600px)
+   ==========================================================================
+*/
+
+@media (max-width: 900px) {
+  /* Stack Bento Grid on Tablets */
+  .performanceBoard {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+  .boardLeft {
+    border-right: none;
+    border-bottom: 1px solid var(--border-color);
+    padding-right: 0;
+    padding-bottom: 30px;
+  }
+}
+
+@media (max-width: 600px) {
+  /* 1. General Container */
+  .pageWrapper {
+    padding: 20px 16px;
+    padding-top: 80px; /* Adjust for nav */
+  }
+
+  .header {
+    font-size: 1.8rem;
+  }
+
+  /* 2. Bento Grid Stacking */
+  .bentoGrid {
+    grid-template-columns: 1fr; /* Stack Stats/Form above Entries */
+    gap: 24px;
+  }
+
+  /* 3. Stats Grid Stacking */
+  .statsGrid {
+    grid-template-columns: 1fr; /* Single column for stats */
+  }
+
+  /* 4. Performance Board Mobile */
+  .performanceBoard {
+    padding: 20px;
+  }
+  
+  .boardRight {
+    grid-template-columns: 1fr; /* Single column for metrics */
+    gap: 12px;
+  }
+  
+  .overallScoreCircle {
+    width: 120px; height: 120px;
+  }
+  .bigScore { font-size: 3rem; }
+
+  /* 5. Evaluation Table -> Card View Transformation */
+  /* Hide the desktop header */
+  .tableHeader { display: none; }
+
+  /* Make container take full width */
+  .evaluationsTable {
+    min-width: 100%;
+    gap: 16px;
+  }
+
+  /* Transform Row into Card */
+  .tableRow {
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 20px;
+    gap: 12px;
+    align-items: stretch;
+  }
+
+  /* Pseudo-Labels for Data */
+  .dateGroup {
+    width: 100%;
+    justify-content: space-between;
+    border-bottom: 1px dashed var(--border-color);
+    padding-bottom: 12px;
+    margin-bottom: 4px;
+  }
+  
+  /* Hide individual ratings on mobile to save space, show Avg only */
+  .ratingNum { display: none; }
+
+  /* Average Rating Row */
+  .ratingAvg {
+    width: 100%;
+    justify-content: space-between;
+    background: transparent;
+    padding: 0;
+    color: var(--text-main);
+    border-bottom: 1px dashed var(--border-color);
+    padding-bottom: 12px;
+  }
+  .ratingAvg::before {
+    content: "Weekly Average";
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+  }
+
+  /* Comment Section */
+  .commentText {
+    margin-top: 8px;
+    display: block;
+  }
+  .commentText::before {
+    content: "COMMENTS:";
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+  }
+  
+  /* Hide desktop-specific columns */
+  .evaluationsTable :global(.mobile-hide) {
+    display: none;
   }
 }

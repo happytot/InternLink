@@ -1,18 +1,20 @@
 /*
 |--------------------------------------------------------------------------
-| Company Dashboard - Light Dark Mode Theme
+| Company Dashboard - Responsive & 1500px Layout
 |--------------------------------------------------------------------------
-
+*/
 
 /* Page Layout */
 .dashboard-content {
   padding: 40px;
-  max-width: 1500px;
+  max-width: 1600px;
+  margin: 0 auto;
   min-height: 100vh;
   background-color: var(--bg-main);
   color: var(--text-main);
   font-family: 'Inter', sans-serif;
   animation: fadeIn 0.5s ease-in-out;
+  box-sizing: border-box;
 }
 
 @keyframes fadeIn {
@@ -26,6 +28,8 @@
 */
 .brand-bar-card {
   background: var(--bg-card);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-card);
   padding: 24px 30px;
@@ -36,6 +40,8 @@
   box-shadow: var(--shadow-card);
   position: relative;
   overflow: hidden;
+  flex-wrap: wrap; /* Allow wrapping on small screens */
+  gap: 16px;
 }
 
 .brand-bar-card::before {
@@ -46,7 +52,6 @@
   pointer-events: none;
 }
 
-/* Logo Area */
 .brand-logo {
   display: flex;
   align-items: center;
@@ -66,14 +71,13 @@
 }
 
 .logo-text {
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 2.5rem;
+  font-family: var(--font-heading, sans-serif);
+  font-size: 1.5rem;
   font-weight: 800;
   color: var(--text-main);
   letter-spacing: -0.02em;
 }
 
-/* Date Area */
 .brand-date {
   display: flex;
   align-items: center;
@@ -88,64 +92,12 @@
 }
 
 /* |--------------------------------------------------------------------------
-| 1. Header Section
-|--------------------------------------------------------------------------
-*/
-.dashboard-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  margin-bottom: 40px;
-}
-
-.welcome-text h1 {
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 2.5rem;
-  font-weight: 800;
-  color: var(--text-main);
-  margin: 0;
-  letter-spacing: -0.02em;
-}
-
-.welcome-text p {
-  color: var(--text-muted);
-  font-size: 1.1rem;
-  margin-top: 8px;
-}
-
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-
-.post-job-btn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: linear-gradient(135deg, var(--primary-orange), #ff9f5a);
-  color: white;
-  border: none;
-  padding: 12px 24px;
-  border-radius: var(--radius-btn);
-  font-weight: 700;
-  font-size: 0.95rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(238, 116, 40, 0.3);
-}
-
-.post-job-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(238, 116, 40, 0.5);
-}
-
-/* |--------------------------------------------------------------------------
-| 2. Stats Grid
+| STATS GRID
 |--------------------------------------------------------------------------
 */
 .stats-grid {
   display: grid;
+  /* Auto-fit creates responsive columns automatically */
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 24px;
   margin-bottom: 40px;
@@ -153,6 +105,7 @@
 
 .stat-card {
   background: var(--bg-card);
+  backdrop-filter: blur(12px);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-card);
   padding: 24px;
@@ -168,11 +121,10 @@
 .stat-card:hover {
   transform: translateY(-5px);
   border-color: var(--primary-orange);
-  background: color-mix(in srgb, var(--bg-card), white 5%); /* Slight lighten on hover */
+  background: color-mix(in srgb, var(--bg-card), white 5%);
   box-shadow: var(--shadow-glow);
 }
 
-/* Icon Styles */
 .icon-wrapper {
   width: 56px;
   height: 56px;
@@ -183,7 +135,6 @@
   flex-shrink: 0;
 }
 
-/* Adjusted Icon Backgrounds for Lighter Theme */
 .icon-wrapper.blue { background: rgba(0, 212, 255, 0.15); color: var(--secondary-cyan); }
 .icon-wrapper.orange { background: rgba(238, 116, 40, 0.15); color: var(--primary-orange); }
 .icon-wrapper.purple { background: rgba(168, 85, 247, 0.15); color: #a855f7; }
@@ -206,17 +157,18 @@
 }
 
 /* |--------------------------------------------------------------------------
-| 3. Dashboard Split (Feed & Tips)
+| DASHBOARD SPLIT (Feed & Tips)
 |--------------------------------------------------------------------------
 */
 .dashboard-split {
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: 2fr 1fr; /* 2/3 Feed, 1/3 Tips */
   gap: 30px;
 }
 
 .feed-card, .tips-card {
   background: var(--bg-card);
+  backdrop-filter: blur(12px);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-card);
   padding: 30px;
@@ -225,7 +177,7 @@
 }
 
 .card-header h3 {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--font-heading, sans-serif);
   font-size: 1.25rem;
   font-weight: 700;
   margin-bottom: 24px;
@@ -288,7 +240,6 @@
   padding: 20px;
 }
 
-/* Quick Actions List */
 .tips-list {
   display: flex;
   flex-direction: column;
@@ -317,48 +268,55 @@
   transform: translateX(5px);
 }
 
-/* Loading Spinner */
-.loading-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  color: var(--primary-orange);
-  background-color: var(--bg-main);
-}
+/* |--------------------------------------------------------------------------
+| 📱 RESPONSIVE ADJUSTMENTS
+|--------------------------------------------------------------------------
+*/
 
-.spin-icon {
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-/* Responsive */
+/* Tablet: Stack split layout (Feed/Tips) */
 @media (max-width: 1024px) {
   .dashboard-split {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr; /* Stack vertically */
   }
 }
 
+/* Mobile: Stack everything, smaller text/padding */
 @media (max-width: 768px) {
-  .dashboard-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 20px;
-  }
-  .header-actions {
-    width: 100%;
-    justify-content: space-between;
-  }
   .dashboard-content {
-    padding: 20px;
+    padding: 20px; /* Reduce main padding */
   }
+
   .brand-bar-card {
     flex-direction: column;
-    gap: 15px;
-    align-items: flex-start;
+    align-items: flex-start; /* Align left */
+    gap: 16px;
+    padding: 20px;
+  }
+
+  .brand-date {
+    width: 100%; /* Full width date bar */
+    justify-content: center;
+  }
+
+  /* Stats cards stack 1 per row on very small screens, or 2 on wider phones */
+  .stats-grid {
+    grid-template-columns: repeat(auto-fit, minmax(100%, 1fr)); 
+    gap: 16px;
+  }
+
+  .stat-card {
+    padding: 20px; /* Reduce padding inside cards */
+  }
+
+  .stat-info h2 {
+    font-size: 1.5rem; /* Smaller numbers */
+  }
+
+  .feed-card, .tips-card {
+    padding: 20px;
+  }
+
+  .feed-time {
+    display: none; /* Hide time on tiny screens if it cramps layout */
   }
 }

@@ -1,226 +1,412 @@
 'use client';
 
 import Link from 'next/link';
-import './ApplicationHistory.css';
-import Header from '../../components/Header';
+import './ApplicationHistory.css'; 
 import InternNav from '../../components/InternNav';
 import { useState, useEffect, useCallback } from 'react';
-import { getApplicationHistory, startInternship } from './actions'; // 1. Import Actions
+import { getApplicationHistory, startInternship, cancelApplication } from './actions';
+import { RefreshCcw, CheckCircle, Clock, XCircle, ChevronRight, Loader2, PlayCircle, Filter, Zap } from 'lucide-react';
+import { toast } from 'sonner';
+import FloatingAIChatWithCharts from '../../components/chatbot';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 
-// ✅ Helper to format status text (Updated with new statuses)
+// ... (Status Helpers remain the same) ...
+
 const formatStatusText = (status) => {
-  switch (status) {
-    case 'Pending':
-      return 'Pending';
-    case 'Company_Approved_Waiting_Coordinator':
-      return 'Waiting Coordinator Approval';
-    case 'approved_by_coordinator': // The status before starting
-      return 'Approved! Ready to Start';
-    case 'ongoing': // The active status
-      return 'Active Internship';
-    case 'Accepted':
-      return 'Accepted';
-    case 'Rejected':
-      return 'Rejected';
-    default:
-      return status;
-  }
+    switch (status) {
+        case 'Pending':
+            return 'Pending Review';
+        case 'Company_Approved_Waiting_Coordinator':
+            return 'Company Approved (Awaiting Coordinator)';
+        case 'approved_by_coordinator': 
+            return 'Ready to Start';
+        case 'ongoing': 
+            return 'Active Internship';
+        case 'Accepted':
+            return 'Accepted (Deprecated)';
+        case 'Rejected':
+            return 'Application Rejected';
+        default:
+            return status;
+    }
 };
 
-// ✅ Helper for CSS classes
 const getStatusClass = (status) => {
-  switch (status) {
-    case 'Pending':
-    case 'Company_Approved_Waiting_Coordinator':
-      return 'pending'; // Yellow/Orange
-    case 'approved_by_coordinator':
-      return 'ready'; // Blue/Purple (You might need to add this class in CSS)
-    case 'ongoing':
-    case 'Accepted':
-      return 'accepted'; // Green
-    case 'Rejected':
-      return 'rejected'; // Red
-    default:
-      return 'pending';
-  }
+    switch (status) {
+        case 'Pending':
+        case 'Company_Approved_Waiting_Coordinator':
+            return 'pending'; 
+        case 'approved_by_coordinator':
+            return 'ready'; 
+        case 'ongoing':
+        case 'Accepted':
+            return 'ongoing'; 
+        case 'Rejected':
+            return 'rejected'; 
+        default:
+            return 'pending';
+    }
 };
 
 export default function ApplicationHistory() {
-  const [applications, setApplications] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [message, setMessage] = useState('');
-  const [processingId, setProcessingId] = useState(null); // To handle button loading state
+     const supabase = createClientComponentClient(); 
+    const [applications, setApplications] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [message, setMessage] = useState('');
+    const [processingId, setProcessingId] = useState(null);
+    const [filterStatus, setFilterStatus] = useState('All'); 
+    const [lastUpdated, setLastUpdated] = useState(Date.now()); 
+ const [user, setUser] = useState(null);
 
-  // 2. Fetch data using Server Action
-  const fetchApplications = useCallback(async () => {
-    setLoading(true);
-    const result = await getApplicationHistory();
-
-    if (result.success) {
-      setApplications(result.data || []);
-    } else {
-      setMessage(result.error);
-    }
-    setLoading(false);
-  }, []);
-
+  // Fetch logged-in user
   useEffect(() => {
-    fetchApplications();
-  }, [fetchApplications]);
+    const getUser = async () => {
+      const { data } = await supabase.auth.getUser();
+      if (data?.user) setUser(data.user);
+    };
+    getUser();
+  }, [supabase]);
+    // Fetch, Start, Cancel logic remains the same...
+    const fetchApplications = useCallback(async () => {
+        setLoading(true);
+        const result = await getApplicationHistory();
 
-  // 3. Handle Start Internship Click
-  const handleStartInternship = async (appId) => {
-    const confirmed = window.confirm("Are you ready to officially start your OJT hours? This will unlock your logbook.");
-    if (!confirmed) return;
+        if (result.success) {
+            const sortedData = (result.data || []).sort((a, b) => {
+                const order = { 'ongoing': 4, 'approved_by_coordinator': 3, 'Pending': 2, 'Company_Approved_Waiting_Coordinator': 2, 'Rejected': 1 };
+                return (order[b.status] || 0) - (order[a.status] || 0);
+            });
+            setApplications(sortedData);
+            setLastUpdated(Date.now()); 
+        } else {
+            setMessage(result.error);
+        }
+        setLoading(false);
+    }, []);
 
-    setProcessingId(appId);
-    const result = await startInternship(appId);
+    useEffect(() => {
+        fetchApplications();
+    }, [fetchApplications]);
 
-    if (result.success) {
-      alert(result.message);
-      fetchApplications(); // Refresh list to show new status
-    } else {
-      alert(result.error);
-    }
-    setProcessingId(null);
-  };
+    const handleStartInternship = async (appId) => {
+        const confirmed = window.confirm("Are you ready to officially start your OJT hours? This will unlock your logbook.");
+        if (!confirmed) return;
 
-  if (loading) {
-    return (
-      <>
-        <Header />
-        <div className="history-container">
-          <h1>📜 Your Application History</h1>
-          <div className="skeleton-table">
-            {[1, 2, 3].map(i => (
-              <div key={i} className="skeleton-row">
-                 {/* Skeleton styling */}
-                <div className="skeleton-cell" style={{ width: '100%', height: '50px', background: '#eee' }} />
-              </div>
-            ))}
-          </div>
-        </div>
-        <InternNav />
-      </>
-    );
-  }
+        setProcessingId(appId);
+        try {
+            const result = await startInternship(appId);
+            if (result.success) {
+                toast.success(result.message); 
+                fetchApplications();
+            } else {
+                toast.error(result.error);
+            }
+        } catch (error) {
+            toast.error("An unexpected error occurred while starting the internship.");
+        } finally {
+            setProcessingId(null);
+        }
+    };
 
-  return (
-    <>
-      <Header />
-      <div className="history-container">
-        <h1>📜 Your Application History</h1>
+    const handleCancelApplication = async (appId) => {
+        const confirmed = window.confirm("Are you sure you want to cancel this application?");
+        if (!confirmed) return;
 
-        {message && <p className="history-summary error">{message}</p>}
+        setProcessingId(appId);
+        try {
+            const result = await cancelApplication(appId);
 
-        <p className="history-summary">
-          You have applied to <strong>{applications.length}</strong> positions.
-        </p>
+            if (result.success) {
+                toast.info(result.message);
+                setApplications(prev => prev.filter(app => app.id !== appId));
+                setLastUpdated(Date.now());
+            } else {
+                toast.error(result.error);
+            }
+        } catch (err) {
+            toast.error("An unexpected error occurred while canceling.");
+        } finally {
+            setProcessingId(null);
+        }
+    };
 
-        {/* --- TABLE VIEW (Desktop) --- */}
+    const filteredApplications = applications.filter(app => {
+        if (filterStatus === 'All') return true;
+        
+        const statusMap = {
+            'Pending': ['Pending', 'Company_Approved_Waiting_Coordinator'],
+            'Ready': ['approved_by_coordinator'],
+            'Ongoing': ['ongoing'],
+            'Rejected': ['Rejected'],
+        };
+
+        return statusMap[filterStatus]?.includes(app.status) || false;
+    });
+
+
+    // --- Table View ---
+    const ApplicationTable = ({ applications }) => (
         <div className="history-table-wrapper table-view">
-          <table>
-            <thead>
-              <tr>
-                <th>Internship Title</th>
-                <th>Company</th>
-                <th>Date Applied</th>
-                <th>Status</th>
-                <th>Action</th> {/* Changed 'Details' to 'Action' */}
-              </tr>
-            </thead>
-            <tbody>
-              {applications.length === 0 ? (
-                <tr>
-                  <td colSpan="5" style={{ textAlign: 'center' }}>
-                    You have not applied to any jobs yet.
-                  </td>
-                </tr>
-              ) : (
-                applications.map(app => (
-                  <tr key={app.id}>
-                    <td>{app.job_posts?.title || 'Unknown Job'}</td>
-                    <td>{app.companies?.name || 'Unknown Company'}</td>
-                    <td>{new Date(app.created_at).toLocaleDateString()}</td>
-                    <td>
-                      <span className={`status-badge status-${getStatusClass(app.status)}`}>
-                        {formatStatusText(app.status)}
-                      </span>
-                    </td>
-                    <td>
-                      {/* 🚀 THE START BUTTON LOGIC */}
-                      {app.status === 'approved_by_coordinator' ? (
-                        <button 
-                            onClick={() => handleStartInternship(app.id)}
-                            disabled={processingId === app.id}
-                            style={{ 
-                                backgroundColor: '#16a34a', color: 'white', 
-                                padding: '6px 12px', borderRadius: '4px', 
-                                border: 'none', cursor: 'pointer', fontWeight: 'bold'
-                            }}
-                        >
-                            {processingId === app.id ? 'Starting...' : '🚀 Start Internship'}
-                        </button>
-                      ) : app.status === 'ongoing' ? (
-                        <span style={{ color: '#16a34a', fontWeight: 'bold', fontSize: '0.9rem' }}>
-                            ✅ Active
-                        </span>
-                      ) : (
-                        <Link href="/intern/listings" className="view-link">View Job</Link>
-                      )}
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Internship Title</th>
+                        <th>Company</th>
+                        <th>Date Applied</th>
+                        <th>Updated</th> 
+                        <th>Status</th>
+                        <th className="action-cell">Action</th> 
+                    </tr>
+                </thead>
+                <tbody>
+                    {applications.length === 0 ? (
+                        <tr>
+                            <td colSpan="6" className="empty-state-cell"> 
+                                <Filter size={32} className="text-muted" style={{ marginBottom: '10px' }}/>
+                                <p>No applications found matching the {filterStatus} filter.</p>
+                                {filterStatus !== 'All' && <p>Try switching your filter back to All.</p>}
+                                {filterStatus === 'All' && <Link href="/intern/listings" className="link-button">Browse Internships</Link>}
+                            </td>
+                        </tr>
+                    ) : (
+                        applications.map(app => (
+                            <tr key={app.id}>
+                                <td className="job-title-cell">{app.job_posts?.title || 'Unknown Job'}</td>
+                                <td className="company-name-cell">{app.companies?.name || 'Unknown Company'}</td>
+                                <td>{new Date(app.created_at).toLocaleDateString()}</td>
+                                <td>{new Date(app.updated_at || app.created_at).toLocaleDateString()}</td> 
+                                <td>
+                                    <span className={`status-badge status-${getStatusClass(app.status)}`}>
+                                        {formatStatusText(app.status)}
+                                    </span>
+                                </td>
+                                <td>
+                                    {app.status === 'approved_by_coordinator' ? (
+                                        <button 
+                                            onClick={() => handleStartInternship(app.id)}
+                                            disabled={processingId === app.id}
+                                            className="btn-start-internship"
+                                        >
+                                            {processingId === app.id ? (
+                                                <Loader2 className="icon-spin" size={16} />
+                                            ) : (
+                                                <PlayCircle size={14} />
+                                            )} Start
+                                        </button>
+                                    ) : app.status === 'ongoing' ? (
+                                        <span className="text-active"><CheckCircle size={14} /> Active</span>
+                                    ) : (['Pending', 'Company_Approved_Waiting_Coordinator'].includes(app.status)) ? (
+                                        <button
+                                            onClick={() => handleCancelApplication(app.id)}
+                                            disabled={processingId === app.id}
+                                            className="btn-cancel"
+                                        >
+                                            {processingId === app.id ? <Loader2 className="icon-spin" size={14} /> : <XCircle size={14} />} Cancel
+                                        </button>
+                                    ) : (
+                                        // Icon-only link for table view
+                                        <Link href={`/intern/jobs/${app.job_post_id}`} className="view-link" title="View Details">
+                                            <ChevronRight size={16} />
+                                        </Link>
+                                    )}
+                                </td>
+                            </tr>
+                        ))
+                    )}
+                </tbody>
+            </table>
         </div>
+    );
 
-        {/* --- CARD VIEW (Mobile) --- */}
+    // --- Card View ---
+    const ApplicationCards = ({ applications }) => (
         <div className="job-grid card-view">
-          {applications.map(app => (
-            <div key={app.id} className="job-card">
-              <div className="job-header">
-                <h2>{app.job_posts?.title || 'Unknown Job'}</h2>
-              </div>
-              <p className="location">{app.companies?.name || 'Unknown Company'}</p>
-              <p className="date">{new Date(app.created_at).toLocaleDateString()}</p>
-              <p className={`status status-${getStatusClass(app.status)}`}>
-                {formatStatusText(app.status)}
-              </p>
-              
-              <div style={{ marginTop: '10px' }}>
-                  {app.status === 'approved_by_coordinator' ? (
-                    <button 
-                        onClick={() => handleStartInternship(app.id)}
-                        disabled={processingId === app.id}
-                        style={{ 
-                            width: '100%', backgroundColor: '#16a34a', color: 'white', 
-                            padding: '10px', borderRadius: '4px', 
-                            border: 'none', cursor: 'pointer', fontWeight: 'bold' 
-                        }}
-                    >
-                        {processingId === app.id ? 'Starting...' : '🚀 Start Internship'}
-                    </button>
-                  ) : app.status === 'ongoing' ? (
-                    <div style={{ textAlign: 'center', color: '#16a34a', fontWeight: 'bold', padding: '10px' }}>
-                        ✅ Internship Active
+            {applications.length === 0 ? (
+                <div className="empty-state-card">
+                    <Filter size={32} className="text-muted" style={{ marginBottom: '10px' }}/>
+                    <p>No applications found matching the **'{filterStatus}'** filter.</p>
+                    {filterStatus !== 'All' && <p>Try switching your filter back to '**All**'.</p>}
+                    {filterStatus === 'All' && <Link href="/intern/listings" className="link-button">Browse Internships</Link>}
+                </div>
+            ) : (
+                applications.map(app => (
+                    <div key={app.id} className={`job-card status-${getStatusClass(app.status)}`}> 
+                        <span className={`status-badge status-${getStatusClass(app.status)} status-mobile`}>
+                            {formatStatusText(app.status)}
+                        </span>
+                        <div className="job-header">
+                            <h2>{app.job_posts?.title || 'Unknown Job'}</h2>
+                        </div>
+                        <p className="company-name">{app.companies?.name || 'Unknown Company'}</p>
+                        <p className="date-applied">Applied: {new Date(app.created_at).toLocaleDateString()}</p>
+                        <p className="date-applied">Updated: {new Date(app.updated_at || app.created_at).toLocaleDateString()}</p> 
+
+                        <div className="card-action-area">
+                            {app.status === 'approved_by_coordinator' ? (
+                                <button 
+                                    onClick={() => handleStartInternship(app.id)}
+                                    disabled={processingId === app.id}
+                                    className="btn-start-internship full-width"
+                                >
+                                    {processingId === app.id ? <Loader2 className="icon-spin" size={14} /> : <PlayCircle size={14} />} Start Internship
+                                </button>
+                            ) : app.status === 'ongoing' ? (
+                                <div className="text-active center-text"><CheckCircle size={14} /> Internship Active</div>
+                            ) : (['Pending', 'Company_Approved_Waiting_Coordinator'].includes(app.status)) ? (
+                                <button
+                                    onClick={() => handleCancelApplication(app.id)}
+                                    disabled={processingId === app.id}
+                                    className="btn-cancel full-width"
+                                >
+                                    {processingId === app.id ? <Loader2 className="icon-spin" size={14} /> : <XCircle size={14} />} Cancel
+                                </button>
+                            ) : (
+                                <Link href={`/intern/jobs/${app.job_post_id}`} className="view-link full-width">
+                                    View Details <ChevronRight size={14} />
+                                </Link>
+                            )}
+                        </div>
                     </div>
-                  ) : (
-                    <Link href="/intern/listings" className="view-link resume-link">View Job</Link>
-                  )}
+                ))
+            )}
+        </div>
+    );
+
+    if (loading) {
+        // ... (Loading state will use the new layout structure) ...
+        return (
+            <>
+              <div className="history-container loading-state">
+                <div className="header-area">
+                    <div className="title-group">
+                        <h1><Clock size={28} className="icon-inline"/> Loading History...</h1>
+                    </div>
+                   
+                </div>
+                
+                <div className="main-content-area">
+                    {/* Skeleton for Filters */}
+                    <div className="filter-controls-container" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <div className="filter-buttons">
+                            <div className="skeleton-cell" style={{ width: '50px', height: '30px', borderRadius: '20px' }}/>
+                            <div className="skeleton-cell" style={{ width: '80px', height: '30px', borderRadius: '20px' }}/>
+                            <div className="skeleton-cell" style={{ width: '70px', height: '30px', borderRadius: '20px' }}/>
+                        </div>
+                        <div className="skeleton-cell" style={{ width: '36px', height: '36px', borderRadius: '50%' }}/>
+                    </div>
+                    {/* Table Skeleton */}
+                    <div className="history-table-wrapper table-view">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Internship Title</th>
+                                <th>Company</th>
+                                <th>Date Applied</th>
+                                <th>Last Updated</th> 
+                                <th>Status</th>
+                                <th className="action-cell">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {[1,2,3].map((_, idx) => (
+                                <tr key={idx}>
+                                    <td><div className="skeleton-cell" style={{ width: '90%' }}/></td>
+                                    <td><div className="skeleton-cell" style={{ width: '70%' }}/></td>
+                                    <td><div className="skeleton-cell" style={{ width: '50%' }}/></td>
+                                    <td><div className="skeleton-cell" style={{ width: '50%' }}/></td> 
+                                    <td><div className="skeleton-cell" style={{ width: '70%' }}/></td>
+                                    <td><div className="skeleton-cell" style={{ width: '60px', height: '30px' }}/></td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                    </div>
+                </div>
+
               </div>
+              <InternNav />
+            </>
+          );
+    }
+
+    const totalCount = applications.length;
+    const activeCount = applications.filter(a => a.status === 'ongoing').length;
+    const readyCount = applications.filter(a => a.status === 'approved_by_coordinator').length;
+
+    return (
+        <>
+            <div className="history-container">
+                
+                <div className="main-grid">
+                    
+                    <div className="main-table-container">
+                        <div className="header-area">
+                            <div className="title-group">
+                                <h1><Clock size={38} /> Application History</h1>
+                                <p className="last-updated-time">
+                                    Last Updated: {new Date(lastUpdated).toLocaleTimeString()}
+                                </p>
+                            </div>
+                          <div className="summary-card">
+                        <div>
+                            <p>Total Applications</p>
+                            <span className="count-large">{totalCount}</span>
+                        </div>
+                        
+                        <hr style={{ borderColor: 'var(--border-subtle)', margin: '15px 0' }} />
+
+                        <div>
+                            <p>Ready to Start</p>
+                            <span className="count-large" style={{ color: 'var(--clr-status-cyan)' }}>{readyCount}</span>
+                        </div>
+
+                        <hr style={{ borderColor: 'var(--border-subtle)', margin: '15px 0' }} />
+
+                        {activeCount > 0 ? (
+                            <div className="active-indicator">
+                                <CheckCircle size={20} />
+                                {activeCount} Internship{activeCount > 1 ? 's' : ''} Active
+                            </div>
+                        ) : (
+                            <div className="active-indicator" style={{ color: 'var(--clr-brand-orange)' }}>
+                                <Zap size={20} />
+                                Time to Start!
+                            </div>
+                        )}
+                    </div>
+                            
+                        </div>
+
+                        {message && <p className="history-summary error-message">{message}</p>}
+
+                        {/* Filter Controls */}
+                        <div className="filter-controls-container">
+                            <div className="filter-buttons">
+                                {['All', 'Pending', 'Ready', 'Ongoing', 'Rejected'].map(status => (
+                                    <button
+                                        key={status}
+                                        onClick={() => setFilterStatus(status)}
+                                        className={`btn-filter ${filterStatus === status ? 'active' : ''}`}
+                                    >
+                                        {status}
+                                        {status === 'All' && totalCount > 0 && (
+                                            <span className="filter-badge">{totalCount}</span>
+                                        )}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                        
+                        <ApplicationTable applications={filteredApplications} />
+                        <ApplicationCards applications={filteredApplications} />
+                    </div>
+
+                    {/* Summary Card (New Feature) */}
+                    
+                </div>
             </div>
-          ))}
-        </div>
-
-        <div className="history-stats">
-            <p>Active/Ongoing: <strong>{applications.filter(a => a.status === 'ongoing').length}</strong></p>
-            <p>Total Applications: <strong>{applications.length}</strong></p>
-        </div>
-      </div>
-
-      <InternNav />
-    </>
-  );
+  {user?.id && <FloatingAIChatWithCharts studentId={user.id} />}
+            <InternNav />
+        </>
+    );
 }

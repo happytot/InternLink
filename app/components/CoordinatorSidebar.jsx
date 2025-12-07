@@ -43,20 +43,24 @@ export default function CoordinatorSidebar() {
   const isActive = (href) => pathname === href;
 
   const navItems = [
-    { href: "/coordinator/dashboard", icon: <LayoutDashboard size={20} />, label: "Overview" },
-    { href: "/coordinator/students", icon: <Users size={20} />, label: "Students" },
-    { href: "/coordinator/approvals", icon: <CheckSquare size={20} />, label: "Approvals" },
-    { href: "/coordinator/internships", icon: <Briefcase size={20} />, label: "Internships" },
-    { href: "/coordinator/companies", icon: <Building2 size={20} />, label: "Companies" },
-    { href: "/coordinator/announcements", icon: <Megaphone size={20} />, label: "Announcements" },
-    { href: "/coordinator/settings", icon: <Settings size={20} />, label: "Settings" },
+    { href: "/coordinator/dashboard", icon: <LayoutDashboard size={22} />, label: "Overview" },
+    { href: "/coordinator/students", icon: <Users size={22} />, label: "Students" },
+    { href: "/coordinator/approvals", icon: <CheckSquare size={22} />, label: "Approvals" },
+    { href: "/coordinator/internships", icon: <Briefcase size={22} />, label: "Internships" },
+    { href: "/coordinator/companies", icon: <Building2 size={22} />, label: "Companies" },
+    { href: "/coordinator/announcements", icon: <Megaphone size={22} />, label: "Announcements" },
+    { href: "/coordinator/settings", icon: <Settings size={22} />, label: "Settings" },
   ];
 
   return (
-    <aside className="sidebar-icon-only">
+    <aside className="coordinator-sidebar-icon-only">
       <div className="sidebar-nav">
         {navItems.map((item, index) => (
-          <Link key={index} href={item.href} className={isActive(item.href) ? "active nav-item" : "nav-item"}>
+          <Link 
+            key={index} 
+            href={item.href} 
+            className={isActive(item.href) ? "active nav-item" : "nav-item"}
+          >
             {item.icon}
             <span className="tooltip">{item.label}</span>
           </Link>

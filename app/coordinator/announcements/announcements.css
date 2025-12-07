@@ -1,321 +1,399 @@
-/* --- 1. Core Theme & Colors (Dark Mode Default) --- */
-:root {
-  /* Colors */
-  --bg-dark: #021217;
-  --text-light: #F1F5F9;
-  --primary-orange: #EE7428; /* Dark Mode Accent */
-  --secondary-cyan: #00d4ff;
-  --border-color: rgba(241, 245, 249, 0.1); /* Subtle Border for Glassmorphism */
-  
-  /* Glassmorphism/Card Background */
-  --bg-card: rgba(15, 23, 42, 0.4); 
-  --bg-input: rgba(15, 23, 42, 0.6); 
+/*
+|--------------------------------------------------------------------------
+| ANNOUNCEMENTS PAGE STYLES
+|--------------------------------------------------------------------------
+| Layout (shell/sidebar) is handled by coordinator-layout.css.
+| This file styles the specific widgets for the announcements page.
+*/
 
-  /* Shadows for Dark Mode - subtle */
-  --shadow-deep: 0 10px 30px rgba(0, 0, 0, 0.5);
-  --shadow-card: 0 4px 18px rgba(0, 0, 0, 0.3);
-
-  /* Typography */
-  --font-heading: 'Plus Jakarta Sans', sans-serif;
-  --font-body: 'Inter', sans-serif;
+/*
+|--------------------------------------------------------------------------
+| Header & Title (Consistent with other pages)
+|--------------------------------------------------------------------------
+*/
+.header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--bg-card);
+    padding: 30px 40px;
+    border-radius: var(--radius-card); 
+    box-shadow: var(--shadow-card);
+    margin-bottom: 40px;
+    border: 1px solid var(--border-color);
+    backdrop-filter: blur(12px);
 }
 
-/* --- Light Mode Overrides --- */
-.light-mode {
-  --bg-dark: #F8FAFC;
-  --text-light: #0F172A;
-  --primary-orange: #EA580C; /* Light Mode Accent */
-  --secondary-cyan: #3b82f6;
-  --border-color: rgba(15, 23, 42, 0.1);
-
-  --bg-card: rgba(255, 255, 255, 0.6); 
-  --bg-input: rgba(255, 255, 255, 0.8);
-  
-  /* Shadows for Light Mode - lighter */
-  --shadow-deep: 0 10px 30px rgba(0, 0, 0, 0.1);
-  --shadow-card: 0 4px 18px rgba(0, 0, 0, 0.08);
+.header-text h2 {
+    font-size: 2.2rem;
+    color: var(--text-main);
+    margin: 0 0 5px 0;
+    line-height: 1.1;
+    font-family: var(--font-heading);
+    font-weight: 800;
 }
 
-/* --- Global & Typography Setup --- */
-body {
-  font-family: var(--font-body);
-  background-color: var(--bg-dark);
-  color: var(--text-light);
-  transition: background-color 0.3s, color 0.3s;
+.dash-subtitle {
+    font-size: 1rem;
+    color: var(--text-muted);
+    margin: 0;
 }
 
-h1, h2, h3 {
-  font-family: var(--font-heading);
-  font-weight: 700;
-  letter-spacing: -0.03em; /* Tighter tracking */
+.header-icon {
+    font-size: 2rem;
+    color: var(--primary-orange);
+    background: var(--bg-input);
+    padding: 15px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-card);
 }
 
-p {
-  line-height: 1.6;
+/*
+|--------------------------------------------------------------------------
+| Main Grid Layout
+|--------------------------------------------------------------------------
+*/
+.announcements-grid {
+    display: grid;
+    /* Left: Feed (Flexible), Right: Form (Fixed 380px) */
+    grid-template-columns: 1fr 380px; 
+    gap: 30px;
+    align-items: start;
 }
 
-/* ----- Layout ----- */
-.coordinator-page {
-  display: flex;
-  min-height: 100vh;
+/*
+|--------------------------------------------------------------------------
+| Feed Column (Left)
+|--------------------------------------------------------------------------
+*/
+.feed-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
 }
 
-.announcement-page {
-  flex: 1;
-  padding: 50px 80px; /* High padding for "breathing room" */
+.feed-header h3 {
+    font-size: 1.4rem;
+    color: var(--text-main);
+    font-family: var(--font-heading);
+    margin: 0;
 }
 
-/* ----- Header & Glass Card (24px Radius) --- */
-.glass-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-radius: 24px; /* Card/Container Radius */
-  box-shadow: var(--shadow-card);
-}
-
-.announcement-header {
-  padding: 30px 40px;
-  margin-bottom: 40px;
-}
-
-.announcement-header h1 {
-  font-size: 32px;
-  color: var(--primary-orange);
-}
-
-/* ----- Layout: left & right (Grid System) ----- */
-.announcement-content {
-  display: flex;
-  gap: 50px;
-  align-items: flex-start;
-}
-
-.latest-updates {
-  flex: 2;
-}
-
-.latest-updates h2 {
-  font-size: 24px;
-  margin-bottom: 25px;
+.badge {
+    background: var(--primary-orange);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
 }
 
 .announcement-list {
-  display: flex;
-  flex-direction: column;
-  gap: 30px;
-  overflow-y: auto;
-  max-height: calc(100vh - 240px);
-  padding-right: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
 }
 
-/* Announcement Card Item */
-.announcement-item {
-  padding: 24px;
-  border-radius: 24px; /* Card/Container Radius */
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  box-shadow: var(--shadow-card);
-  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Smooth transition for hover */
+.announcement-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-card);
+    padding: 30px;
+    box-shadow: var(--shadow-card);
+    transition: transform 0.2s, border-color 0.2s;
 }
 
-/* --- Hover Effect: Lift + Orange Border Glow + Deep Shadow --- */
-.card-hover-effect:hover {
-  transform: translateY(-8px); /* Lift */
-  box-shadow: var(--shadow-deep), 0 0 20px 0px rgba(238, 116, 40, 0.4); /* Deep Shadow + Orange Glow */
-  border-color: var(--primary-orange);
+.announcement-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--primary-orange);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
 }
 
-.announcement-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 18px; 
-  margin-bottom: 20px;
-  border: 1px solid var(--border-color);
+.post-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border-color);
 }
 
-.announcement-title {
-  font-size: 22px;
-  margin-bottom: 8px;
+.post-title {
+    font-size: 1.5rem;
+    color: var(--text-main);
+    margin: 0;
+    font-weight: 700;
 }
 
-.announcement-text {
-  font-size: 16px;
-  margin-bottom: 12px;
-  color: var(--text-light);
-  opacity: 0.85;
+.post-time {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    white-space: nowrap;
 }
 
-.announcement-item .date {
-  font-size: 14px;
-  opacity: 0.6;
+.post-content {
+    font-size: 1rem;
+    color: var(--text-muted);
+    line-height: 1.7;
+    margin-bottom: 20px;
+    white-space: pre-wrap;
 }
 
-.announcement-actions {
-  margin-top: 15px;
-  display: flex;
-  gap: 12px;
+.post-image-wrapper {
+    margin-bottom: 20px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
 }
 
-/* ----- RIGHT: Create Form ----- */
-.create-announcement {
-  flex: 1.2;
-  padding: 30px 30px;
-  position: sticky;
-  top: 50px; /* Aligned with top padding */
-  max-height: calc(100vh - 100px);
+.post-image {
+    width: 100%;
+    max-height: 400px;
+    object-fit: cover;
+    display: block;
 }
 
-.create-announcement h2 {
-  font-size: 22px;
-  margin-bottom: 20px;
+.post-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid var(--border-color);
 }
 
-.create-announcement label {
-  font-size: 15px;
-  font-weight: 600;
-  margin-top: 15px;
-  display: block;
-  opacity: 0.9;
+.author-tag {
+    font-size: 0.8rem;
+    color: var(--primary-orange);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: rgba(0, 212, 255, 0.1);
+    padding: 4px 10px;
+    border-radius: 4px;
 }
 
-/* Inputs & Textareas */
-.create-announcement input,
-.create-announcement textarea {
-  width: 90%;
-  padding: 14px;
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  margin-top: 8px;
-  font-size: 15px;
-  background: var(--bg-input);
-  color: var(--text-light);
-  transition: all 0.2s ease;
+.action-buttons {
+    display: flex;
+    gap: 10px;
 }
 
-.create-announcement input:focus,
-.create-announcement textarea:focus {
-  border-color: var(--secondary-cyan);
-  outline: none;
-  background: var(--bg-input); /* Maintain glass background */
+.icon-btn {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-muted);
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
 }
 
-/* --- Buttons (12px Radius) --- */
-.announcement-actions button,
-.create-announcement button {
-  padding: 14px 20px;
-  font-weight: 600;
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.25s ease;
+.edit-btn:hover { color: var(--secondary-cyan); border-color: var(--secondary-cyan); background: var(--bg-input); }
+.delete-btn:hover { color: var(--color-danger); border-color: var(--color-danger); background: rgba(239, 68, 68, 0.1); }
+
+
+/*
+|--------------------------------------------------------------------------
+| Form Column (Right - Sticky)
+|--------------------------------------------------------------------------
+*/
+.form-column {
+    position: sticky;
+    top: 20px;
 }
 
-/* Primary Button (Form Post) */
+.create-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-card);
+    padding: 30px;
+    box-shadow: var(--shadow-deep);
+}
+
+.form-header h3 {
+    font-size: 1.3rem;
+    color: var(--text-main);
+    margin: 0 0 20px 0;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.input-field, .textarea-field {
+    width: 100%;
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+    padding: 12px;
+    border-radius: var(--radius-btn);
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    box-sizing: border-box;
+    transition: all 0.2s;
+}
+
+.input-field:focus, .textarea-field:focus {
+    border-color: var(--primary-orange);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(238, 116, 40, 0.15);
+}
+
+/* File Upload Button Styling */
+.file-upload-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.custom-file-upload {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 15px;
+    cursor: pointer;
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-btn);
+    color: var(--text-main);
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.custom-file-upload:hover {
+    border-color: var(--primary-orange);
+    color: var(--primary-orange);
+}
+
+.file-name {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 150px;
+}
+
+.form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.full-width {
+    flex: 1;
+    justify-content: center;
+}
+
+/* Buttons */
 .btn-primary {
-  width: 35%;
-  background: var(--primary-orange);
-  color: var(--bg-dark); /* Dark text on bright orange */
-  margin-top: 25px;
+    background: var(--primary-orange);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: var(--radius-btn);
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
 }
-
 .btn-primary:hover:not(:disabled) {
-  background: #f78c4a; /* Slightly lighter orange for hover */
-  transform: translateY(-2px); /* Subtle lift */
-  box-shadow: 0 8px 15px rgba(238, 116, 40, 0.3);
+    background: #d9651d;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(238, 116, 40, 0.3);
 }
-
 .btn-primary:disabled {
-  background: #475569;
-  cursor: not-allowed;
+    background: var(--border-color);
+    cursor: not-allowed;
 }
 
-/* Secondary Button (Edit) */
 .btn-secondary {
-  background-color: var(--secondary-cyan);
-  color: var(--bg-dark);
+    background: var(--bg-input);
+    color: var(--text-muted);
+    border: 1px solid var(--border-color);
+    padding: 12px 20px;
+    border-radius: var(--radius-btn);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
 }
-
 .btn-secondary:hover {
-  background-color: #5edfff;
-  transform: translateY(-2px);
+    color: var(--text-main);
+    background: var(--border-color);
 }
 
-/* Delete Button */
-.btn-delete {
-  background-color: #ef4444; /* Red */
-  color: white;
+/*
+|--------------------------------------------------------------------------
+| States & Animations
+|--------------------------------------------------------------------------
+*/
+.empty-state-card {
+    padding: 60px;
+    text-align: center;
+    border: 1px dashed var(--border-color);
+    border-radius: var(--radius-card);
+    color: var(--text-muted);
+    font-size: 1.1rem;
 }
 
-.btn-delete:hover {
-  background-color: #dc2626;
-  transform: translateY(-2px);
+.reveal-on-scroll {
+  opacity: 0; 
+  animation: slideUpFade 0.6s ease-out forwards;
 }
 
-/* Cancel Button */
-.btn-cancel {
-  width: 100%;
-  background: #475569 !important; /* Slate Gray */
-  color: var(--text-light);
-  margin-top: 15px;
-}
-
-.btn-cancel:hover {
-  background: #64748b !important;
-  transform: translateY(-2px);
-}
-
-/* Empty State */
-.no-announcement {
-  opacity: 0.7;
-  font-size: 16px;
-  margin-top: 20px;
-  text-align: center;
-  padding: 40px;
-}
-
-
-/* --- 5. Animations & Effects --- */
-
-/* Reveal on Scroll (Placeholder - in a real app, you'd use IntersectionObserver) */
-@keyframes slideUpFadeIn {
-  from {
+@keyframes slideUpFade {
+  0% {
     opacity: 0;
-    transform: translateY(30px);
+    transform: translateY(20px);
   }
-  to {
+  100% {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
-.reveal-on-scroll {
-  animation: slideUpFadeIn 0.8s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
-  opacity: 0;
+/* Skeleton */
+.skeleton-card {
+    height: 250px;
+    background: var(--bg-card);
+    border-radius: var(--radius-card);
+    border: 1px solid var(--border-color);
+    margin-bottom: 20px;
 }
 
-/* Stagger the animation */
-.announcement-list .announcement-item:nth-child(1) { animation-delay: 0.1s; }
-.announcement-list .announcement-item:nth-child(2) { animation-delay: 0.2s; }
-.announcement-list .announcement-item:nth-child(3) { animation-delay: 0.3s; }
-/* ... continue staggering for more items */
-.create-announcement { animation-delay: 0.15s; }
-
-/* Scrollbar styling for list/form */
-.announcement-list::-webkit-scrollbar,
-.create-announcement::-webkit-scrollbar {
-  width: 8px;
-}
-
-.announcement-list::-webkit-scrollbar-thumb,
-.create-announcement::-webkit-scrollbar-thumb {
-  background: rgba(241, 245, 249, 0.1);
-  border-radius: 10px;
-}
-
-.announcement-list::-webkit-scrollbar-track,
-.create-announcement::-webkit-scrollbar-track {
-  background: transparent;
+/* Responsive */
+@media (max-width: 1024px) {
+    .announcements-grid {
+        grid-template-columns: 1fr; /* Stack layout on smaller screens */
+    }
+    .form-column {
+        order: -1; /* Form goes to top on mobile */
+        position: static;
+    }
 }

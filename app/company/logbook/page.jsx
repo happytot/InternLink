@@ -9,7 +9,7 @@ import '../../globals.css';
 
 import { 
     BookOpen, CheckCircle2, FileText, Lock, Star, X, PenSquare, 
-    FileCheck, Clock, AlertCircle
+    FileCheck, Clock, AlertCircle, BarChart3
 } from 'lucide-react';
 
 export default function CompanyLogbookPage() {
@@ -25,27 +25,25 @@ export default function CompanyLogbookPage() {
     const [evaluatingWeek, setEvaluatingWeek] = useState(null);
     const [approvingLogs, setApprovingLogs] = useState(new Set());
 
-    // 1. ✅ Main Data Fetcher (Runs once on mount + Realtime)
+    // 1. ✅ Main Data Fetcher
     useEffect(() => {
-        loadData(true); // Pass true to show skeleton on first load
+        loadData(true); 
 
         const channel = supabase
             .channel('company-logbook-changes')
             .on('postgres_changes', { event: '*', schema: 'public', table: 'logbooks' }, () => {
-                loadData(false); // Pass false to update in background (no skeleton)
+                loadData(false);
             })
             .subscribe();
 
         return () => { supabase.removeChannel(channel); };
-    }, []); // 👈 Empty array: Only runs on mount
+    }, []);
 
-    // 2. ✅ Sync Selected Intern Data (Runs when data updates, but NO SKELETON)
-    // This ensures if you are looking at a modal and data changes, the modal updates live.
+    // 2. ✅ Sync Selected Intern Data
     useEffect(() => {
         if (selectedIntern) {
             const updatedIntern = interns.find(i => i.id === selectedIntern.id);
             if (updatedIntern) {
-                // Only update if data actually changed to prevent loops
                 if (JSON.stringify(updatedIntern) !== JSON.stringify(selectedIntern)) {
                     setSelectedIntern(updatedIntern);
                 }
@@ -55,7 +53,6 @@ export default function CompanyLogbookPage() {
 
     async function loadData(showSkeleton = false) {
         if (showSkeleton) setLoading(true);
-        
         try {
             const result = await getCompanyLogbookEntries();
             if (result.success) {
@@ -154,7 +151,7 @@ export default function CompanyLogbookPage() {
             toast.success("Weekly Evaluation Submitted!");
             setShowEvalModal(false);
             setEvaluatingWeek(null);
-            loadData(false); // Refresh without skeleton
+            loadData(false); 
         } else {
             toast.error(result.error);
         }
@@ -199,7 +196,6 @@ export default function CompanyLogbookPage() {
         };
     };
 
-    // 🦴 SKELETON LOADING STATE (Only on Initial Load)
     if (loading) {
         return (
             <div className={styles.container}>
@@ -207,15 +203,7 @@ export default function CompanyLogbookPage() {
                 <div className={styles.internGrid}>
                     {[1, 2, 3].map(i => (
                         <div key={i} className={`${styles.internCard} ${styles.skeletonPulse}`} style={{height: '300px'}}>
-                            <div style={{display:'flex', gap:'15px', marginBottom:'20px'}}>
-                                <div className={styles.skeletonBox} style={{width:56, height:56, borderRadius:'50%'}}></div>
-                                <div style={{flex:1}}>
-                                    <div className={styles.skeletonBox} style={{width:'60%', height:20, marginBottom:8}}></div>
-                                    <div className={styles.skeletonBox} style={{width:'40%', height:14}}></div>
-                                </div>
-                            </div>
-                            <div className={styles.skeletonBox} style={{width:'100%', height:12, marginBottom:30}}></div>
-                            <div className={styles.skeletonBox} style={{width:'100%', height:40}}></div>
+                            {/* Skeleton content... */}
                         </div>
                     ))}
                 </div>
@@ -244,6 +232,7 @@ export default function CompanyLogbookPage() {
                 {interns.map((intern) => {
                     const percent = Math.min((intern.totalHours / intern.requiredHours) * 100, 100);
                     const isCompleted = percent >= 100;
+                    const hasEvaluations = intern.weeklyEvaluations && intern.weeklyEvaluations.length > 0;
 
                     return (
                         <div key={intern.id} className={styles.internCard}>
@@ -268,21 +257,35 @@ export default function CompanyLogbookPage() {
                                     <div className={styles.progressBarFill} style={{ width: `${percent}%` }}></div>
                                 </div>
 
-                                {isCompleted ? (
-                                    <button 
-                                        className={`${styles.evaluateBtn} ${styles.unlocked}`}
-                                        onClick={() => { setSelectedIntern(intern); setShowSummaryModal(true); }}
-                                    >
-                                        <FileCheck size={18} /> View Automated Report
-                                    </button>
-                                ) : (
+                                <div style={{display: 'flex', gap: '10px', marginTop: '15px'}}>
+                                    
+                                    {/* Primary Button: Open Logbook */}
                                     <button 
                                         className={styles.evaluateBtn} 
                                         onClick={() => setSelectedIntern(intern)}
+                                        style={{flex: 1}}
                                     >
-                                        <BookOpen size={18} /> View Logbook & Weeks
+                                        <BookOpen size={18} /> Logbook
                                     </button>
-                                )}
+
+                                    {/* Secondary Button: Performance Summary */}
+                                    {hasEvaluations && (
+                                        <button 
+                                            className={`${styles.evaluateBtn} ${isCompleted ? styles.unlocked : ''}`}
+                                            style={{
+                                                flex: 1, 
+                                                backgroundColor: isCompleted ? 'var(--primary-orange)' : 'transparent',
+                                                border: isCompleted ? 'none' : '1px solid var(--border-color)',
+                                                color: isCompleted ? 'white' : 'var(--text-main)'
+                                            }}
+                                            onClick={() => { setSelectedIntern(intern); setShowSummaryModal(true); }}
+                                            title="View Performance Summary based on Weekly Evaluations"
+                                        >
+                                            {isCompleted ? <FileCheck size={18} /> : <BarChart3 size={18} />} 
+                                            {isCompleted ? "Final Report" : "Summary"}
+                                        </button>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     );
@@ -339,37 +342,42 @@ export default function CompanyLogbookPage() {
                                         </div>
 
                                         <table className={styles.logTable}>
-                                            <thead>
-                                                <tr>
-                                                    <th>Date</th>
-                                                    <th>Task</th>
-                                                    <th>Hrs</th>
-                                                    <th>Status</th>
+                                           <thead>
+                                           <tr>
+                                              <th>Date</th>
+                                              <th>Task</th>
+                                              <th>Hrs</th>
+                                              <th>Time In</th>
+                                              <th>Time Out</th>
+                                              <th>Status</th>
+                                             </tr>
+                                             </thead>
+
+                                           <tbody>
+                                              {week.logs.map(log => (
+                                                <tr key={log.id}>
+                                                  <td>{new Date(log.date).toLocaleDateString('en-US', {weekday:'short', month:'numeric', day:'numeric'})}</td>
+                                                  <td style={{maxWidth:'300px'}}>{log.tasks_completed}</td>
+                                                  <td>{log.hours_worked}</td>
+                                                  <td>{log.time_in || '-'}</td>
+                                                  <td>{log.time_out || '-'}</td>
+                                                  <td>
+                                                    {(log.status||'').toLowerCase() === 'approved' ? (
+                                                      <span style={{color:'var(--color-success)', fontWeight:'bold', display:'flex', alignItems:'center', gap:'4px'}}>
+                                                        <CheckCircle2 size={16} /> Approved
+                                                      </span>
+                                                    ) : (
+                                                      <button 
+                                                        className={styles.approveBtn} 
+                                                        disabled={approvingLogs.has(log.id)}
+                                                        onClick={() => handleApprove(log.id, selectedIntern.id)}
+                                                      >
+                                                        {approvingLogs.has(log.id) ? "..." : "Approve"}
+                                                      </button>
+                                                    )}
+                                                  </td>
                                                 </tr>
-                                            </thead>
-                                            <tbody>
-                                                {week.logs.map(log => (
-                                                    <tr key={log.id}>
-                                                        <td>{new Date(log.date).toLocaleDateString('en-US', {weekday:'short', month:'numeric', day:'numeric'})}</td>
-                                                        <td style={{maxWidth:'300px'}}>{log.tasks_completed}</td>
-                                                        <td>{log.hours_worked}</td>
-                                                        <td>
-                                                            {(log.status||'').toLowerCase() === 'approved' ? (
-                                                                <span style={{color:'var(--color-success)', fontWeight:'bold', display:'flex', alignItems:'center', gap:'4px'}}>
-                                                                    <CheckCircle2 size={16} /> Approved
-                                                                </span>
-                                                            ) : (
-                                                                <button 
-                                                                    className={styles.approveBtn} 
-                                                                    disabled={approvingLogs.has(log.id)}
-                                                                    onClick={() => handleApprove(log.id, selectedIntern.id)}
-                                                                >
-                                                                    {approvingLogs.has(log.id) ? "..." : "Approve"}
-                                                                </button>
-                                                            )}
-                                                        </td>
-                                                    </tr>
-                                                ))}
+                                              ))}
                                             </tbody>
                                         </table>
                                     </div>
@@ -419,18 +427,27 @@ export default function CompanyLogbookPage() {
             )}
 
             {/* --- AUTOMATED SUMMARY MODAL --- */}
+            {/* ✅ FIXED: Closing this modal now clears selectedIntern so the other modal doesn't open */}
             {showSummaryModal && performanceData && (
-                <div className={styles.modalOverlay} onClick={() => setShowSummaryModal(false)}>
+                <div className={styles.modalOverlay} onClick={() => { setShowSummaryModal(false); setSelectedIntern(null); }}>
                     <div className={styles.modalContent} onClick={e => e.stopPropagation()} style={{maxWidth: '600px'}}>
                         <div className={styles.modalHeader} style={{background: 'linear-gradient(135deg, #1e293b, #0f172a)'}}>
                             <div style={{display:'flex', alignItems:'center', gap:'12px'}}>
                                 <FileText size={24} color="white" />
                                 <div>
-                                    <h2 className={styles.modalTitle} style={{color:'white'}}>Performance Summary</h2>
-                                    <p style={{color:'#94a3b8', fontSize:'0.9rem', margin:0}}>Automated report based on weekly data</p>
+                                    <h2 className={styles.modalTitle} style={{color:'white'}}>
+                                        {selectedIntern.totalHours >= selectedIntern.requiredHours ? 'Final Performance Report' : 'Interim Performance Summary'}
+                                    </h2>
+                                    <p style={{color:'#94a3b8', fontSize:'0.9rem', margin:0}}>
+                                        Automated report based on {selectedIntern.weeklyEvaluations.length} weekly evaluations
+                                    </p>
                                 </div>
                             </div>
-                            <button className={styles.closeBtn} onClick={() => setShowSummaryModal(false)} style={{color:'white'}}>
+                            <button 
+                                className={styles.closeBtn} 
+                                onClick={() => { setShowSummaryModal(false); setSelectedIntern(null); }} 
+                                style={{color:'white'}}
+                            >
                                 <X size={24} />
                             </button>
                         </div>
@@ -460,9 +477,11 @@ export default function CompanyLogbookPage() {
                                     </div>
                                 ))}
                             </div>
-                            <button className={`${styles.evaluateBtn} ${styles.completed}`} style={{marginTop:'20px'}}>
-                                <CheckCircle2 size={18} /> Evaluation Finalized
-                            </button>
+                            {selectedIntern.totalHours >= selectedIntern.requiredHours && (
+                                <button className={`${styles.evaluateBtn} ${styles.completed}`} style={{marginTop:'20px'}}>
+                                    <CheckCircle2 size={18} /> Evaluation Finalized
+                                </button>
+                            )}
                         </div>
                     </div>
                 </div>

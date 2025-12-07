@@ -1,12 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { supabase } from '../../../lib/supabaseClient'; 
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { toast, Toaster } from 'sonner';
 import { getInternLogbookData, submitNewLogEntry } from '@/app/intern/logbook/actions';
 import styles from './Logbook.module.css';
 import LogbookForm from './LogbookForm';
 import LogbookEntry from './LogbookEntry';
+import WeeklyEvaluations from './WeeklyEvaluations';
+import FloatingAIChatWithCharts from '../../components/chatbot';
 
 const formatDate = (dateString) => {
   return new Date(dateString).toLocaleDateString('en-US', {
@@ -18,11 +20,13 @@ const formatDate = (dateString) => {
 };
 
 export default function LogbookClient() {
+  const supabase = createClientComponentClient();
+  const [user, setUser] = useState(null);
   const [logbooks, setLogbooks] = useState([]);
   const [stats, setStats] = useState({
     totalHours: 0,
     progress: 0,
-    requiredHours: 486,
+    requiredHours: 500,
     jobTitle: 'Loading...',
     companyName: 'Loading...'
   });
@@ -31,7 +35,6 @@ export default function LogbookClient() {
   const [isLoading, setIsLoading] = useState(true);
 
   // --- REUSABLE FETCH FUNCTION ---
-  // We moved this OUT of useEffect so the Realtime listener can call it too.
   const fetchLogbookData = async (showLoadingSpinner = false) => {
     if (showLoadingSpinner) setIsLoading(true);
     
@@ -60,39 +63,36 @@ export default function LogbookClient() {
 
   // --- 1. INITIAL LOAD ---
   useEffect(() => {
-    fetchLogbookData(true); // True = show full page loading spinner
+    fetchLogbookData(true); 
   }, []);
 
-  // --- 2. REALTIME LISTENER (The Magic Part) ---
+  // --- 2. REALTIME LISTENER ---
   useEffect(() => {
-    console.log("🟢 Intern listening for Company updates...");
+    const getUser = async () => {
+      const { data } = await supabase.auth.getUser();
+      if (data?.user) setUser(data.user);
+    };
+    getUser();
 
     const channel = supabase
       .channel('intern-logbook-updates')
       .on(
         'postgres_changes',
-        // Listen specifically for UPDATES on the logbooks table
         { event: 'UPDATE', schema: 'public', table: 'logbooks' },
         (payload) => {
-          console.log('Update received:', payload);
-
-          // Check if the status changed to 'Approved'
           const newStatus = (payload.new.status || '').toLowerCase();
           if (newStatus === 'approved') {
             toast.success("Your log entry was just APPROVED!");
           }
-
-          // REFRESH DATA (Updates the list and the progress bar instantly)
-          fetchLogbookData(false); // False = don't show full page spinner, just update UI
+          fetchLogbookData(false); 
         }
       )
       .subscribe();
 
-    // Cleanup
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [supabase]);
 
   // --- 3. HANDLE SUBMISSION ---
   const handleAddLog = async (logData) => {
@@ -101,23 +101,14 @@ export default function LogbookClient() {
     formData.append('hours_worked', logData.hours_worked);
     formData.append('tasks_completed', logData.tasks_completed);
     formData.append('attendance_status', logData.attendance_status || 'Present'); 
+    formData.append('time_in', logData.time_in || '');
+    formData.append('time_out', logData.time_out || '');
 
     const result = await submitNewLogEntry(formData);
 
     if (result.success) {
       toast.success('Log entry submitted successfully!');
-      
-      // We manually add it to the list for instant feedback, 
-      // but fetchLogbookData will also run if RLS triggers an INSERT event.
-      const newEntry = {
-        id: Date.now(), // Temporary ID until refresh
-        ...logData,
-        status: 'Pending',
-        hours_worked: parseFloat(logData.hours_worked)
-      };
-      
-      setLogbooks([newEntry, ...logbooks]);
-      fetchLogbookData(false); // Refresh to get the real ID from server
+      setLogbooks([result.log, ...logbooks]);
     } else {
       toast.error(result.error);
     }
@@ -127,16 +118,47 @@ export default function LogbookClient() {
       toast.info("Delete functionality coming soon.");
   };
 
+  // Loading Skeleton
   if (isLoading) {
     return (
-      <div className={styles.pageContainer}>
+      <div className={styles.pageWrapper}>
         <h1 className={styles.header}>Digital Logbook</h1>
-        <p>Loading your data...</p>
+        <p className={styles.subHeader}>
+          Submitting for: <span className={styles.skeleton} style={{width:'150px'}}></span> at <span className={styles.skeleton} style={{width:'200px'}}></span>
+        </p>
+
+        <div className={styles.bentoGrid}>
+          <div className={styles.leftPane}>
+            <div className={styles.statsGrid}>
+               {/* Merged Skeleton */}
+               <div className={styles.statCard}>
+                 <div className={styles.skeleton} style={{height:'16px', width:'50%', marginBottom:'12px'}}></div>
+                 <div className={styles.skeleton} style={{height:'48px', width:'70%'}}></div>
+                 <div className={styles.skeleton} style={{height:'12px', width:'100%', marginTop:'12px'}}></div>
+               </div>
+            </div>
+            <div className={styles.formContainer}>
+               {/* Form Skeletons */}
+               {[1,2,3,4].map(i => <div key={i} className={styles.skeleton} style={{height:'40px', width:'100%', marginBottom:'16px'}}></div>)}
+            </div>
+          </div>
+
+          <div className={styles.rightPane}>
+            <h2 className={styles.listHeader}>Submitted Entries</h2>
+            <div className={styles.entriesScroll}>
+               {[1,2,3].map(i => (
+                 <div key={i} className={styles.entryCard}>
+                    <div className={styles.skeleton} style={{height:'48px', width:'100%'}}></div>
+                 </div>
+               ))}
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
 
-  // --- 4. LOCKED STATE ---
+  // Locked State
   if (!isApproved) {
     return (
       <div className={styles.pageContainer}>
@@ -149,61 +171,84 @@ export default function LogbookClient() {
             on your approved application before you can log hours.
           </p>
         </div>
+        {user?.id && <FloatingAIChatWithCharts studentId={user.id} />}
       </div>
     );
   }
 
   return (
-    <div className={styles.pageContainer}>
+    <div className={styles.pageWrapper}>
       <Toaster richColors position="top-right" />
-      
+
       <h1 className={styles.header}>Digital Logbook</h1>
-      
-      <>
-        {/* Dynamic Header */}
-        <p className={styles.subHeader}>
-          Submitting for: <strong>{stats.jobTitle}</strong> at <strong>{stats.companyName}</strong>
-        </p>
 
-        <div className={styles.statsGrid}>
-          <div className={styles.statCard}>
-            <h3 className={styles.statTitle}>Total Hours Approved</h3>
-            <p className={styles.statValue}>{stats.totalHours}</p>
-          </div>
-          <div className={styles.statCard}>
-            <h3 className={styles.statTitle}>Progress ({stats.requiredHours} Hours)</h3>
-            
-            <div className={styles.progressContainer}>
-              <div
-                className={styles.progressBar}
-                style={{ width: `${stats.progress}%` }}
-              ></div>
+      <p className={styles.subHeader}>
+        Submitting for: <strong>{stats.jobTitle}</strong> at <strong>{stats.companyName}</strong>
+      </p>
+
+      {/* --- BENTO GRID --- */}
+      <div className={styles.bentoGrid}>
+
+        {/* LEFT SIDE — Stats + Form */}
+        <div className={styles.leftPane}>
+
+          {/* Merged Stats Card */}
+          <div className={styles.statsGrid} style={{gridTemplateColumns: '1fr'}}> 
+            <div className={styles.statCard}>
+              <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '10px'}}>
+                 <div>
+                    <h3 className={styles.statTitle}>Total Hours Approved</h3>
+                    <p className={styles.statValue}>{stats.totalHours}</p>
+                 </div>
+                 <div style={{textAlign: 'right'}}>
+                    <span style={{fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: 600}}>Goal: {stats.requiredHours} hrs</span>
+                 </div>
+              </div>
+
+              <div className={styles.progressContainer}>
+                <div
+                  className={styles.progressBar}
+                  style={{ width: `${stats.progress}%` }}
+                ></div>
+              </div>
+
+              <p className={styles.progressText}>
+                {stats.progress.toFixed(1)}% Complete
+              </p>
             </div>
-            
-            <p className={styles.progressText}>{stats.progress.toFixed(1)}% Complete</p>
+          </div>
+
+          <div className={styles.formContainer}>
+            <LogbookForm onSubmit={handleAddLog} />
           </div>
         </div>
 
-        <div className={styles.formContainer}>
-          <LogbookForm onSubmit={handleAddLog} />
-        </div>
-      </>
+        {/* RIGHT SIDE — Entries */}
+        <div className={styles.rightPane}>
+          <h2 className={styles.listHeader}>Submitted Entries</h2>
 
-      <div className={styles.listContainer}>
-        <h2 className={styles.listHeader}>Submitted Entries</h2>
-        {logbooks.length === 0 ? (
-          <p className={styles.noEntriesText}>No logbook entries found.</p>
-        ) : (
-          logbooks.map((log) => (
-            <LogbookEntry
-              key={log.id}
-              log={log}
-              formatDate={formatDate}
-              onDelete={handleDeleteLog}
-            />
-          ))
-        )}
+          <div className={styles.entriesScroll}>
+            {logbooks.length === 0 ? (
+              <p className={styles.noEntriesText}>No logbook entries found.</p>
+            ) : (
+              logbooks.map((log) => (
+                <LogbookEntry
+                  key={log.id}
+                  log={log}
+                  formatDate={formatDate}
+                  onDelete={handleDeleteLog}
+                />
+              ))
+            )}
+          </div>
+        </div>
+      
       </div>
+      
+      <WeeklyEvaluations />
+
+      {/* Floating AI Chat */}
+      {user?.id && <FloatingAIChatWithCharts studentId={user.id} />}
     </div>
   );
 }

@@ -1,125 +1,159 @@
 /*
 |--------------------------------------------------------------------------
-| InternLink Design System - CSS Variables (Dark Mode Default)
+| 🚨 CORE LAYOUT (Matched to Dashboard)
 |--------------------------------------------------------------------------
 */
-:root {
-    /* 1. Core Theme & Colors (Dark Mode Default) */
-    --bg-main: #021217;
-    --bg-card: #0F172A; /* Slate 900 */
-    --bg-glass: rgba(15, 23, 42, 0.7); /* Card background with transparency for glassmorphism */
-    --bg-input: #1e293b; /* Slate 800 for inputs/close buttons */
-    
-    --text-main: #F1F5F9; /* Slate 100 */
-    --text-muted: #94A3B8; /* Slate 400 */
-    
-    --primary-orange: #EE7428; /* Primary Accent - Orange (Dark) */
-    --secondary-cyan: #00d4ff; /* Secondary Accent - Cyan */
-    
-    --border-color: rgba(241, 245, 249, 0.1); /* Subtle white border */
 
-    /* Status Colors */
-    --color-success: #22c55e; /* Green 500 */
-    --color-danger: #ef4444; /* Red 500 */
-    
-    /* 2. Typography */
-    --font-heading: 'Plus Jakarta Sans', sans-serif;
-    --font-body: 'Inter', sans-serif;
-    
-    /* 3. Shapes & UI Components */
-    --radius-card: 24px;
-    --radius-btn: 12px;
-    --radius-pill: 50px;
-    
-    /* Shadows */
-    --shadow-deep: 0 25px 50px -12px rgba(0, 0, 0, 0.5); /* Deep Shadow for Cards */
-    --shadow-btn: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
-    --shadow-card: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -4px rgba(0, 0, 0, 0.3);
 
-    /* 4. Skeleton Colors */
-    --skeleton-base: color-mix(in srgb, var(--bg-card), white 5%);
-    --skeleton-shine: color-mix(in srgb, var(--bg-card), white 15%);
-}
-
-/* Light Mode Override (Optional, but included for completeness) */
-.light-mode {
-    --bg-main: #F8FAFC;
-    --bg-card: #FFFFFF;
-    --bg-glass: rgba(255, 255, 255, 0.7);
-    --bg-input: #E2E8F0;
-    
-    --text-main: #0F172A;
-    --text-muted: #64748B;
-    
-    --primary-orange: #EA580C; /* Primary Accent - Orange (Light) */
-    --secondary-cyan: #3b82f6; /* Secondary Accent - Blue */
-    
-    --border-color: rgba(15, 23, 42, 0.1); 
-    
-    --shadow-deep: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-    --shadow-card: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
-    
-    --skeleton-base: #E2E8F0;
-    --skeleton-shine: #F1F5F9;
+/* 4. Content Container (Width matched to Dashboard) */
+.dashboard-inner {
+    width: 100%;
+    max-width: 1500px;    /* ✅ Matched to dashboard max-width */
+    margin: 0 auto;       
+    padding: 40px;        
+    padding-bottom: 120px; /* ✅ Extra space at bottom */
+    box-sizing: border-box; 
 }
 
 
 /*
 |--------------------------------------------------------------------------
-| Core Layout & Global Styles
+| ✨ HEADER BENTO BOX
 |--------------------------------------------------------------------------
 */
-.dashboard-root {
-    display: flex;
-    min-height: 100vh;
-    background-color: var(--bg-main);
-    color: var(--text-main);
-    font-family: var(--font-body);
+.header-bento {
+    display: block;
+    width: 100%;
+    margin-bottom: 30px;
 }
 
-.dashboard-main {
-    flex: 1;
-    padding: 80px 40px; /* High Padding for "Breathing Room" */
+.header-bento-card {
+    display: flex !important;           
+    flex-direction: row !important;     
+    justify-content: space-between;     
+    align-items: center;                
+    width: 100%;                        
+    padding: 40px 50px;
+    background: var(--bg-card);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card);
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+    box-sizing: border-box; 
+    
+    /* ❌ EXPLICITLY NO HOVER TRANSFORM as requested */
+    transform: none !important;
+}
+
+.header-left {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: left;
+    min-width: 300px; 
 }
 
 .dash-title {
     font-family: var(--font-heading);
-    font-size: 3rem;
+    font-size: 2.8rem;
     font-weight: 800;
     color: var(--text-main);
-    margin-bottom: 10px;
+    letter-spacing: -1px;
+    margin: 0;
+    line-height: 1.1;
 }
 
 .dash-subtitle {
+    margin-top: 10px;
+    margin-bottom: 0;
+    color: var(--text-muted);
     font-size: 1.1rem;
-    color: var(--text-muted);
-    margin-bottom: 40px;
-}
-
-.text-muted {
-    color: var(--text-muted);
-    font-size: 0.9rem;
+    font-weight: 500;
 }
 
 
 /*
 |--------------------------------------------------------------------------
-| Applications Table Section (Card/Container)
+| 🔍 SEARCH COMPONENT (Integrated in Bento)
+|--------------------------------------------------------------------------
+*/
+.header-right.search-area {
+    display: flex;
+    align-items: center;
+    gap: 40px; 
+    width: 450px; /* Specific width for search bar balance */
+}
+
+.search-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+}
+
+.search-input {
+    width: 100%;
+    padding: 14px 20px;
+    border-radius: var(--radius-btn);
+    border: 1px solid var(--border-color);
+    background: var(--bg-input);
+    color: var(--text-main);
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.search-input::placeholder {
+    color: var(--text-muted);
+}
+
+.search-input:focus {
+    border-color: var(--primary-orange);
+    box-shadow: 0 0 0 3px rgba(238, 116, 40, 0.15);
+}
+
+.search-button {
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    border: none;
+    border-radius: var(--radius-btn);
+    background: var(--primary-orange);
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(238, 116, 40, 0.3);
+}
+
+.search-button:hover {
+    background: var(--primary-orange-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(238, 116, 40, 0.4);
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| 📋 APPLICATIONS TABLE SECTION
 |--------------------------------------------------------------------------
 */
 .applications-table-section {
-    /* Base Card Style */
     background: var(--bg-card);
-    border-radius: var(--radius-card); /* 24px Radius */
+    border-radius: var(--radius-card);
     box-shadow: var(--shadow-deep);
     border: 1px solid var(--border-color);
     padding: 30px;
-    transition: all 0.4s ease;
-    
-    /* Hover Effect: Orange Border Glow */
-    &:hover {
-        border-color: var(--primary-orange);
-    }
+    transition: border-color 0.4s ease;
+}
+
+.applications-table-section:hover {
+    border-color: var(--primary-orange);
 }
 
 .table-wrapper {
@@ -134,372 +168,180 @@
 
 .approvals-table th,
 .approvals-table td {
-    padding: 18px 25px;
+    padding: 20px 24px;
     text-align: left;
     color: var(--text-main);
-    font-size: 0.95rem;
+    vertical-align: middle;
 }
 
 /* Header Styling */
 .approvals-table th {
-    background-color: color-mix(in srgb, var(--primary-orange), black 10%); 
-    color: var(--bg-card); /* Dark text on orange */
+    background-color: var(--bg-input); 
+    color: var(--text-muted);
     font-family: var(--font-heading);
     font-weight: 700;
     text-transform: uppercase;
     font-size: 0.8rem;
     letter-spacing: 0.05em;
-    border-bottom: 2px solid var(--primary-orange);
+    border-bottom: 1px solid var(--border-color);
 }
 
-/* Rounded corners for the table header */
-.approvals-table thead tr:first-child th:first-child {
-    border-top-left-radius: 18px; /* Slightly less than card radius */
-}
-.approvals-table thead tr:first-child th:last-child {
-    border-top-right-radius: 18px;
-}
+.approvals-table thead tr:first-child th:first-child { border-top-left-radius: 12px; }
+.approvals-table thead tr:first-child th:last-child { border-top-right-radius: 12px; }
 
-/* Row Styling */
+/* Rows */
 .approvals-table tbody tr {
     border-bottom: 1px solid var(--border-color);
-    transition: background-color 0.2s, transform 0.2s;
+    transition: background-color 0.2s;
 }
 
-.approvals-table tbody tr:hover {
-    background-color: color-mix(in srgb, var(--bg-card), white 5%);
-    transform: translateY(-2px); /* Subtle Lift on Hover */
-    box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+.approvals-table td {
+    border-bottom: 1px solid var(--border-color);
 }
-
-.approvals-table tbody tr:last-child {
+.approvals-table tbody tr:last-child td {
     border-bottom: none;
 }
 
-/* Specific Cell Styles */
-.student-name, .job-title {
-    font-weight: 600;
-    color: var(--text-main);
-    margin-bottom: 2px;
+.approvals-table tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.03);
 }
+
+/* Typography for Cells */
+.student-name, .job-title {
+    font-weight: 700;
+    color: var(--text-main);
+    margin: 0 0 4px 0;
+    font-size: 1rem;
+}
+
 .student-email, .job-location {
     color: var(--text-muted);
     font-size: 0.85rem;
+    margin: 0;
 }
+
 .no-data-cell {
-    padding: 40px;
+    padding: 60px;
+    text-align: center;
     font-size: 1.1rem;
-    color: var(--secondary-cyan);
-    font-family: var(--font-heading);
-    font-weight: 500;
+    color: var(--text-muted);
+    font-style: italic;
 }
 
 
 /*
 |--------------------------------------------------------------------------
-| Buttons and Actions
+| 🔘 BUTTONS & ACTIONS
 |--------------------------------------------------------------------------
 */
-
-/* Resume Link Button (Secondary Accent/Cyan) */
 .resume-link-btn {
-    color: var(--bg-card);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 8px 15px;
-    font-size: 0.9rem;
+    display: inline-block;
+    padding: 8px 16px;
+    font-size: 0.85rem;
     font-weight: 600;
-    background-color: var(--secondary-cyan);
-    border: none;
-    border-radius: var(--radius-btn); /* 12px Radius */
+    color: var(--secondary-cyan);
+    background: rgba(0, 212, 255, 0.1);
+    border: 1px solid rgba(0, 212, 255, 0.2);
+    border-radius: var(--radius-btn);
     text-decoration: none;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 10px rgba(0, 212, 255, 0.2);
+    transition: all 0.2s;
 }
 
 .resume-link-btn:hover {
-    background-color: color-mix(in srgb, var(--secondary-cyan), black 10%);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(0, 212, 255, 0.3);
+    background: var(--secondary-cyan);
+    color: #000;
+    box-shadow: 0 0 15px rgba(0, 212, 255, 0.4);
 }
 
-/* Action Buttons (Approve/Reject) */
 .action-cell {
+    min-width: 220px;
+}
+
+.btn-group {
     display: flex;
-    gap: 15px;
-    align-items: center;
-    
+    gap: 10px;
 }
 
 .action-btn {
-    padding: 10px 18px;
+    padding: 10px 16px;
     font-size: 0.9rem;
     font-weight: 600;
-    color: var(--bg-card); /* Dark text */
+    color: white;
     border: none;
-    border-radius: var(--radius-btn); /* 12px Radius */
+    border-radius: var(--radius-btn);
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.2s;
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    box-shadow: var(--shadow-btn);
-    margin-top: 25px;
-}
-
-.action-btn i {
-    font-size: 0.9rem;
-}
-
-.action-btn:hover {
-    transform: translateY(-2px); /* Subtle lift */
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+    gap: 6px;
 }
 
 .approve-btn {
-  
-    background-color: var(--color-success); /* Green */
+    background-color: var(--color-success);
+    box-shadow: 0 4px 10px rgba(34, 197, 94, 0.2);
 }
-
 .approve-btn:hover {
-    background-color: color-mix(in srgb, var(--color-success), black 10%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(34, 197, 94, 0.4);
 }
 
 .reject-btn {
-    background-color: var(--color-danger); /* Red */
+    background-color: var(--bg-input); 
+    color: var(--text-muted);
+    border: 1px solid var(--border-color);
 }
-
 .reject-btn:hover {
-    background-color: color-mix(in srgb, var(--color-danger), black 10%);
+    background-color: var(--color-danger);
+    color: white;
+    border-color: var(--color-danger);
 }
 
-
-/*
-|--------------------------------------------------------------------------
-| Skeleton Loading Animation (Shimmer Effect)
-|--------------------------------------------------------------------------
-*/
-
-@keyframes shimmer {
-    0% { background-position: -800px 0; }
-    100% { background-position: 800px 0; }
-}
-
-.skeleton-row {
-    display: flex;
-    justify-content: space-between;
+.status-badge {
+    display: inline-flex;
     align-items: center;
-    padding: 10px 0;
-    gap: 20px;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    font-weight: 600;
 }
 
-.skeleton-line {
-    background: var(--skeleton-base);
-    background-image: linear-gradient(
-        to right, 
-        var(--skeleton-base) 0%, 
-        var(--skeleton-shine) 20%, 
-        var(--skeleton-base) 40%
-    );
-    background-repeat: no-repeat;
-    background-size: 800px 104px;
-    animation: shimmer 1.2s linear infinite;
-    
-    height: 18px;
-    border-radius: 4px;
+.status-badge.active {
+    background: rgba(34, 197, 94, 0.1);
+    color: var(--color-success);
+    border: 1px solid rgba(34, 197, 94, 0.2);
 }
-
-.skeleton-row .short { width: 10%; }
-.skeleton-row .medium { width: 15%; }
-.skeleton-row .long { width: 20%; }
-.skeleton-row .full { width: 25%; }
-
 
 /*
 |--------------------------------------------------------------------------
-| Sonner Toaster (Glass Card Style)
+| 📱 RESPONSIVE
 |--------------------------------------------------------------------------
 */
-/* The Glass Toast Card */
-[data-sonner-toaster] [data-sonner-toast] {
-    background: var(--bg-glass) !important;
-    backdrop-filter: blur(16px) !important;
-    -webkit-backdrop-filter: blur(16px) !important;
-    
-    border: 1px solid var(--border-color) !important;
-    border-radius: 16px !important; 
-    padding: 18px 22px !important;
-    
-    color: var(--text-main) !important;
-    box-shadow: var(--shadow-card) !important;
-    gap: 12px !important;
-    
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-}
-
-/* Hover Effect: Lift + Orange Glow */
-[data-sonner-toaster] [data-sonner-toast]:hover {
-    transform: translateY(-4px) !important;
-    box-shadow: 0 20px 40px -10px rgba(0,0,0,0.5), 0 0 20px rgba(238, 116, 40, 0.15) !important;
-    border-color: var(--primary-orange) !important;
-}
-
-/* Typography */
-[data-sonner-toaster] [data-sonner-toast] [data-title] {
-    font-family: var(--font-heading) !important;
-    font-weight: 700 !important;
-    font-size: 0.95rem !important;
-    line-height: 1.4 !important;
-    color: var(--text-main) !important;
-}
-
-[data-sonner-toaster] [data-sonner-toast] [data-description] {
-    font-family: var(--font-body) !important;
-    font-weight: 400 !important;
-    font-size: 0.85rem !important;
-    line-height: 1.6 !important;
-    color: var(--text-muted) !important;
-    margin-top: 4px !important;
-}
-
-/* Status Indicators (Left Border Accent) */
-/* Success: Green (Standard) */
-[data-sonner-toast][data-type="success"] {
-    border-left: 4px solid var(--color-success) !important;
-}
-[data-sonner-toast][data-type="success"] [data-icon] {
-    color: var(--color-success) !important;
-}
-
-/* Error: Red (Standard) */
-[data-sonner-toast][data-type="error"] {
-    border-left: 4px solid var(--color-danger) !important;
-}
-[data-sonner-toast][data-type="error"] [data-icon] {
-    color: var(--color-danger) !important;
-}
-
-/* Info/Default: Brand Orange */
-[data-sonner-toast][data-type="info"],
-[data-sonner-toast][data-type="default"],
-[data-sonner-toast][data-type="loading"] { /* Apply to loading toast too */
-    border-left: 4px solid var(--primary-orange) !important;
-}
-[data-sonner-toast][data-type="info"] [data-icon],
-[data-sonner-toast][data-type="loading"] [data-icon] {
-    color: var(--primary-orange) !important;
-}
-
-/* Close Button */
-[data-sonner-toast] [data-close-button] {
-    background: var(--bg-input) !important;
-    border: 1px solid var(--border-color) !important;
-    color: var(--text-muted) !important;
-    transition: all 0.2s !important;
-}
-[data-sonner-toast] [data-close-button]:hover {
-    background: var(--primary-orange) !important;
-    color: white !important;
-    border-color: var(--primary-orange) !important;
-}
-
-
-/*
-|--------------------------------------------------------------------------
-| Responsive Adjustments
-|--------------------------------------------------------------------------
-*/
-@media (max-width: 1200px) {
-    .dashboard-main {
-        padding: 50px 25px;
-    }
-}
-
-@media (max-width: 992px) {
-    .dash-title {
-        font-size: 2.5rem;
-    }
-    .applications-table-section {
-        padding: 20px;
-    }
-    .approvals-table th,
-    .approvals-table td {
-        padding: 12px 15px;
-        font-size: 0.85rem;
-    }
-    .action-cell {
-        gap: 8px;
-        flex-direction: column;
+@media (max-width: 1024px) {
+    .header-bento-card {
+        flex-direction: column !important;
         align-items: flex-start;
+        gap: 24px;
+        padding: 30px;
     }
-    .action-btn {
+    
+    .header-right.search-area {
         width: 100%;
-        padding: 8px 12px;
-        font-size: 0.8rem;
     }
 }
 
 @media (max-width: 768px) {
-    .dashboard-main {
-        padding: 20px 15px;
+    .dashboard-inner {
+        padding: 20px;
+        padding-bottom: 100px;
     }
-    .dash-title {
-        font-size: 2rem;
+    
+    .approvals-table th, 
+    .approvals-table td {
+        padding: 16px;
+    }
+    
+    .btn-group {
+        flex-direction: column;
     }
 }
-
-/* Dash header flex container */
-/* Search Container */
-.search-container {
- 
-  gap: 10px;
-  margin-bottom: 30px;
-}
-
-/* Search Input */
-.search-input {
-  flex: 1;
-  padding: 12px 20px;
-  border-radius: var(--radius-card);
-  border: 1px solid var(--border-color);
-  background: var(--bg-card);
-  color: var(--text-main);
-  font-family: var(--font-body);
-  font-size: 1rem;
-  outline: none;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  box-shadow: var(--shadow-card);
-  transition: all 0.3s ease;
-}
-
-.search-input::placeholder {
-  color: var(--text-muted);
-}
-
-/* Input focus effect */
-.search-input:focus {
-  border-color: var(--primary-orange);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3), 0 0 15px rgba(238, 116, 40, 0.1);
-}
-
-/* Search Button */
-.search-button {
-  padding: 12px 25px;
-  border: none;
-  border-radius: var(--radius-card);
-  background: var(--primary-orange);
-  color: #fff;
-  font-family: var(--font-heading);
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  margin-left: 10px;
-}
-
-.search-button:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 25px rgba(238, 116, 40, 0.5);
-}
-

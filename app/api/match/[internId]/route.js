@@ -45,6 +45,7 @@ export async function GET(req, { params }) {
         id,
         title,
         location,
+        created_at,
         salary,
         description,
         responsibilities, 

@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+// Make sure this path points to the shared file generated above!
 import styles from '../../components/AuthPage.module.css'; 
 import { useRouter } from 'next/navigation';
-// 1. ✅ ADDED Toaster to JSX (Explained below)
 import { Toaster, toast } from 'sonner'; 
 import { FaEye, FaEyeSlash, FaSun, FaMoon } from 'react-icons/fa';
 import { useTheme } from 'next-themes';
@@ -23,7 +23,8 @@ export default function InternAuthPage() {
   const supabase = createClientComponentClient();
 
   // --- THEME & UI STATE ---
-  const { theme, setTheme } = useTheme();
+  // resolvedTheme is useful to know what the 'system' preference actually is (light/dark)
+  const { theme, setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -44,6 +45,15 @@ export default function InternAuthPage() {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
+  };
+
+  const toggleTheme = () => {
+    // If the theme is currently dark (or system defaults to dark), switch to light
+    if (resolvedTheme === 'dark') {
+      setTheme('light');
+    } else {
+      setTheme('dark');
+    }
   };
 
   // --- LOGIN LOGIC ---
@@ -149,10 +159,11 @@ export default function InternAuthPage() {
       {/* 🌗 THEME TOGGLE */}
       <button
         className={styles.themeToggle}
-        onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+        onClick={toggleTheme}
         aria-label="Toggle Theme"
+        type="button"
       >
-        {theme === 'dark' ? <FaSun /> : <FaMoon />}
+        {resolvedTheme === 'dark' ? <FaSun /> : <FaMoon />}
       </button>
 
       <div className={styles.container}>
@@ -256,7 +267,7 @@ export default function InternAuthPage() {
                     onChange={handleChange}
                     required
                     disabled={isLoading}
-                    minLength={6} // Basic HTML5 validation
+                    minLength={6} 
                   />
                   <button
                     type="button"

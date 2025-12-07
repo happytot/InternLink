@@ -1,23 +1,25 @@
+/* listings.css */
+
 /*
 |--------------------------------------------------------------------------
-| Job Listings - Matches Dashboard Layout (1500px)
+| Job Listings - Matches Dashboard Layout
 |--------------------------------------------------------------------------
 */
 
 /* Container Layout */
 .job-listings-container {
-  /* 🟢 MATCHING DASHBOARD DIMENSIONS */
   width: 100%;
-  max-width: 1500px;      /* Matches your Dashboard */
-  padding: 40px;          /* Matches your Dashboard */
-  margin: 0 auto;         /* Centers the container */
+  max-width: 1600px;      /* Fixed typo from 16 00px */
+  padding: 40px;          
+  margin: 0 auto;       
   
+  /* Use Global Variables for adaptability */
   background-color: var(--bg-main);
   color: var(--text-main);
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-body, sans-serif);
+  
   animation: fadeIn 0.5s ease-in-out;
-  box-sizing: border-box; /* Prevents scrollbars */
-  overflow-x: hidden;
+  box-sizing: border-box; 
   min-height: 100vh;
 }
 
@@ -27,7 +29,34 @@
 }
 
 /* |--------------------------------------------------------------------------
-| 🍱 NEW BENTO HEADER (Replaces old header-bar)
+| ✨ SMOOTH SCROLLBAR STYLING
+|--------------------------------------------------------------------------
+*/
+/* Width */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: var(--bg-main); 
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: var(--border-color); 
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-orange); 
+}
+
+/* |--------------------------------------------------------------------------
+| 🍱 BENTO HEADER
 |--------------------------------------------------------------------------
 */
 .bento-header {
@@ -36,7 +65,7 @@
   -webkit-backdrop-filter: blur(12px);
   
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-card);
+  border-radius: var(--radius-card, 20px);
   padding: 24px 30px;
   
   display: flex;
@@ -77,7 +106,7 @@
 }
 
 .header-info h1 {
-  font-family: var(--font-heading);
+  font-family: var(--font-heading, sans-serif);
   font-size: 1.8rem;
   font-weight: 800;
   color: var(--text-main);
@@ -91,7 +120,7 @@
   font-size: 0.95rem;
 }
 
-/* Post Job Button (Inside Header) */
+/* Post Job Button */
 .post-job-btn {
   display: flex;
   align-items: center;
@@ -100,7 +129,7 @@
   color: white;
   border: none;
   padding: 12px 24px;
-  border-radius: var(--radius-btn);
+  border-radius: var(--radius-btn, 12px);
   font-weight: 700;
   font-size: 0.95rem;
   cursor: pointer;
@@ -116,12 +145,21 @@
 }
 
 /* Empty State */
+.empty-state-container {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-card, 20px);
+    padding: 60px;
+    display: flex;
+    justify-content: center;
+}
+
 .empty-text {
   text-align: center;
   color: var(--text-muted);
   font-size: 1.1rem;
-  margin-top: 50px;
   font-style: italic;
+  margin: 0;
 }
 
 /*
@@ -131,7 +169,7 @@
 */
 .table-view {
   background: var(--bg-card);
-  border-radius: var(--radius-card);
+  border-radius: var(--radius-card, 20px);
   border: 1px solid var(--border-color);
   box-shadow: var(--shadow-card);
   overflow: hidden;
@@ -167,7 +205,7 @@ tbody tr:last-child {
 }
 
 tbody tr:hover {
-  background: var(--bg-card-hover);
+  background: var(--bg-input);
 }
 
 td {
@@ -195,7 +233,7 @@ td.font-medium {
 .job-card {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-card);
+  border-radius: var(--radius-card, 20px);
   padding: 24px;
   display: flex;
   flex-direction: column;
@@ -242,19 +280,18 @@ button {
 }
 
 .edit-btn {
-  background: rgba(0, 212, 255, 0.15);
+  background: rgba(0, 212, 255, 0.15); /* Keep generic or map to var(--secondary-cyan) with opacity */
   color: var(--secondary-cyan);
   border: 1px solid rgba(0, 212, 255, 0.2);
   padding: 8px 16px;
   border-radius: 8px;
   font-size: 0.85rem;
   font-weight: 600;
-  margin-right: 5px;
 }
 
 .edit-btn:hover {
   background: var(--secondary-cyan);
-  color: white;
+  color: white; /* Often better to keep text white on hover for high contrast */
   box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
 }
 
@@ -295,9 +332,9 @@ button {
 .modal-content {
   background: var(--bg-card);
   width: 100%;
-  max-width: 600px;
+  max-width: 1000px;
   max-height: 85vh;
-  border-radius: var(--radius-card);
+  border-radius: var(--radius-card, 20px);
   border: 1px solid var(--border-color);
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
   display: flex;
@@ -313,13 +350,13 @@ button {
   align-items: center;
 }
 
-.modal-header h2 { margin: 0; font-size: 1.25rem; }
+.modal-header h2 { margin: 0; font-size: 1.25rem; color: var(--text-main); }
 
 .close-btn { background: none; border: none; color: var(--text-muted); font-size: 1.5rem; }
-.close-btn:hover { color: white; }
+.close-btn:hover { color: var(--text-main); }
 
 .modal-body {
-  padding: 24px;
+  padding: 30px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
@@ -331,6 +368,7 @@ button {
   font-weight: 600;
   color: var(--text-muted);
   margin-bottom: -8px;
+  display: block;
 }
 
 .modal-body input,
@@ -342,6 +380,8 @@ button {
   border-radius: 8px;
   font-size: 0.95rem;
   outline: none;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .modal-body input:focus,
@@ -380,6 +420,8 @@ button {
   color: var(--primary-orange);
   font-weight: bold;
   padding: 0;
+  display: flex;
+  align-items: center;
 }
 
 .tag-input-container input {
@@ -388,6 +430,7 @@ button {
   padding: 4px;
   flex: 1;
   min-width: 120px;
+  color: var(--text-main);
 }
 .tag-input-container input:focus { border: none; }
 
@@ -404,8 +447,9 @@ button {
   border: 1px solid var(--border-color);
   padding: 10px 20px;
   border-radius: 8px;
+  background: transparent;
 }
-.cancel-btn:hover { border-color: white; color: white; }
+.cancel-btn:hover { border-color: var(--text-main); color: var(--text-main); }
 
 .save-btn {
   background: var(--primary-orange);
@@ -415,7 +459,7 @@ button {
   border-radius: 8px;
   font-weight: 600;
 }
-.save-btn:hover { background: #ff8a4d; }
+.save-btn:hover { background: var(--primary-orange-hover); }
 .save-btn:disabled { opacity: 0.7; cursor: not-allowed; }
 
 /* Responsive */
@@ -429,4 +473,27 @@ button {
 @media (min-width: 769px) {
   .card-view { display: none; }
   .table-view { display: block; }
+}
+
+/* ----------------------
+   MODAL 2-COLUMN LAYOUT
+-------------------------*/
+.modal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  width: 100%;
+}
+
+.modal-col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Make it 1 column on mobile */
+@media (max-width: 768px) {
+  .modal-grid {
+    grid-template-columns: 1fr;
+  }
 }

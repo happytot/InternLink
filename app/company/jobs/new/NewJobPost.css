@@ -7,7 +7,7 @@
 /* --- Base Page Container (Matches .dashboard-content) --- */
 .page-wrapper {
   padding: 40px;          /* Match Dashboard padding */
-  max-width: 1500px;      /* Match Dashboard width */
+  max-width: 1600px;      /* Match Dashboard width */
   width: 100%;
   margin: 0 auto;         /* Centers the content on large screens */
   min-height: 100vh;

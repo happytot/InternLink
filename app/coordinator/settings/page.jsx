@@ -1,25 +1,39 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import CoordinatorSidebar from "../../components/CoordinatorSidebar";
 import "./settings.css";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { 
+  User, 
+  Lock, 
+  Settings as SettingsIcon, 
+  Edit3, 
+  Save, 
+  X, 
+  Camera,
+  Sun, 
+  Moon
+} from "lucide-react";
 
-const supabase = createClientComponentClient();
-
-const initialProfileData = {
-  imageUrl: "https://placehold.co/128x128/EE7428/021217?text=C",
-  fullName: "N/A",
-  jobTitle: "N/A",
-  bio: "N/A",
-};
+// Font imports (Keep these if not in your root layout, otherwise remove)
+import '@fontsource/plus-jakarta-sans/700.css';
+import '@fontsource/inter/400.css';
+import '@fontsource/inter/500.css';
+import '@fontsource/inter/600.css';
+import '@fontsource/inter/700.css';
 
 export default function CoordinatorSettings() {
+  const supabase = createClientComponentClient();
   const [activeTab, setActiveTab] = useState("profile");
 
   // Profile state
-  const [profileData, setProfileData] = useState(initialProfileData);
-  const [originalProfileData, setOriginalProfileData] = useState(initialProfileData);
+  const [profileData, setProfileData] = useState({
+    imageUrl: "", // Will be filled from DB
+    fullName: "",
+    jobTitle: "",
+    bio: "",
+  });
+  const [originalProfileData, setOriginalProfileData] = useState({});
   const [editMode, setEditMode] = useState(false);
 
   // Password state
@@ -30,16 +44,31 @@ export default function CoordinatorSettings() {
   });
 
   const [loading, setLoading] = useState(true);
+  const [isLightMode, setIsLightMode] = useState(false);
 
-  // --- Fetch profile data from database ---
+  // --- Theme Toggle Logic ---
+  useEffect(() => {
+    // Check initial state
+    if (document.body.classList.contains('light-mode')) {
+      setIsLightMode(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isLightMode) {
+      document.body.classList.add('light-mode');
+    } else {
+      document.body.classList.remove('light-mode');
+    }
+  }, [isLightMode]);
+
+  // --- Fetch profile data ---
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const userRes = await supabase.auth.getUser();
-        const userId = userRes.data.user?.id;
+        const { data: { user } } = await supabase.auth.getUser();
 
-        if (!userId) {
-          console.error("User not logged in!");
+        if (!user) {
           setLoading(false);
           return;
         }
@@ -47,24 +76,23 @@ export default function CoordinatorSettings() {
         const { data: profile, error } = await supabase
           .from("profiles")
           .select("*")
-          .eq("id", userId)
+          .eq("id", user.id)
           .single();
 
         if (error) throw error;
 
         if (profile) {
           const filledProfile = {
-            fullName: profile.fullname || "N/A",
-            jobTitle: profile.job_title || "N/A",
-            bio: profile.summary || "N/A",
-            imageUrl: profile.profile_pic_url || initialProfileData.imageUrl,
+            fullName: profile.fullname || "",
+            jobTitle: profile.job_title || "",
+            bio: profile.summary || "",
+            imageUrl: profile.profile_pic_url || "https://placehold.co/128x128/EE7428/021217?text=C",
           };
           setProfileData(filledProfile);
           setOriginalProfileData(filledProfile);
         }
       } catch (err) {
         console.error("Error fetching profile:", err);
-        console.log("Failed to load profile data.");
       } finally {
         setLoading(false);
       }
@@ -86,9 +114,8 @@ export default function CoordinatorSettings() {
 
   const handleProfileSave = async () => {
     try {
-      const userRes = await supabase.auth.getUser();
-      const userId = userRes.data.user?.id;
-      if (!userId) throw new Error("User ID is missing.");
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("User ID is missing.");
 
       const { error } = await supabase
         .from("profiles")
@@ -98,7 +125,7 @@ export default function CoordinatorSettings() {
           summary: profileData.bio,
           profile_pic_url: profileData.imageUrl,
         })
-        .eq("id", userId);
+        .eq("id", user.id);
 
       if (error) throw error;
 
@@ -107,7 +134,6 @@ export default function CoordinatorSettings() {
       setEditMode(false);
     } catch (err) {
       console.error(err);
-      console.log("Failed to update profile.");
     }
   };
 
@@ -128,7 +154,6 @@ export default function CoordinatorSettings() {
       setPasswordData({ currentPassword: "", newPassword: "", confirmPassword: "" });
     } catch (err) {
       console.error(err);
-      console.log("Failed to update password. Please ensure your session is active and valid.");
     }
   };
 
@@ -144,7 +169,6 @@ export default function CoordinatorSettings() {
 
     if (uploadError) {
       console.error(uploadError);
-      console.log("Failed to upload image.");
       return;
     }
 
@@ -162,15 +186,14 @@ export default function CoordinatorSettings() {
 
   // --- Tabs ---
   const ProfileTab = () => (
-    <>
-      <h2>👤 Profile Details</h2>
+    <div className="tab-content-wrapper">
+      <h2 className="section-title">
+        <User size={24} className="icon-orange" /> Profile Details
+      </h2>
 
       {loading ? (
         <div className="profile-skeleton">
-          <div className="skeleton skeleton-circle" style={{ width: 128, height: 128 }} />
-          <div className="skeleton skeleton-line" style={{ width: "60%", marginTop: 10 }} />
-          <div className="skeleton skeleton-line" style={{ width: "40%", marginTop: 10 }} />
-          <div className="skeleton skeleton-textarea" style={{ width: "80%", height: 60, marginTop: 10 }} />
+          Loading...
         </div>
       ) : (
         <div className="profile-section">
@@ -178,9 +201,8 @@ export default function CoordinatorSettings() {
             <img src={profileData.imageUrl} alt="Profile" className="profile-pic" />
             {editMode && (
               <label className="upload-btn-label">
-                Upload New Photo
+                <Camera size={16} /> Upload New Photo
                 <input 
-                  key="image-upload-input"
                   type="file" 
                   accept="image/*" 
                   onChange={handleImageChange} 
@@ -193,148 +215,172 @@ export default function CoordinatorSettings() {
           <div className="form-group">
             <label>Full Name</label>
             <input
-              key="profile-full-name"
               type="text"
               name="fullName"
               value={profileData.fullName}
               onChange={handleProfileChange}
               disabled={!editMode}
               autoComplete="off"
+              className="settings-input"
             />
           </div>
 
           <div className="form-group">
             <label>Job Title</label>
             <input
-              key="profile-job-title"
               type="text"
               name="jobTitle"
               value={profileData.jobTitle}
               onChange={handleProfileChange}
               disabled={!editMode}
               autoComplete="off"
+              className="settings-input"
             />
           </div>
 
           <div className="form-group">
             <label>Short Bio</label>
             <textarea
-              key="profile-bio"
               name="bio"
               value={profileData.bio}
               onChange={handleProfileChange}
               rows={3}
               disabled={!editMode}
+              className="settings-textarea"
             />
           </div>
 
-          {!editMode && (
-            <button className="btn-primary" onClick={() => setEditMode(true)}>
-              ✏️ Edit Profile
-            </button>
-          )}
-
-          {editMode && (
-            <>
-              <button className="btn-primary" onClick={handleProfileSave}>
-                💾 Save
-              </button>
-              <button
-                className="btn-primary"
-                style={{ background: "#475569", marginTop: "10px" }}
-                onClick={() => {
-                  setProfileData(originalProfileData);
-                  setEditMode(false);
-                }}
-              >
-                ❌ Cancel
-              </button>
-            </>
-          )}
+          <div className="button-group">
+            {!editMode ? (
+                <button className="btn-primary" onClick={() => setEditMode(true)}>
+                <Edit3 size={18} /> Edit Profile
+                </button>
+            ) : (
+                <>
+                <button className="btn-primary" onClick={handleProfileSave}>
+                    <Save size={18} /> Save
+                </button>
+                <button
+                    className="btn-secondary"
+                    onClick={() => {
+                    setProfileData(originalProfileData);
+                    setEditMode(false);
+                    }}
+                >
+                    <X size={18} /> Cancel
+                </button>
+                </>
+            )}
+          </div>
         </div>
       )}
-    </>
+    </div>
   );
 
   const SecurityTab = () => (
-    <>
-      <h2>🔒 Change Password</h2>
+    <div className="tab-content-wrapper">
+      <h2 className="section-title">
+        <Lock size={24} className="icon-orange" /> Change Password
+      </h2>
+      
       <div className="form-group">
         <label>Current Password</label>
         <input
-          key="security-current-password"
           type="password"
           name="currentPassword"
           value={passwordData.currentPassword}
           onChange={handlePasswordChange}
+          className="settings-input"
         />
       </div>
 
       <div className="form-group">
         <label>New Password</label>
         <input
-          key="security-new-password"
           type="password"
           name="newPassword"
           value={passwordData.newPassword}
           onChange={handlePasswordChange}
           autoComplete="new-password"
+          className="settings-input"
         />
       </div>
 
       <div className="form-group">
         <label>Confirm New Password</label>
         <input
-          key="security-confirm-password"
           type="password"
           name="confirmPassword"
           value={passwordData.confirmPassword}
           onChange={handlePasswordChange}
           autoComplete="new-password"
+          className="settings-input"
         />
       </div>
 
-      <button
-        className="btn-primary"
-        onClick={handleSecuritySave}
-        disabled={passwordData.newPassword.length < 8}
-      >
-        Update Password
-      </button>
-    </>
+      <div className="button-group">
+        <button
+            className="btn-primary"
+            onClick={handleSecuritySave}
+            disabled={passwordData.newPassword.length < 8}
+        >
+            <Save size={18} /> Update Password
+        </button>
+      </div>
+    </div>
   );
 
   return (
-    <div className="coordinator-settings-layout">
-      <CoordinatorSidebar /> 
+    <div className="dashboard-inner">
+      
+      {/* Header Section */}
+      <div className="settings-header glass-card reveal-on-scroll">
+        <div className="header-content">
+            <h1 className="settings-title">
+                <SettingsIcon size={32} style={{marginRight:'10px', color:'var(--primary-orange)'}} />
+                Coordinator Settings
+            </h1>
+            <p className="settings-subtitle">Manage your profile and account security.</p>
+        </div>
+        
+        {/* Theme Toggle Button (Right Side) */}
+        <div className="header-actions">
+            <button 
+                className="theme-toggle-btn" 
+                onClick={() => setIsLightMode(!isLightMode)}
+                title={isLightMode ? "Switch to Dark Mode" : "Switch to Light Mode"}
+            >
+                {isLightMode ? <Moon size={20} /> : <Sun size={20} />}
+                <span className="toggle-text">{isLightMode ? "Dark Mode" : "Light Mode"}</span>
+            </button>
+        </div>
+      </div>
 
-      <div className="settings-container">
-        <div className="settings-header glass-card reveal-on-scroll">
-          <h1 className="settings-title">Coordinator Settings 🛠️</h1>
-          <p className="settings-subtitle">Manage your profile and account security.</p>
+      {/* Main Grid Layout */}
+      <div className="settings-bento-grid">
+        
+        {/* Navigation Panel */}
+        <div className="tab-navigation-panel glass-card reveal-on-scroll" style={{ animationDelay: "0.1s" }}>
+          <button
+            className={activeTab === "profile" ? "active btn-tab" : "btn-tab"}
+            onClick={() => setActiveTab("profile")}
+          >
+            <User size={18} /> Profile
+          </button>
+          <button
+            className={activeTab === "security" ? "active btn-tab" : "btn-tab"}
+            onClick={() => setActiveTab("security")}
+          >
+            <Lock size={18} /> Security
+          </button>
         </div>
 
-        <div className="settings-bento-grid">
-          <div className="tab-navigation-panel glass-card reveal-on-scroll" style={{ animationDelay: "0.1s" }}>
-            <button
-              className={activeTab === "profile" ? "active btn-tab" : "btn-tab"}
-              onClick={() => setActiveTab("profile")}
-            >
-              👤 Profile
-            </button>
-            <button
-              className={activeTab === "security" ? "active btn-tab" : "btn-tab"}
-              onClick={() => setActiveTab("security")}
-            >
-              🔒 Security
-            </button>
-          </div>
-
-          <div className="settings-content-card glass-card reveal-on-scroll" style={{ animationDelay: "0.2s" }}>
-            {activeTab === "profile" && <ProfileTab key="profile-tab-content" />}
-            {activeTab === "security" && <SecurityTab key="security-tab-content" />}
-          </div>
+        {/* Content Panel */}
+        <div className="settings-content-card glass-card reveal-on-scroll" style={{ animationDelay: "0.2s" }}>
+          {activeTab === "profile" && <ProfileTab />}
+          {activeTab === "security" && <SecurityTab />}
         </div>
+
       </div>
     </div>
   );

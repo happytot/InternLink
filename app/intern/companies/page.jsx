@@ -1,12 +1,12 @@
 // app/intern/companies/page.jsx
 // (This is a SERVER COMPONENT - no 'use client')
-
+import './companies.css'; // Import the CSS here
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 import CompaniesClient from './CompaniesClient'; // Import our client file
 import InternNav from '../../components/InternNav';
-import Header from '../../components/Header'; // 👈 1. Import Header here
-import './companies.css'; // Import the CSS here
+
+
 
 // This is the (slow) data-fetching logic from your old file.
 // But now it runs on the server, which is much faster.
@@ -14,7 +14,7 @@ const fetchCompanies = async (supabase) => {
   try {
     let { data: companiesData, error } = await supabase
       .from('companies')
-      .select('id, name, description, logo_url, star_rating');
+      .select('id, name, description, logo_url, star_rating, email, phone, ceo');
 
     if (error) throw error;
 
@@ -54,9 +54,9 @@ export default async function CompaniesPage() {
   // 2. We render the static layout and pass the data to the client.
   return (
     <div className="companies-page">
-      <Header />
+      
       <InternNav />
-      <h1>🏢 Companies</h1>
+      <h1> Companies</h1>
       
       {/* The client component is only for the *interactive* parts 
         (search, modal, and applying). It gets the data as a prop.

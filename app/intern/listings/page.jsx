@@ -3,9 +3,10 @@
 import { useState, useEffect } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import './Listings.css';
-import Header from '../../components/Header';
 import InternNav from '../../components/InternNav';
 import { toast } from 'sonner';
+import { useSearchParams } from "next/navigation";
+import FloatingAIChatWithCharts from '../../components/chatbot';
 
 export default function Listings() {
   const supabase = createClientComponentClient();
@@ -16,14 +17,18 @@ export default function Listings() {
   const [selectedJobId, setSelectedJobId] = useState(null);
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(true);
-const [savedJobs, setSavedJobs] = useState([]); // Stores saved job objects
-const [showSavedJobs, setShowSavedJobs] = useState(false); // Toggle modal/panel
-const [postTimeFilter, setPostTimeFilter] = useState(''); // '', '24h', '7d', '30d'
+  const [savedJobs, setSavedJobs] = useState([]); // Stores saved job objects
+  const [showSavedJobs, setShowSavedJobs] = useState(false); // Toggle modal/panel
+  const [postTimeFilter, setPostTimeFilter] = useState(''); // '', '24h', '7d', '30d'
   const [filterType, setFilterType] = useState('');
+  
+  // 📱 Mobile View State
+  const [showMobileDetail, setShowMobileDetail] = useState(false);
 
+  const searchParams = useSearchParams();
+  const jobIdFromURL = searchParams.get("jobId");
 
-
-  // ... (Fetch Logged-in Intern useEffect remains the same) ...
+  // ... (Fetch Logged-in Intern useEffect) ...
   useEffect(() => {
     const getUser = async () => {
       const { data } = await supabase.auth.getUser();
@@ -33,13 +38,11 @@ const [postTimeFilter, setPostTimeFilter] = useState(''); // '', '24h', '7d', '3
   }, [supabase]);
 
   // Helper: convert timestamp to "time ago"
-  // <-- THIS FUNCTION FIXES the ReferenceError by ensuring timeAgo is defined inside the component scope
   const timeAgo = (timestamp) => {
     if (!timestamp) return 'Just now';
     const now = new Date();
     const posted = new Date(timestamp);
     const seconds = Math.floor((now - posted) / 1000);
-
     if (seconds < 5) return 'Just now';
 
     const intervals = [
@@ -51,14 +54,12 @@ const [postTimeFilter, setPostTimeFilter] = useState(''); // '', '24h', '7d', '3
       { label: 'minute', seconds: 60 },
       { label: 'second', seconds: 1 },
     ];
-
     for (const interval of intervals) {
       const count = Math.floor(seconds / interval.seconds);
       if (count >= 1) {
         return `${count} ${interval.label}${count > 1 ? 's' : ''} ago`;
       }
     }
-
     return 'Just now';
   };
 
@@ -110,7 +111,7 @@ const [postTimeFilter, setPostTimeFilter] = useState(''); // '', '24h', '7d', '3
     fetchListings();
   }, [supabase]);
 
-  // --- Apply to Job Function (Remains the same, but calls apply directly) ---
+  // --- Apply to Job Function ---
   const applyToJob = async (jobId, companyId) => {
     if (!user) {
       toast.error("Please login first.");
@@ -145,7 +146,7 @@ const [postTimeFilter, setPostTimeFilter] = useState(''); // '', '24h', '7d', '3
       }
       return;
     }
-    // Re-fetch listings to update 'Applied' status (simple refresh, could be optimized)
+    // Re-fetch listings to update 'Applied' status
     setListings(prev => prev.map(job => 
         job.id === jobId 
             ? { ...job, job_applications: [...(job.job_applications || []), { intern_id: user.id }] }
@@ -159,35 +160,37 @@ const [postTimeFilter, setPostTimeFilter] = useState(''); // '', '24h', '7d', '3
     setSelectedJobId(jobId);
   };
 
+  // 📱 Handler for Mobile "View Details" button
+  const handleMobileView = (jobId) => {
+    setSelectedJobId(jobId);
+    setShowMobileDetail(true);
+  };
+
   // --- Filter Logic ---
-// Unified filter logic
-const filteredInternships = listings
-  .filter(job =>
-    job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    job.company.toLowerCase().includes(searchTerm.toLowerCase())
-  )
-  .filter(job =>
-    filterType ? job.work_setup.toLowerCase() === filterType.toLowerCase() : true
-  )
-  .filter(job => {
-    if (!postTimeFilter) return true;
+  const filteredInternships = listings
+    .filter(job =>
+      job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      job.company.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    .filter(job =>
+      filterType ? job.work_setup.toLowerCase() === filterType.toLowerCase() : true
+    )
+    .filter(job => {
+      if (!postTimeFilter) return true;
+      const now = new Date();
+      const posted = new Date(job.created_at);
+      const diffHours = (now - posted) / 1000 / 3600; 
 
-    const now = new Date();
-    const posted = new Date(job.created_at);
-    const diffHours = (now - posted) / 1000 / 3600; // hours difference
+      if (postTimeFilter === '24h') return diffHours <= 24;
+      if (postTimeFilter === '7d') return diffHours <= 24 * 7;
+      if (postTimeFilter === '30d') return diffHours <= 24 * 30;
+      return true;
+    });
 
-    if (postTimeFilter === '24h') return diffHours <= 24;
-    if (postTimeFilter === '7d') return diffHours <= 24 * 7;
-    if (postTimeFilter === '30d') return diffHours <= 24 * 30;
-
-    return true;
-  });
-
-  
   // 🔑 Get the currently selected job object
   const selectedJob = listings.find(job => job.id === selectedJobId);
 
-  // Helper function to render list items (same as before)
+  // Helper function to render list items
   const renderList = (items) => (
     <ul className="job-detail-list">
       {items.map((item, index) => (
@@ -196,43 +199,21 @@ const filteredInternships = listings
     </ul>
   );
 
-  // --- Job Detail Component (Refactored from Modal content) ---
+  // --- Job Detail Component ---
   const JobDetailsPane = ({ job, applyFn, user }) => {
     if (!job) {
         return (
             <div className="job-details-pane no-job-selected">
                 <h2>Select an Internship to View Details</h2>
                 <p>Click on any listing on the left to see the full description, requirements, and apply.</p>
-                
             </div>
         );
     }
-
-    const isApplied = job.job_applications?.some(app => app.intern_id === user?.id);
-
-<button
-  className={`secondary-btn save-btn ${savedJobs.some(j => j.id === job.id) ? 'saved' : ''}`}
-  onClick={() => {
-    if (!savedJobs.some(j => j.id === job.id)) {
-      setSavedJobs([...savedJobs, job]);
-      toast.success("Job saved!");
-    } else {
-      setSavedJobs(savedJobs.filter(j => j.id !== job.id));
-      toast("Job removed from saved list");
-    }
-  }}
->
-  {savedJobs.some(j => j.id === job.id) ? "Saved" : "Save"}
-</button>
-
-
-
 
     return (
       <div className="job-details-pane">
         <div className="modal-header">
             <h2>Job Details</h2>
-            {/* The close button is removed here */}
         </div>
 
         <div className="modal-body">
@@ -240,6 +221,7 @@ const filteredInternships = listings
             <div className="job-detail-group">
                 <h3 className="job-detail-title">{job.title}</h3>
                 <p className="job-detail-company">{job.company}</p>
+                 <p className="job-detail-ceo">{job.ceo}</p>
                 <p className="posted-ago">Posted {timeAgo(job.created_at)}</p>
             </div>
 
@@ -249,6 +231,7 @@ const filteredInternships = listings
                     <span className="job-detail-label">Location</span>
                     <span className="job-detail-value">{job.location}</span>
                 </div>
+            
                 {job.work_setup && (
                     <div className="job-detail-item">
                         <span className="job-detail-label">Work Setup</span>
@@ -257,7 +240,7 @@ const filteredInternships = listings
                 )}
                 {job.work_schedule && (
                     <div className="job-detail-item">
-                        <span className="job-detail-label">Work Schedule</span>
+                        <span className="job-detail-label">Work Status</span>
                         <span className="job-detail-value">{job.work_schedule}</span>
                     </div>
                 )}
@@ -297,41 +280,51 @@ const filteredInternships = listings
         </div>
 
        <div className="modal-footer">
-  {/* Save Button */}
-  <button
-    className={`secondary-btn save-btn ${savedJobs.some(j => j.id === job.id) ? 'saved' : ''}`}
-    onClick={() => {
-      if (!savedJobs.some(j => j.id === job.id)) {
-        setSavedJobs([...savedJobs, job]);
-        toast.success("Job saved! ❤️");
-      } else {
-        setSavedJobs(savedJobs.filter(j => j.id !== job.id));
-        toast("Job removed from saved list");
-      }
-    }}
-  >
-    {savedJobs.some(j => j.id === job.id) ? 'Saved ❤️' : 'Save'}
-  </button>
+          {/* Save Button */}
+          <button
+            className={`secondary-btn save-btn ${savedJobs.some(j => j.id === job.id) ? 'saved' : ''}`}
+            onClick={() => {
+              if (!savedJobs.some(j => j.id === job.id)) {
+                setSavedJobs([...savedJobs, job]);
+                toast.success("Job saved! ❤️");
+              } else {
+                setSavedJobs(savedJobs.filter(j => j.id !== job.id));
+                toast("Job removed from saved list");
+              }
+            }}
+          >
+            {savedJobs.some(j => j.id === job.id) ? 'Saved ❤️' : 'Save'}
+          </button>
 
-  {/* Apply Button */}
-  <button
-    className="primary-btn"
-    onClick={() => applyFn(job.id, job.company_id)}
-    disabled={job.job_applications?.some(app => app.intern_id === user?.id)}
-  >
-    {job.job_applications?.some(app => app.intern_id === user?.id) ? "Applied ✔️" : "Apply Now"}
-  </button>
-</div>
-
-
+          {/* Apply Button */}
+          <button
+            className="primary-btn"
+            onClick={() => applyFn(job.id, job.company_id)}
+            disabled={job.job_applications?.some(app => app.intern_id === user?.id)}
+          >
+            {job.job_applications?.some(app => app.intern_id === user?.id) ? "Applied ✔️" : "Apply Now"}
+          </button>
+        </div>
       </div>
     );
   };
 
+  // URL Auto-scroll effect
+  useEffect(() => {
+    if (!jobIdFromURL || listings.length === 0) return;
+    const exists = listings.some(job => job.id === jobIdFromURL);
+    if (exists) {
+      setSelectedJobId(jobIdFromURL);
+      const el = document.getElementById(`job-${jobIdFromURL}`);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+        el.classList.add("highlight-job");
+      }
+    }
+  }, [jobIdFromURL, listings]);
 
   return (
     <>
-      <Header />
       <div className="listings-container">
         <h1>Browse Internship Opportunities</h1>
         <div className="search-filter-bar">
@@ -342,34 +335,23 @@ const filteredInternships = listings
             onChange={(e) => setSearchTerm(e.target.value)}
             className="search-input"
           />
-          <button
-  className="saved-jobs-btn"
-  onClick={() => setShowSavedJobs(true)}
->
-  Saved Jobs ({savedJobs.length})
-</button>
-          <select
-  className="filter-select"
-  value={filterType}
-  onChange={(e) => setFilterType(e.target.value)}
->
-  <option value="">All Types</option>
-  <option value="Remote">Remote</option>
-  <option value="On-site">On-site</option>
-  <option value="Hybrid">Hybrid</option>
-</select>
+          <button className="saved-jobs-btn" onClick={() => setShowSavedJobs(true)}>
+            Saved Jobs ({savedJobs.length})
+          </button>
+          
+          <select className="filter-select" value={filterType} onChange={(e) => setFilterType(e.target.value)}>
+            <option value="">All Types</option>
+            <option value="Remote">Remote</option>
+            <option value="On-site">On-site</option>
+            <option value="Hybrid">Hybrid</option>
+          </select>
 
-<select
-  className="filter-select"
-  value={postTimeFilter}
-  onChange={(e) => setPostTimeFilter(e.target.value)}
->
-  <option value="">Any time</option>
-  <option value="24h">Last 24 hours</option>
-  <option value="7d">Last 7 days</option>
-  <option value="30d">Last 30 days</option>
-</select>
-
+          <select className="filter-select" value={postTimeFilter} onChange={(e) => setPostTimeFilter(e.target.value)}>
+            <option value="">Any time</option>
+            <option value="24h">Last 24 hours</option>
+            <option value="7d">Last 7 days</option>
+            <option value="30d">Last 30 days</option>
+          </select>
         </div>
 
         <div className="bento-box-layout">
@@ -384,6 +366,7 @@ const filteredInternships = listings
               <div className="internship-results-list">
                 {filteredInternships.map((job) => (
                   <div 
+                    id={`job-${job.id}`}
                     key={job.id} 
                     className={`listing-card ${job.id === selectedJobId ? 'selected-card' : ''}`}
                     onClick={() => selectJob(job.id)}
@@ -394,64 +377,90 @@ const filteredInternships = listings
                       <span className="location-pill">{job.location}</span>
                       {job.work_setup && <span className="work-setup-pill">{job.work_setup}</span>}
                     </p>
-
                     <p className="job-timeago">{timeAgo(job.created_at)}</p>
+
+                    {/* 📱 Mobile Only: View Details Button */}
+                    <button 
+                      className="view-details-btn-mobile"
+                      onClick={(e) => {
+                        e.stopPropagation(); // Prevent triggering the card click
+                        handleMobileView(job.id);
+                      }}
+                    >
+                      View Details →
+                    </button>
                   </div>
                 ))}
               </div>
             )}
           </div>
 
-          {/* ➡️ Right Pane: Job Details */}
-          <JobDetailsPane 
-            job={selectedJob} 
-            applyFn={applyToJob} 
-            user={user} 
-          />
+          {/* ➡️ Right Pane: Job Details (Hidden on Mobile) */}
+          <div className="desktop-details-container">
+             <JobDetailsPane 
+               job={selectedJob} 
+               applyFn={applyToJob} 
+               user={user} 
+             />
+          </div>
         </div>
       </div>
-{/* --- Saved Jobs Modal --- */}
-{showSavedJobs && (
-  <div className="modal-overlay active" onClick={() => setShowSavedJobs(false)}>
-    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-      <div className="modal-header">
-        <h2>Saved Jobs</h2>
-        <button className="close-btn" onClick={() => setShowSavedJobs(false)}>×</button>
-      </div>
-      <div className="modal-body">
-        {savedJobs.length === 0 ? (
-          <p>You haven't saved any jobs yet.</p>
-        ) : (
-          savedJobs.map((job) => (
-            <div key={job.id} className="listing-card saved-listing-card">
-              <h3 className="job-title">{job.title}</h3>
-              <p className="job-company">{job.company}</p>
-              <p className="job-meta">{job.location} | {job.work_setup}</p>
-              <div className="saved-card-footer">
-                <button
-                  className="primary-btn"
-                  onClick={() => {
-                    selectJob(job.id);
-                    setShowSavedJobs(false); // Close modal and view job details
-                  }}
-                >
-                  View Details
-                </button>
-                <button
-                  className="secondary-btn remove-btn"
-                  onClick={() => setSavedJobs(savedJobs.filter(j => j.id !== job.id))}
-                >
-                  Remove
-                </button>
-              </div>
-            </div>
-          ))
-        )}
-      </div>
-    </div>
-  </div>
-)}
 
+      {/* 📱 Mobile Details Component (Overlay) */}
+      <div className={`mobile-details-overlay ${showMobileDetail ? 'active' : ''}`}>
+        <button className="mobile-back-btn" onClick={() => setShowMobileDetail(false)}>
+           ← Back to Listings
+        </button>
+        {/* Re-using the same component, but inside the mobile wrapper */}
+        <JobDetailsPane 
+          job={selectedJob} 
+          applyFn={applyToJob} 
+          user={user} 
+        />
+      </div>
+
+      {/* --- Saved Jobs Modal --- */}
+      {showSavedJobs && (
+        <div className="modal-overlay active" onClick={() => setShowSavedJobs(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Saved Jobs</h2>
+              <button className="close-btn" onClick={() => setShowSavedJobs(false)}>×</button>
+            </div>
+            <div className="modal-body">
+              {savedJobs.length === 0 ? (
+                <p>You haven't saved any jobs yet.</p>
+              ) : (
+                savedJobs.map((job) => (
+                  <div key={job.id} className="listing-card saved-listing-card">
+                    <h3 className="job-title">{job.title}</h3>
+                    <p className="job-company">{job.company}</p>
+                    <div className="saved-card-footer">
+                      <button
+                        className="primary-btn"
+                        onClick={() => {
+                          handleMobileView(job.id);
+                          setShowSavedJobs(false);
+                        }}
+                      >
+                        View Details
+                      </button>
+                      <button
+                        className="secondary-btn remove-btn"
+                        onClick={() => setSavedJobs(savedJobs.filter(j => j.id !== job.id))}
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {user?.id && <FloatingAIChatWithCharts studentId={user.id} />}
       <InternNav />
     </>
   );

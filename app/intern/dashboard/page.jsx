@@ -1,12 +1,13 @@
 'use client';
-
+import './Dashboard.css';
+import InternNav from '../../components/InternNav';
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import Link from 'next/link';
-import './Dashboard.css';
-import InternNav from '../../components/InternNav';
 import { toast } from 'sonner';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
+import { useSearchParams } from 'next/navigation';
+import FloatingAIChatWithCharts from '../../components/chatbot';
 
 import { 
   Users, 
@@ -24,6 +25,12 @@ import {
   Moon   // Added for Theme Toggle
 } from 'lucide-react';
 
+
+const isNewAnnouncement = (createdAt) => {
+    const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    const announcementDate = new Date(createdAt);
+    return announcementDate > twentyFourHoursAgo;
+};
 // --- Helper: Get Date for Welcome Box ---
 const getCurrentDate = () => {
   const date = new Date();
@@ -149,7 +156,7 @@ const StatsSummary = ({ applications }) => {
 };
 
 // --- 2. Reusable Slider (Unchanged) ---
-const HorizontalSlider = ({ title, viewAllLink, children, pageCount }) => {
+const HorizontalSlider = ({ title, children, pageCount }) => {
   const [currentPage, setCurrentPage] = useState(0);
   const sliderRef = useRef(null);
 
@@ -177,7 +184,7 @@ const HorizontalSlider = ({ title, viewAllLink, children, pageCount }) => {
 
   useEffect(() => { slideTo(0); }, [pageCount]);
 
-  return (
+return (
     <section className="card dashboard-slider-card">
       <div className="slider-header">
         <h2>{title}</h2>
@@ -194,7 +201,7 @@ const HorizontalSlider = ({ title, viewAllLink, children, pageCount }) => {
           <button key={i} className={`dot ${i === currentPage ? 'active' : ''}`} onClick={() => slideTo(i)} />
         ))}
       </div>
-      <Link href={viewAllLink} className="view-all-link">View All <ChevronRight size={16} /></Link>
+      
     </section>
   );
 };
@@ -222,15 +229,16 @@ const ApplicationSlider = ({ applications }) => {
   }
 
   return (
+    <>
     <HorizontalSlider 
       title={<><Calendar size={20} className="card-title-icon"/> Application History</>} 
       viewAllLink="/intern/history" 
       pageCount={pages.length}
     >
       {pages.map((page, pageIndex) => (
-        <div className="slider-page" key={pageIndex}>
+        <div  className="slider-page" key={pageIndex}>
           {page.map(app => (
-            <div key={app.id} className="app-card">
+            <div  key={app.id} className="app-card">
               <span className={`status-badge status-${(app.status || 'pending').toLowerCase().replace(/\s/g, '-')}`}>
                 {app.status || 'Pending'}
               </span>
@@ -245,6 +253,8 @@ const ApplicationSlider = ({ applications }) => {
         </div>
       ))}
     </HorizontalSlider>
+   
+    </>
   );
 };
 
@@ -254,6 +264,19 @@ const RecommendedMatches = ({ user, openModal }) => {
   const [loading, setLoading] = useState(true);
   const isMobile = useMediaQuery('(max-width: 600px)');
   const pageSize = isMobile ? 1 : 2;
+  const searchParams = useSearchParams();
+const jobId = searchParams.get("jobId");
+
+useEffect(() => {
+  if (!jobId) return;
+
+  const el = document.getElementById(`job-${jobId}`);
+  if (el) {
+    el.scrollIntoView({ behavior: "smooth", block: "center" });
+    el.classList.add('highlight-job');
+  }
+}, [jobId, matches]);
+
 
   useEffect(() => {
     if (!user?.id) return;
@@ -307,21 +330,32 @@ const RecommendedMatches = ({ user, openModal }) => {
       {!loading && matches.length === 0 && <div className="slider-page"><p>No matches found yet.</p></div>}
       {pages.map((page, idx) => (
         <div className="slider-page" key={idx}>
-          {page.map(job => (
-            <div key={job.id} className="job-card" onClick={() => openModal(job)}>
-              <div>
-                <h3>{job.title}</h3>
-                <p className="job-location">{job.company}</p>
-                <span className="match-score">{(job.similarity * 100).toFixed(0)}% Match</span>
-              </div>
-              <button className="btn-primary">View Details</button>
-            </div>
-          ))}
+         {page.map(job => (
+        <div id={`job-${job.id}`} key={job.id} className="job-card">
+   <div>
+      <h3>{job.title}</h3>
+      <p className="job-location">{job.company}</p>
+
+      {/* NEW: Date Posted */}
+      <small className="job-posted-date">
+        Posted on: {new Date(job.created_at).toLocaleDateString()}
+      </small>
+
+      <span className="match-score">
+        {(job.similarity * 100).toFixed(0)}% Match
+      </span>
+    </div>
+    
+  </div>
+))}
+
            {page.length < pageSize && <div className="app-card-empty" />}
         </div>
       ))}
     </HorizontalSlider>
+    
   );
+  
 };
 
 // --- 5. Announcements (Unchanged) ---
@@ -334,14 +368,19 @@ const Announcements = () => {
     const fetchAnnouncements = async () => {
       try {
         const { data } = await supabase
-          .from('announcements')
-          .select('*')
-          .order('created_at', { ascending: false })
+          .from("announcements")
+          .select("*")
+          .order("created_at", { ascending: false })
           .limit(5);
+
         setAnnouncements(data || []);
-      } catch (err) { console.error(err); } 
-      finally { setLoading(false); }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
     };
+
     fetchAnnouncements();
   }, [supabase]);
 
@@ -349,10 +388,12 @@ const Announcements = () => {
     return (
       <section className="card dashboard-announcements skeleton-widget">
         <SkeletonBox width="180px" height="26px" className="mb-3" />
+
         <div className="announcement-list">
           {[...Array(3)].map((_, i) => (
             <div key={i} className="announcement-card">
               <SkeletonBox width="60px" height="60px" className="rounded-sm" />
+
               <div className="announcement-content">
                 <SkeletonBox width="80%" height="18px" className="mb-1" />
                 <SkeletonBox width="95%" height="14px" className="mb-1" />
@@ -361,30 +402,57 @@ const Announcements = () => {
             </div>
           ))}
         </div>
-        <SkeletonBox width="100px" height="16px" className="view-all-link-skeleton mt-3 ml-auto" />
+
+        <SkeletonBox
+          width="100px"
+          height="16px"
+          className="view-all-link-skeleton mt-3 ml-auto"
+        />
       </section>
     );
   }
 
   return (
     <section className="card dashboard-announcements">
-      <h2><MessageSquare size={20} className="card-title-icon"/> Announcements</h2>
+      <h2>
+        <MessageSquare size={20} className="card-title-icon" /> Announcements
+      </h2>
+
       <div className="announcement-list">
-        {announcements.length === 0 ? <p>No announcements.</p> : announcements.map(ann => (
-          <div key={ann.id} className="announcement-card">
-            {ann.image_url && <img src={ann.image_url} alt={ann.title} className="announcement-image" />}
-            <div className="announcement-content">
-              <h3>{ann.title}</h3>
-              <p>{ann.content}</p>
-              <small>{new Date(ann.created_at).toLocaleDateString()}</small>
+        {announcements.length === 0 ? (
+          <p>No announcements.</p>
+        ) : (
+          announcements.map((ann) => (
+            <div key={ann.id} className="announcement-card">
+              {ann.image_url && (
+                <img
+                  src={ann.image_url}
+                  alt={ann.title}
+                  className="announcement-image"
+                />
+              )}
+
+              <div className="announcement-content">
+                <div className="announcement-title-row">
+                  <h3>{ann.title}</h3>
+                  {isNewAnnouncement(ann.created_at) && (
+                    <span className="new-badge">NEW</span>
+                  )}
+                </div>
+
+                <p>{ann.content}</p>
+                <small>
+                  {new Date(ann.created_at).toLocaleDateString()}
+                </small>
+              </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
-      <Link href="/intern/announcements" className="view-all-link">View All <ChevronRight size={16}/></Link>
     </section>
   );
 };
+
 
 // --- 6. Profile Widget (Unchanged) ---
 const ProfileWidget = ({ loading }) => (
@@ -585,25 +653,7 @@ export default function InternDashboard() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             
             {/* Theme Toggle Button */}
-            <button 
-              onClick={toggleTheme} 
-              style={{
-                background: 'rgba(255,255,255,0.05)',
-                border: '1px solid var(--border-color)',
-                borderRadius: '50%',
-                width: '40px',
-                height: '40px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                color: theme === 'light' ? 'var(--primary-orange)' : 'var(--text-main)',
-                transition: 'all 0.2s'
-              }}
-              title="Toggle Theme"
-            >
-              {theme === 'light' ? <Sun size={20} /> : <Moon size={20} />}
-            </button>
+          
 
             <div className="welcome-date">
               <span className="date-day">{dateInfo.day}</span>
@@ -627,7 +677,7 @@ export default function InternDashboard() {
           </aside>
         </div>
       </div>
-      
+      {user?.id && <FloatingAIChatWithCharts studentId={user.id} />}
       <InternNav className={selectedJob ? 'hidden' : ''} />
 
       {selectedJob && (

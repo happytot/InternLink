@@ -405,6 +405,15 @@ p {
     flex-direction: column;
     justify-content: flex-start;
 }
+.bento-item.medium:nth-child(2) { /* Digital Logbooks */
+    grid-column: 3;
+    grid-row: 1;
+}
+
+.bento-item.medium:nth-child(3) { /* Blockchain Certificates */
+    grid-column: 1;
+    grid-row: 2;
+}
 .bento-item:hover { border-color: var(--primary-orange); }
 .bento-item h3 { font-size: 1.4rem; color: var(--text-main); margin-bottom: 12px; }
 .bento-item p { color: var(--text-muted); font-size: 1rem; line-height: 1.6; }
@@ -412,9 +421,9 @@ p {
 .bento-icon { font-size: 2.2rem; color: var(--primary-orange); margin-bottom: 24px; }
 
 /* Bento Specifics */
-.large { grid-column: span 2; background: radial-gradient(circle at top right, rgba(238,116,40,0.05), transparent), var(--bg-item); }
-.wide { grid-column: span 3; display: flex; flex-direction: column; justify-content: center; }
-.bento-flex { display: flex; gap: 60px; align-items: center; width: 100%; }
+.large { grid-column: 1 / span 2; grid-row: 1; background: radial-gradient(circle at top right, rgba(238,116,40,0.05), transparent), var(--bg-item); }
+.wide { grid-column: 2 / span 2; grid-row: 2; display: flex; flex-direction: column; justify-content: center; }
+.bento-flex { display: flex; gap: 30px; align-items: center; width: 100%; }
 .graph-visual { flex-grow: 1; display: flex; align-items: flex-end; gap: 12px; height: 120px; }
 .bar { width: 20%; background: rgba(125, 125, 125, 0.2); border-radius: 6px 6px 0 0; animation: bar-grow 2s infinite alternate; }
 .b1 { height: 40%; }

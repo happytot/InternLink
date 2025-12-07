@@ -3,28 +3,24 @@
 import styles from './Logbook.module.css';
 
 export default function LogbookEntry({ log, formatDate, onDelete }) {
-  // 1. Normalize status for consistent styling
+  // Normalize status for consistent styling
   const status = log.status ? log.status.toLowerCase() : 'pending';
   const isApproved = status === 'approved';
   const isPending = status === 'pending' || status === 'submitted';
 
-  // 2. Helper to choose the right status class
+  // Helper to choose the right status class
   const getStatusClass = () => {
     if (isApproved) return styles.statusApproved;
     if (isPending) return styles.statusPending;
     return styles.statusRejected;
   };
 
-  // 3. Helper to clean up the Task Description
-  // This fixes the "undefined" bug robustly
+  // Helper to clean up the Task Description
   const getTaskDescription = () => {
     const text = log.tasks_completed;
-    
-    // If null, empty, or literally the text "undefined" (case-insensitive)
     if (!text || String(text).trim().toLowerCase() === 'undefined') {
       return "No tasks description provided.";
     }
-    
     return text;
   };
 
@@ -52,13 +48,19 @@ export default function LogbookEntry({ log, formatDate, onDelete }) {
           </div>
         </div>
 
-        {/* Right Side: Hours */}
+        {/* Right Side: Hours + Time In/Out */}
         <div className={styles.entryHours}>
           <span className={styles.hoursValue}>
             {log.hours_worked} <span style={{fontSize: '0.6em', fontWeight: '500'}}>hrs</span>
           </span>
-          
-          {/* Delete Button (Only if not approved) */}
+
+          {/* Time In / Time Out */}
+          <div className={styles.timeInOut}>
+            {log.time_in && <span>In: {log.time_in}</span>}
+            {log.time_out && <span>Out: {log.time_out}</span>}
+          </div>
+
+          {/* Delete Button (only if not approved) */}
           {!isApproved && onDelete && (
             <button 
               onClick={() => onDelete(log.id)}

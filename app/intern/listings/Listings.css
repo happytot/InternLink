@@ -1,64 +1,16 @@
-/* Listings.css - InternLink Design System (Dark Mode) */
-
-/* 1. Core Variables (Dark Mode Default) */
-:root {
-  /* Colors */
-  --bg-main: #021217; /* Background */
-  --bg-glass: rgba(15, 23, 42, 0.4); /* Slate-900 transparent for glass */
-  --bg-card: rgba(15, 23, 42, 0.85); /* Slightly less transparent for card fill */
-  --text-main: #F1F5F9; /* Slate-100 Text */
-  --text-muted: #94A3B8; /* Slate-400 Muted Text */
-  --border-color: rgba(241, 245, 249, 0.1); /* Light border for glass effect */
-  --primary-orange: #EE7428;
-  --secondary-cyan: #00d4ff;
-
-  /* Typography */
-  --font-heading: 'Plus Jakarta Sans', sans-serif;
-  --font-body: 'Inter', sans-serif;
-
-  /* Shapes/Shadows */
-  --radius-card: 24px;
-  --radius-button: 12px;
-  --radius-pill: 50px;
-  --shadow-card: 0 10px 30px rgba(0, 0, 0, 0.4), 0 0 15px rgba(238, 116, 40, 0.05); /* Deep Shadow + Subtle Glow */
-  --shadow-hover: 0 20px 40px -10px rgba(0,0,0,0.6), 0 0 20px rgba(238, 116, 40, 0.3); /* Lift + Orange Glow */
-}
-
-/* 2. Light Mode Override */
-.light-mode {
-  --bg-main: #F8FAFC;
-  --bg-glass: rgba(255, 255, 255, 0.6);
-  --bg-card: rgba(255, 255, 255, 0.95);
-  --text-main: #0F172A;
-  --text-muted: #475569;
-  --border-color: rgba(15, 23, 42, 0.1);
-  --primary-orange: #EA580C; /* Slightly deeper orange for contrast */
-  --secondary-cyan: #3b82f6;
-  --shadow-card: 0 10px 30px rgba(0, 0, 0, 0.05);
-  --shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.1), 0 0 15px rgba(234, 88, 12, 0.2);
-}
-
-body {
-  background-color: var(--bg-main);
-  font-family: var(--font-body);
-  color: var(--text-main);
-  margin: 0;
-  padding: 0;
-  transition: background-color 0.3s ease;
-}
+/* Listings.css - InternLink Design System */
+/* Note: Variables and Base Styles are now inherited from globals.css */
 
 /* 🌟 Main container (Glassmorphism) */
 .listings-container {
-    max-width: 100%; /* Increased max width for the split pane */
-    margin: 3rem auto;
-    margin-top: 100px;
-    margin-bottom: 100px;
-    padding: 2.5rem; 
-    /* ... (Glassmorphism styles remain the same) ... */
-   
-    backdrop-filter: blur(12px) saturate(180%);
-    -webkit-backdrop-filter: blur(12px) saturate(180%);
-   
+  max-width: 100%; 
+  margin: 3rem auto;
+  margin-top: 100px;
+  margin-bottom: 20px;
+  padding: 2.5rem; 
+  /* Uses global glass vars */
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
 }
 
 /* 🧭 Page Header */
@@ -83,7 +35,7 @@ body {
   flex-grow: 1;
   padding: 1rem 1.2rem;
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-button); /* 12px */
+  border-radius: var(--radius-btn); /* Adapts to global radius */
   font-size: 1rem;
   font-family: var(--font-body);
   background: var(--bg-card);
@@ -110,7 +62,7 @@ body {
 .listing-card {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-card); /* 24px */
+  border-radius: var(--radius-card); 
   padding: 1.8rem;
   box-shadow: var(--shadow-card);
   transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
@@ -120,11 +72,16 @@ body {
   min-height: 200px;
 }
 
-/* Hover Effect: Lift + Orange Border Glow + Deep Shadow */
+/* Hover Effect */
 .listing-card:hover {
   transform: translateY(-8px);
   box-shadow: var(--shadow-hover);
   border-color: var(--primary-orange);
+}
+
+.listing-card.selected-card {
+  border-color: var(--primary-orange);
+  background: rgba(238, 116, 40, 0.08);
 }
 
 /* 🏷 Job Info */
@@ -134,7 +91,7 @@ body {
   font-weight: 700;
   color: var(--text-main);
   margin-bottom: 0.6rem;
-  letter-spacing: -0.02em; /* Tighter tracking */
+  letter-spacing: -0.02em;
 }
 
 .job-company {
@@ -153,11 +110,16 @@ body {
   gap: 10px;
 }
 
+.job-timeago {
+  font-size: 0.85rem;
+  opacity: 0.7;
+}
+
 /* Badges/Pills */
 .location-pill, .work-setup-pill {
   display: inline-flex;
   padding: 0.3rem 0.8rem;
-  border-radius: var(--radius-pill); /* 50px */
+  border-radius: var(--radius-pill);
   font-size: 0.75rem;
   font-weight: 500;
   text-transform: uppercase;
@@ -165,35 +127,34 @@ body {
 }
 
 .location-pill {
-  background: rgba(0, 212, 255, 0.15); /* Cyan */
+  background: rgba(0, 212, 255, 0.15); /* Cyan tint */
   color: var(--secondary-cyan);
 }
 .work-setup-pill {
-  background: rgba(238, 116, 40, 0.15); /* Orange */
+  background: rgba(238, 116, 40, 0.15); /* Orange tint */
   color: var(--primary-orange);
 }
 
-
-/* 🔘 View Details Button */
+/* 🔘 View Details Button (Desktop Default) */
 .btn-details {
   align-self: flex-start;
   background-color: var(--primary-orange);
   color: #fff;
   border: none;
   padding: 0.7rem 1.6rem;
-  border-radius: var(--radius-button); /* 12px */
+  border-radius: var(--radius-btn);
   font-weight: 600;
   font-family: var(--font-heading);
   cursor: pointer;
   box-shadow: 0 4px 10px rgba(238, 116, 40, 0.3);
   transition: all 0.25s ease;
-  margin-top: auto; /* Push to the bottom */
+  margin-top: auto; 
 }
 
 .btn-details:hover {
-  transform: translateY(-2px); /* Subtle lift */
+  transform: translateY(-2px);
   box-shadow: 0 8px 16px rgba(238, 116, 40, 0.5);
-  background-color: #d16120;
+  background-color: var(--primary-orange-hover);
 }
 
 /* 🕊 No Results State */
@@ -209,22 +170,19 @@ body {
   backdrop-filter: blur(16px);
 }
 
-/* 🧊 MODAL (Glassmorphism & New Design) ---------- */
+/* 🧊 MODAL (Glassmorphism & New Design) */
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  /* --- CHANGED: Use a darker, more opaque background --- */
-  background: rgba(0, 0, 0, 0.9); /* Almost black, high opacity */
-  /* backdrop-filter: blur(8px);  (Kept the blur for depth) */
+  background: rgba(0, 0, 0, 0.9);
   backdrop-filter: blur(8px);
-  /* ... (rest of styles remain the same) ... */
   display: flex;
   justify-content: center;
   align-items: flex-start; 
-  padding-top: 5vh;
+  padding-top: 12vh;
   z-index: 1000;
   opacity: 0;
   pointer-events: none;
@@ -238,19 +196,17 @@ body {
 
 /* ---------- MODAL BOX ---------- */
 .modal-content {
-  background: rgba(15, 23, 42, 0.85) !important; /* Dark glass */
+  background: var(--bg-card) !important;
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   border: 1px solid var(--border-color);
-
-  border-radius: var(--radius-card); /* 24px */
+  border-radius: var(--radius-card);
   padding: 30px;
   width: 100%;
   max-width: 800px;
   max-height: 200vh;
   overflow-y: auto;
   box-shadow: var(--shadow-card);
-
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -295,91 +251,34 @@ body {
 
 /* ---------- MODAL BODY ---------- */
 .modal-body {
-    display: flex;
-    flex-direction: column;
-    gap: 25px; /* Tighter spacing between main sections */
-    line-height: 1.6;
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  line-height: 1.6;
 }
 
 .detail-card {
-    background: rgba(255, 255, 255, 0.05); /* Very slight background distinction */
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-card); /* 24px */
-    padding: 24px 30px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
-    gap: 15px; /* Spacing within the card */
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-card);
+  padding: 24px 30px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 20px;
 }
 
 .job-detail-subheading {
-    font-family: var(--font-heading);
-    font-size: 1.15rem;
-    font-weight: 700;
-    color: var(--primary-orange); /* Use orange accent for section titles */
-    letter-spacing: 0.5px;
-    padding-bottom: 5px;
-    border-bottom: 2px solid var(--border-color); /* Subtle divider */
-}
-/* Secondary Info Grid */
-.job-detail-secondary-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 20px;
-  padding: 15px 0;
-  border-top: 1px solid var(--border-color);
-  border-bottom: 1px solid var(--border-color);
-}
-
-/* --- MODAL BODY STYLES --- */
-.job-detail-group {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-/* Main title and company */
-.job-detail-title {
   font-family: var(--font-heading);
-  font-size: 2rem;
+  font-size: 1.15rem;
   font-weight: 700;
-  color: var(--text-main);
-  margin: 0;
+  color: var(--primary-orange);
+  letter-spacing: 0.5px;
+  padding-bottom: 5px;
+  border-bottom: 2px solid var(--border-color);
 }
 
-.job-detail-company {
-  font-family: var(--font-body);
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: var(--secondary-cyan);
-  margin: 0;
-  margin-top: -6px;
-}
-
-/* Location and Salary */
-.job-detail-item {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.job-detail-label {
-  font-family: var(--font-body);
-  font-size: 0.8rem;
-  font-weight: 500;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.job-detail-value {
-  font-family: var(--font-heading);
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: var(--text-main);
-}
-
-/* Description */
 .job-detail-description {
   font-family: var(--font-body);
   font-size: 1rem;
@@ -390,33 +289,32 @@ body {
 
 /* Styles for new Job Detail Lists */
 .job-detail-list {
-    list-style-type: none;
-    padding-left: 0;
-    margin: 0;
-    font-size: 1rem;
-    color: var(--text-main);
-    line-height: 1.6;
+  list-style-type: none;
+  padding-left: 0;
+  margin: 0;
+  font-size: 1rem;
+  color: var(--text-main);
+  line-height: 1.6;
 }
 
 .job-detail-list li {
-    font-family: var(--font-body);
-    margin-bottom: 12px; /* Increased spacing for readability */
-    position: relative;
-    padding-left: 25px;
+  font-family: var(--font-body);
+  margin-bottom: 12px;
+  position: relative;
+  padding-left: 25px;
 }
 
 /* Custom bullet with primary accent */
 .job-detail-list li::before {
-    content: "•";
-    color: var(--secondary-cyan); /* Use Cyan for bullet points to break up the orange */
-    font-size: 1.2rem;
-    font-weight: 700;
-    position: absolute;
-    left: 0;
-    top: 0;
-    line-height: inherit;
+  content: "•";
+  color: var(--secondary-cyan);
+  font-size: 1.2rem;
+  font-weight: 700;
+  position: absolute;
+  left: 0;
+  top: 0;
+  line-height: inherit;
 }
-
 
 /* ---------- MODAL FOOTER ---------- */
 .modal-footer {
@@ -424,13 +322,19 @@ body {
   justify-content: flex-end;
   gap: 15px;
   padding-top: 15px;
+  /* Sticky footer within the pane */
+  position: sticky;
+  bottom: 0;
+  background: var(--bg-card);
+  backdrop-filter: blur(5px);
+  z-index: 10;
+  border-top: 1px solid var(--border-color);
 }
 
-.primary-btn,
-.secondary-btn {
+.primary-btn, .secondary-btn {
   border: none;
   padding: 12px 22px;
-  border-radius: var(--radius-button);
+  border-radius: var(--radius-btn);
   cursor: pointer;
   font-weight: 600;
   font-family: var(--font-heading);
@@ -443,13 +347,15 @@ body {
   color: white;
   box-shadow: 0 4px 10px rgba(238, 116, 40, 0.4);
 }
+
 .primary-btn:hover:not(:disabled) {
-  background-color: #d16120;
+  background-color: var(--primary-orange-hover);
   box-shadow: 0 8px 16px rgba(238, 116, 40, 0.6);
   transform: translateY(-2px);
 }
+
 .primary-btn:disabled {
-  background-color: #475569; /* Slate-600 */
+  background-color: #475569;
   color: #E2E8F0;
   box-shadow: none;
   transform: none;
@@ -467,250 +373,144 @@ body {
   border-color: var(--secondary-cyan);
 }
 
-
-/* --- ANIMATION KEYFRAMES (Re-used, but with custom timing) --- */
+/* --- ANIMATIONS --- */
 @keyframes slideInFromTop {
-  from {
-    opacity: 0;
-    transform: translateY(-50px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(-50px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes slideOutToTop {
-  from {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  to {
-    opacity: 0;
-    transform: translateY(-50px);
-  }
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(-50px); }
 }
 
-/* Custom 'reveal-on-scroll' for cards */
-.reveal-on-scroll {
-    opacity: 0;
-    transform: translateY(30px); /* Slide up 30px */
-    animation: reveal-fade-in 0.6s ease-out forwards;
+.job-detail-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 10px;
 }
 
-/* NOTE: In a real app, this animation would be handled by an Intersection Observer
-to trigger on scroll. Here, it will fire immediately. */
-@keyframes reveal-fade-in {
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+.job-detail-title {
+  font-size: 2rem;
+  font-weight: 700;
+  font-family: var(--font-heading);
+  color: var(--text-main);
+  margin: 0;
 }
 
-
-/* 📱 --- RESPONSIVE STYLES --- 📱 */
-
-@media (max-width: 768px) {
-  .listings-container {
-    margin: 4.4rem 0.5rem 6.25rem 0.5rem;
-    padding: 1.5rem;
-  }
-
-  .listings-container h1 {
-    font-size: 1.8rem;
-    margin-top: 0;
-  }
-
-  .search-input {
-    width: 100%;
-    padding: 0.8rem 1rem;
-  }
-  
-  .listing-card {
-    min-height: auto;
-  }
-
-  .modal-content {
-    width: 95%;
-    padding: 20px;
-    gap: 15px;
-  }
-
-  .job-detail-title {
-    font-size: 1.5rem;
-  }
-  
-  .job-detail-secondary-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: 15px;
-  }
-
-  .modal-footer {
-    flex-direction: column-reverse;
-    gap: 10px;
-  }
-  
-  .primary-btn,
-  .secondary-btn {
-    width: 100%;
-    text-align: center;
-  }
+.job-detail-company {
+  font-size: 1.1rem;
+  color: var(--primary-orange);
+  font-weight: 600;
+  margin: 0;
 }
 
-@media (max-width: 992px) {
-    .listings-container {
-        max-width: 95%; /* Adjust for smaller screens */
-        padding: 1.5rem;
-    }
-
-    /* Stack the two panes vertically on smaller screens (Bento Box -> Stack) */
-    .bento-box-layout {
-        grid-template-columns: 1fr; /* Single column */
-        min-height: auto;
-    }
-    
-    /* Make both panes auto-height */
-    .listings-pane,
-    .job-details-pane {
-        max-height: auto; 
-    }
-    
-    /* Give the list pane a fixed height on mobile so the details are visible below */
-    .listings-pane {
-        max-height: 40vh;
-    }
+.job-detail-ceo {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  font-style: italic;
+  margin: 0;
 }
 
-.bento-box-layout {
-    display: grid;
-    grid-template-columns: 2fr 3fr;
-    gap: 20px;
-    /* Remove fixed height to let viewport scroll naturally */
-    height: auto; 
-    align-items: start;
-}
-
-/* Left Pane scrolls independently */
-.listings-pane {
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-card);
-    padding: 20px;
-
-   
-}
-
-/* Right Pane stays sticky on screen */
-.job-details-pane {
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-card);
-    padding: 20px;
-
-    position: sticky;
-    top: 100px; /* height of your header */
-    align-self: start; /* important to stick at the top */
-    overflow-y: auto;
-    height: 800px;
-}
-
-
-
-/* ⬅️ Left Pane: Job Listings */
-
-
-/* List of Cards */
-.internship-results-list {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-/* Individual Job Cards in the List (MODIFIED) */
-.listing-card {
-    background: rgba(255, 255, 255, 0.05); /* Very slight background distinction */
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-button); /* Smaller radius for list items */
-    padding: 1.2rem;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-    transition: all 0.2s ease;
-    cursor: pointer;
-    min-height: auto; /* Revert min-height for list item */
-    
-    /* Remove details button space */
-    display: block; 
-}
-
-.listing-card:hover {
-    transform: none; /* Remove hover lift */
-    box-shadow: 0 0 0 1px var(--secondary-cyan); /* Subtle cyan outline on hover */
-    border-color: var(--secondary-cyan);
-}
-
-/* 🆕 Highlight selected card */
-.listing-card.selected-card {
-    background-color: rgba(0, 212, 255, 0.1); /* Subtle cyan background */
-    border-color: var(--secondary-cyan);
-    box-shadow: 0 0 0 1px var(--secondary-cyan);
-}
-
-.listing-card .job-title {
-    font-size: 1.1rem;
-    margin-bottom: 0.4rem;
-}
-
-.listing-card .job-company {
-    font-size: 0.85rem;
-    margin-bottom: 0.8rem;
-}
-
-
-
-
-/* Clean up header and footer in the new context */
-.job-details-pane .modal-header {
-    /* Remove border-bottom from modal header since job info is detailed below it */
-    border-bottom: none;
-    padding-bottom: 0;
-}
-.job-details-pane .modal-body {
-    /* Allow body content to grow */
-    overflow-y: visible;
-    flex-grow: 1;
-}
-
-/* No job selected state */
-.job-details-pane.no-job-selected {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    flex-direction: column;
-    color: var(--text-muted);
-}
-.job-details-pane.no-job-selected h2 {
-    color: var(--primary-orange);
-}
-.job-timeago,
 .posted-ago {
   font-size: 0.85rem;
-  opacity: 0.7;
-  margin-top: 5px;
+  color: var(--text-muted);
+  margin: 0;
 }
 
-.modal-footer {
-  display: flex;
-  justify-content: flex-end;
+.job-detail-secondary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: 15px;
-  padding-top: 15px;
+  margin-bottom: 20px;
+}
+
+.job-detail-item {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-color);
+  padding: 12px 16px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.job-detail-label {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.job-detail-value {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+/* --- UPDATED LAYOUT FOR SCROLLING --- */
+/* The grid now takes up the remaining viewport height */
+.bento-box-layout {
+  display: grid;
+  grid-template-columns: 2fr 3fr;
+  gap: 20px;
+  /* Fixed height calculated from viewport */
+  height: calc(100vh - 250px);
+  min-height: 500px;
+  align-items: start;
+}
+
+/* Left Pane scrolls internally */
+.listings-pane {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-card);
+  padding: 20px;
+  height: 100%;
+  overflow-y: auto;
+  padding-right: 12px;
+}
+
+/* Right Pane Container */
+.desktop-details-container {
+    height: 100%;
+}
+
+/* Right Pane scrolls internally */
+.job-details-pane {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-card);
+  padding: 30px;
+  height: 100%;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+.internship-results-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.job-details-pane.no-job-selected {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  flex-direction: column;
+  color: var(--text-muted);
+}
+.job-details-pane.no-job-selected h2 {
+  color: var(--primary-orange);
 }
 
 .save-btn {
   background: var(--bg-card);
   color: var(--primary-orange);
-  border: 1px solid var(--primary-orange);
-  border-radius: var(--radius-button);
-  padding: 12px 22px;
+  border: 1px solid var(--border-color);
   font-weight: 600;
   cursor: pointer;
   transition: all 0.25s ease;
@@ -730,13 +530,13 @@ to trigger on scroll. Here, it will fire immediately. */
   margin-left: 1rem;
   padding-right: 2px;
   padding: 0.8rem 1rem;
-  border-radius: var(--radius-button);
+  border-radius: var(--radius-btn);
   border: 1px solid var(--border-color);
   background: var(--bg-card);
   color: var(--text-main);
   font-size: 0.95rem;
   cursor: pointer;
-  width: 15%;
+  width: 20%;
 }
 
 .filter-select:focus {
@@ -748,20 +548,103 @@ to trigger on scroll. Here, it will fire immediately. */
 .saved-jobs-btn {
   margin-left: 1rem;
   padding: 0.9rem 1.5rem;
-  border-radius: var(--radius-button);
+  border-radius: var(--radius-btn);
   border: 1px solid var(--border-color);
   background: var(--bg-card);
   color: var(--text-main);
-  font-family: var(--font-body);
-  font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-  width: 20%;
 }
 
 .saved-jobs-btn:hover {
-  border-color: var(--secondary-cyan);
-  box-shadow: 0 4px 12px rgba(0,212,255,0.3);
+  border-color: var(--primary-orange);
+  color: var(--primary-orange);
+}
+
+/* --- MOBILE RESPONSIVE UPDATES --- */
+
+.view-details-btn-mobile {
+  display: none;
+}
+
+.mobile-details-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background: var(--bg-main); 
+  z-index: 9999;
+  overflow-y: auto;
+  padding: 20px;
+  transform: translateX(100%); 
+  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  display: flex;
+  flex-direction: column;
+}
+
+.mobile-details-overlay.active {
+  transform: translateX(0);
+}
+
+.mobile-back-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+  cursor: pointer;
+}
+.mobile-back-btn:hover { color: var(--primary-orange); }
+
+@media (max-width: 992px) {
+  .listings-container {
+    max-width: 95%;
+    padding: 1.5rem;
+    margin-top: 80px;
+    margin-bottom: 40px;
+  }
+
+  .bento-box-layout {
+    display: block; 
+    height: auto; 
+  }
+
+  .desktop-details-container {
+    display: none;
+  }
+
+  .listings-pane {
+    height: auto !important; 
+    overflow-y: visible;
+    border: none;
+    background: transparent;
+    padding: 0;
+  }
+
+  .view-details-btn-mobile {
+    display: block;
+    width: 100%;
+    margin-top: 15px;
+    padding: 12px;
+    background: transparent;
+    border: 1px solid var(--primary-orange);
+    color: var(--primary-orange);
+    border-radius: var(--radius-btn);
+    font-weight: 600;
+    cursor: pointer;
+    font-family: var(--font-heading);
+    transition: all 0.2s ease;
+  }
+  
+  .view-details-btn-mobile:hover {
+    background: var(--primary-orange);
+    color: #fff;
+  }
 }

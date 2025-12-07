@@ -1,17 +1,19 @@
 'use client';
-
+import './Profile.css';
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { Toaster, toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import InternNav from '../../components/InternNav';
+import FloatingAIChatWithCharts from '../../components/chatbot';
+
 
 import { 
     User, Users, Mail, Phone, MapPin, Briefcase, GraduationCap, Wrench, Plus, X, 
     FileText, Upload, Eye, Trash2, LogOut, Save, Loader2, MinusCircle, FileQuestion, Check, Undo2
 } from 'lucide-react';
 
-import './Profile.css';
+
 
 const STANDARD_DEPARTMENTS = ['CCS', 'CBA', 'CHTM', 'CEA'];
 
@@ -621,6 +623,8 @@ export default function Profile() {
                     </div>
                 </div>
             </form>
+            <FloatingAIChatWithCharts studentId={userId} />
+
             <InternNav /> 
             
             {/* Resume Modal */}

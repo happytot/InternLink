@@ -11,7 +11,7 @@
     height: 70px; /* Fixed height for header */
     z-index: 1000;
     
-    background: #021217; /* Or var(--bg-glass) */
+    background: var(--bg-main); /* Or var(--bg-glass) */
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--border-color);

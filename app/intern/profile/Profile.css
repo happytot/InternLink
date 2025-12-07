@@ -72,7 +72,7 @@
 .profile-content-area {
     width: 95%;
     max-width: none;
-    margin: 20px 0 0;
+    margin: 20px auto 0; /* Centered content on wider screens */
     padding: 0 32px;
     display: flex;
     flex-direction: column;
@@ -104,7 +104,8 @@
 
 .profile-bento-grid {
     display: grid;
-    grid-template-columns: 380px 1fr 340px;
+    /* Define explicit column widths for desktop */
+    grid-template-columns: 380px 1fr 340px; 
     gap: 24px;
     align-items: start;
     width: 100%;
@@ -116,7 +117,7 @@
     gap: 24px;
 }
 
-.bento-col col-left .form-group {
+.bento-col.col-left .form-group { /* Use direct class for better specificity/clarity */
     width: 90%;
 }
 
@@ -268,7 +269,7 @@
     font-size: 0.95rem;
     font-family: 'Inter', sans-serif; /* Body Font */
     color: var(--text-main);
-     line-height: 1.5;
+    line-height: 1.5;
 }
 .summary-textarea:focus { 
     outline: 2px solid rgba(238, 116, 40, 0.2);
@@ -414,7 +415,7 @@
     gap: 8px;
 }
 .skill-badge {
-     background: var(--input-bg);
+    background: var(--input-bg);
     color: white;
     padding: 6px 12px;
     border-radius: var(--radius-pill);
@@ -422,7 +423,7 @@
     display: flex;
     align-items: center;
     gap: 6px;
-   
+    
 }
 .skill-tags .light-mode .skill-badge {
     background: #fff7ed;
@@ -487,7 +488,8 @@
     transition: background 0.2s, transform 0.2s;
 }
 .btn-sm-primary:hover { 
-    background: color-mix(in srgb, var(--secondary-cyan) 80%, white);
+    /* IMPROVEMENT: Changed color-mix to rgba or direct hex for maximum CSS compatibility */
+    background: #79e9ff; /* Calculated lighter cyan */
     transform: translateY(-1px);
 }
 
@@ -506,7 +508,8 @@
     transition: background 0.2s;
 }
 .btn-secondary:hover {
-    background: color-mix(in srgb, var(--input-bg) 80%, var(--primary-orange));
+    /* IMPROVEMENT: Changed color-mix to rgba or direct hex for maximum CSS compatibility */
+    background: #2a3340; /* Slightly mixed input bg with primary orange hue */
 }
 .full-width-btn { width: 88%; 
 margin-top: 10px;}
@@ -602,7 +605,8 @@ margin-top: 10px;}
     transition: background 0.2s;
 }
 .btn-toast-save:hover {
-    background: color-mix(in srgb, var(--primary-orange) 90%, black);
+    /* IMPROVEMENT: Changed color-mix to direct hex */
+    background: #d46524; /* Darker orange */
 }
 
 .btn-toast-save.btn-success-state {
@@ -639,11 +643,39 @@ margin-top: 10px;}
    8. RESPONSIVENESS (Mobile Optimized Toast)
    ========================================= */
 
-@media (max-width: 1100px) {
-    /* Tablet: Stack the Bento Grid */
+@media (max-width: 1400px) {
+    /* Slightly wider layout adjustment before tablet break, if content starts feeling cramped */
     .profile-bento-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: 300px 1fr 300px; /* Reduced side columns slightly */
     }
+}
+
+@media (max-width: 1100px) {
+    /* --- TABLET BREAKPOINT (Collapses 3 columns to 1 column) --- */
+    .profile-content-area {
+        padding: 0 24px; /* Reduced side padding slightly */
+    }
+
+    .profile-bento-grid {
+        grid-template-columns: 1fr; /* Full width for all columns */
+        gap: 30px; /* Increased gap between the stacked columns */
+    }
+    
+    /* Ensure all inner components now use 100% width or auto-adjust */
+    .bento-col.col-left .form-group {
+        width: 100%; /* Fix input width issues in the former left column */
+    }
+
+    .resumeFileUpload {
+        width: 100%;
+    }
+    
+    .full-width-btn { 
+        width: 100%; 
+        max-width: 350px; /* Limit button width on wider tablet screens */
+        margin: 10px auto 0; /* Center button */
+    }
+    
     .page-title { font-size: 1.5rem; }
     
     /* Allow toast to shrink if needed */
@@ -653,16 +685,40 @@ margin-top: 10px;}
     }
 }
 
+@media (max-width: 768px) {
+    /* Further general mobile adjustments for better spacing */
+    .profile-content-area {
+        padding: 20px 20px;
+    }
+
+    .profile-card {
+        padding: 20px;
+        border-radius: 16px; /* Slightly softer radius on smaller screens */
+    }
+
+    .summary-textarea {
+        width: 100%; /* Ensures 100% width for the text area */
+    }
+    .full-width-btn { max-width: 100%; } /* Full button width on small mobiles */
+}
+
+
 @media (max-width: 600px) {
-    .profile-wrapper { padding-top: 20px; }
-    .profile-content-area { padding: 20px 16px; }
+    .profile-wrapper { 
+        padding-top: 20px; 
+        padding-bottom: 70px; /* Reduced bottom padding */
+    }
+    .profile-content-area { 
+        padding: 15px 16px; /* Minimal side padding */
+        gap: 15px; /* Reduced gap between stacked cards */
+    }
 
     /* --- MOBILE TOAST ADJUSTMENTS (Glassmorphism on mobile) --- */
     .floating-save-toast {
         /* 1. Size & Position */
-        width: 90%;
+        width: 95%; /* Increased width for better use of space */
         max-width: 400px;
-        top: 20px;
+        top: 15px; /* Moved up slightly */
         left: 50%;
         
         /* 2. Layout: Stack vertically */
@@ -699,5 +755,15 @@ margin-top: 10px;}
     .btn-toast-cancel {
         background: rgba(255,255,255,0.1);
         color: var(--text-main);
+    }
+}
+
+/* Ensure all relevant form fields take up 100% of their parent container on mobile */
+@media (max-width: 480px) {
+    .form-group input, .form-group select {
+        width: 100%; 
+    }
+    .edu-input-group {
+        width: 100%;
     }
 }

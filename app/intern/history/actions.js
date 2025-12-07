@@ -36,7 +36,6 @@ export async function startInternship(applicationId) {
     const supabase = createSupabaseServerClient();
     const { data: { user } } = await supabase.auth.getUser();
 
-    // 1. Check if we already have an "ongoing" internship
     const { data: existing } = await supabase
         .from('job_applications')
         .select('id, companies!fk_job_applications_company(name)')
@@ -51,7 +50,6 @@ export async function startInternship(applicationId) {
         };
     }
 
-    // 2. Perform the Update
     const { error, data } = await supabase
         .from('job_applications')
         .update({ status: 'ongoing' })
@@ -73,3 +71,40 @@ export async function startInternship(applicationId) {
     revalidatePath('/intern/logbook'); 
     return { success: true, message: 'Internship started successfully!' };
 }
+
+// ✅ ADD CANCEL FUNCTION
+// server-side
+// server-side
+export async function cancelApplication(applicationId) {
+    const supabase = createSupabaseServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+        return { success: false, error: 'User not authenticated' };
+    }
+
+    try {
+        const { error } = await supabase
+            .from('job_applications')
+            .delete()
+            .eq('id', applicationId)
+            .eq('intern_id', user.id);
+
+        if (error) {
+            console.error("Cancel failed:", error);
+            return { success: false, error: error.message };
+        }
+
+        // No need to check `data.length` — deletion succeeded if no error
+        revalidatePath('/intern/application-history');
+        return { success: true, message: "Application canceled successfully." };
+
+    } catch (err) {
+        console.error("Unexpected cancel error:", err);
+        return { success: false, error: "An unexpected error occurred while canceling." };
+    }
+}
+
+
+
+

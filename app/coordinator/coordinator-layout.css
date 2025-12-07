@@ -1,0 +1,70 @@
+/*
+|--------------------------------------------------------------------------
+| 🏗️ COORDINATOR SHELL LAYOUT
+|--------------------------------------------------------------------------
+*/
+
+/* 1. The Outer Shell - Locks to the viewport */
+.company-shell {
+    display: flex;
+    height: 100vh;        /* Exact height of screen */
+    width: 100vw;         /* Exact width of screen */
+    overflow: hidden;     /* Prevents whole-page scrolling */
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    font-family: var(--font-body);
+}
+
+/* 2. The Sidebar - FIXED on the left */
+.company-sidebar-wrapper {
+    flex-shrink: 0;       /* Never shrink width */
+    height: 100%;         /* Fill height */
+    z-index: 50;
+    background-color: var(--bg-card); /* Or your sidebar bg variable */
+    border-right: 1px solid var(--border-color);
+    
+    /* If the menu is taller than the screen, allow internal scrolling 
+       hidden = completely static
+       auto = scrollable if needed
+    */
+    overflow-y: auto;     
+}
+
+/* Hide scrollbar for sidebar for cleaner look (Chrome/Safari) */
+.company-sidebar-wrapper::-webkit-scrollbar {
+    width: 0px;
+    background: transparent;
+}
+
+/* 3. The Main Content - SCROLLABLE area */
+.company-main-content {
+    flex: 1;              /* Take remaining width */
+    height: 100%;         /* Fill height */
+    overflow-y: auto;     /* ✅ THIS enables scrolling for content only */
+    overflow-x: hidden;   
+    position: relative;
+    scroll-behavior: smooth;
+    padding: 0;           /* Padding is handled by dashboard-inner */
+}
+
+/* 4. Inner Container - Centers content on large screens */
+.dashboard-inner {
+    width: 100%;
+    max-width: 1600px;    
+    margin: 0 auto;       
+    padding: 40px;        
+    padding-bottom: 120px; /* Extra space at bottom */
+    box-sizing: border-box; 
+}
+
+/* 📱 RESPONSIVE: Hide sidebar on mobile 
+   (Assuming you have a hamburger menu logic in your Sidebar component) 
+*/
+@media (max-width: 768px) {
+    .company-sidebar-wrapper {
+        display: none; /* Or toggle logic */
+    }
+    .dashboard-inner {
+        padding: 20px;
+    }
+}

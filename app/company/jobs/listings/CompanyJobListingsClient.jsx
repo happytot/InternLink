@@ -1,21 +1,21 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation'; // Added useRouter
+import { useRouter } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import './listings.css';
-import '../../../globals.css'
+// import '../../../globals.css' // No need to import this if it's in layout.js
 import { 
-  Briefcase, Plus, // Added these imports
+  Briefcase, Plus, 
   Edit, Trash2, X, CheckCircle2 
 } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
 
 export default function CompanyJobListingsClient({ initialJobs }) {
-  const router = useRouter(); // Initialize router
+  const router = useRouter();
   const supabase = createClientComponentClient();
 
-  const [jobs, setJobs] = useState(initialJobs);
+  const [jobs, setJobs] = useState(initialJobs || []);
   const [loading, setLoading] = useState(false); 
   
   const [editJob, setEditJob] = useState(null);
@@ -90,16 +90,26 @@ export default function CompanyJobListingsClient({ initialJobs }) {
     }
   };
 
-  if (loading) return <div className="text-center mt-8">Updating job...</div>;
+  if (loading) return <div className="text-center mt-8" style={{color: 'var(--text-muted)'}}>Processing...</div>;
 
   return (
     <>
     <div className="job-listings-container">
-      <Toaster position="bottom-right" toastOptions={{ style: { background: '#333', color: '#fff' } }} />
+      {/* Updated Toaster to use CSS variables for background/color */}
+      <Toaster 
+        position="bottom-right" 
+        toastOptions={{ 
+            style: { 
+                background: 'var(--bg-card)', 
+                color: 'var(--text-main)', 
+                border: '1px solid var(--border-color)' 
+            } 
+        }} 
+      />
 
       {/* ========================================================
           🍱 NEW BENTO HEADER BOX
-         ======================================================== */}
+          ======================================================== */}
       <div className="bento-header">
         <div className="header-left">
           <div className="header-icon-box">
@@ -119,7 +129,9 @@ export default function CompanyJobListingsClient({ initialJobs }) {
       {/* ======================================================== */}
 
       {jobs.length === 0 ? (
-        <p className="empty-text">No job posts yet. Click “Post New Job” to add one.</p>
+        <div className="empty-state-container">
+            <p className="empty-text">No job posts yet. Click “Post New Job” to add one.</p>
+        </div>
       ) : (
         <>
           {/* Table View */}
@@ -142,8 +154,10 @@ export default function CompanyJobListingsClient({ initialJobs }) {
                     <td className="px-4 py-2">{job.salary || '—'}</td>
                     <td className="px-4 py-2">{new Date(job.created_at).toLocaleDateString()}</td>
                     <td className="px-4 py-2 space-x-2">
-                      <button onClick={() => openEditModal(job)} className="edit-btn">Edit</button>
-                      <button onClick={() => handleDelete(job.id)} className="delete-btn">Delete</button>
+                      <div className="flex gap-2">
+                        <button onClick={() => openEditModal(job)} className="edit-btn">Edit</button>
+                        <button onClick={() => handleDelete(job.id)} className="delete-btn">Delete</button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -151,7 +165,7 @@ export default function CompanyJobListingsClient({ initialJobs }) {
             </table>
           </div>
 
-          {/* Card View */}
+          {/* Card View (Visible on Mobile via CSS) */}
           <div className="card-view">
             <div className="job-grid">
               {jobs.map((job) => (
@@ -176,73 +190,81 @@ export default function CompanyJobListingsClient({ initialJobs }) {
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h2>Edit Job</h2>
-              <button className="close-btn" onClick={closeEditModal}>×</button>
+              <button className="close-btn" onClick={closeEditModal}>
+                <X size={24} />
+              </button>
             </div>
 
             <div className="modal-body">
-              <label>Title</label>
-              <input name="title" value={formData.title} onChange={handleEditChange} />
+                <div className="modal-grid">
+                    <div className="modal-col">
+                    <label>Title</label>
+                    <input name="title" value={formData.title} onChange={handleEditChange} />
 
-              <label>Location</label>
-              <input name="location" value={formData.location} onChange={handleEditChange} />
+                    <label>Location</label>
+                    <input name="location" value={formData.location} onChange={handleEditChange} />
 
-              <label>Salary</label>
-              <input name="salary" value={formData.salary} onChange={handleEditChange} />
+                    <label>Salary</label>
+                    <input name="salary" value={formData.salary} onChange={handleEditChange} />
 
-              <label>Description</label>
-              <textarea name="description" value={formData.description} onChange={handleEditChange} />
+                    <label>Work Setup</label>
+                    <input name="work_setup" value={formData.work_setup} onChange={handleEditChange} />
 
-              <label>Responsibilities</label>
-              <div className="tag-input-container">
-                {formData.responsibilities.map((res, i) => (
-                  <span key={i} className="tag-chip">
-                    {res} <button onClick={() => handleTagRemove('responsibilities', i)}>×</button>
-                  </span>
-                ))}
-                <input
-                  type="text"
-                  placeholder="Add responsibility"
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleAddTag('responsibilities', e.target.value.trim());
-                      e.target.value = '';
-                    }
-                  }}
-                />
-              </div>
+                    <label>Work Schedule</label>
+                    <input name="work_schedule" value={formData.work_schedule} onChange={handleEditChange} />
+                    </div>
 
-              <label>Requirements</label>
-              <div className="tag-input-container">
-                {formData.requirements.map((req, i) => (
-                  <span key={i} className="tag-chip">
-                    {req} <button onClick={() => handleTagRemove('requirements', i)}>×</button>
-                  </span>
-                ))}
-                <input
-                  type="text"
-                  placeholder="Add requirement"
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleAddTag('requirements', e.target.value.trim());
-                      e.target.value = '';
-                    }
-                  }}
-                />
-              </div>
+                    <div className="modal-col">
+                    <label>Description</label>
+                    <textarea name="description" value={formData.description} onChange={handleEditChange} />
 
-              <label>Work Setup</label>
-              <input name="work_setup" value={formData.work_setup} onChange={handleEditChange} />
+                    <label>Responsibilities</label>
+                    <div className="tag-input-container">
+                        {formData.responsibilities.map((res, i) => (
+                        <span key={i} className="tag-chip">
+                            {res} <button onClick={() => handleTagRemove('responsibilities', i)}><X size={12} /></button>
+                        </span>
+                        ))}
+                        <input
+                        type="text"
+                        placeholder="Add responsibility + Enter"
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                            e.preventDefault();
+                            handleAddTag('responsibilities', e.target.value.trim());
+                            e.target.value = '';
+                            }
+                        }}
+                        />
+                    </div>
 
-              <label>Work Schedule</label>
-              <input name="work_schedule" value={formData.work_schedule} onChange={handleEditChange} />
+                    <label>Requirements</label>
+                    <div className="tag-input-container">
+                        {formData.requirements.map((req, i) => (
+                        <span key={i} className="tag-chip">
+                            {req} <button onClick={() => handleTagRemove('requirements', i)}><X size={12} /></button>
+                        </span>
+                        ))}
+                        <input
+                        type="text"
+                        placeholder="Add requirement + Enter"
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                            e.preventDefault();
+                            handleAddTag('requirements', e.target.value.trim());
+                            e.target.value = '';
+                            }
+                        }}
+                        />
+                    </div>
+                    </div>
+                </div>
             </div>
 
             <div className="modal-actions">
               <button className="cancel-btn" onClick={closeEditModal}>Cancel</button>
               <button className="save-btn" onClick={submitEdit} disabled={loading}>
-                {loading ? 'Saving...' : 'Save'}
+                {loading ? 'Saving...' : 'Save Changes'}
               </button>
             </div>
           </div>

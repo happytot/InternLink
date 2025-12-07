@@ -3,6 +3,16 @@
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 
+// Helper to convert 24-hour time to 12-hour format with AM/PM
+function formatTime12Hour(timeStr) {
+  if (!timeStr) return null;
+  const [hourStr, min] = timeStr.split(':');
+  let hour = parseInt(hourStr, 10);
+  const ampm = hour >= 12 ? 'PM' : 'AM';
+  hour = hour % 12 || 12; // convert 0 => 12
+  return `${hour}:${min} ${ampm}`;
+}
+
 export async function getInternLogbookData() {
     const supabase = createSupabaseServerClient(); 
     
@@ -28,10 +38,8 @@ export async function getInternLogbookData() {
 
         if (appError) console.error("Error fetching app:", appError);
 
-        // Define the Goal (Use DB value, fallback to 486 if missing)
         const goalHours = activeApp?.required_hours || 486;
 
-        // Case: No Active Internship found
         if (!activeApp) {
             return {
                 success: true,
@@ -39,13 +47,13 @@ export async function getInternLogbookData() {
                 logs: [], 
                 totalApprovedHours: 0, 
                 progress: 0, 
-                requiredHours: goalHours, // Send to UI
+                requiredHours: goalHours,
                 activeJobTitle: '',       
                 activeCompany: ''
             };
         }
 
-        // 2. Manual Fetch for Names (Prevents Ambiguous FK errors)
+        // 2. Fetch Job and Company names
         const { data: jobData } = await supabase
             .from('job_posts')
             .select('title')
@@ -67,19 +75,25 @@ export async function getInternLogbookData() {
 
         if (logsError) throw logsError;
 
+        // Convert time_in and time_out to 12-hour format
+        const formattedLogs = logs.map(log => ({
+          ...log,
+          time_in: formatTime12Hour(log.time_in),
+          time_out: formatTime12Hour(log.time_out)
+        }));
+
         const totalApprovedHours = logs
             .filter(log => log.status === 'Approved')
             .reduce((sum, log) => sum + (log.hours_worked || 0), 0);
 
-        // Calculate progress dynamically based on goalHours
         const progress = Math.min(100, (totalApprovedHours / goalHours) * 100);
 
         return {
             success: true,
-            logs,
+            logs: formattedLogs,
             totalApprovedHours,
             progress,
-            requiredHours: goalHours, // 🟢 Send the dynamic goal to UI
+            requiredHours: goalHours,
             isInternshipApproved: true,
             activeJobTitle: jobData?.title || 'Unknown Job', 
             activeCompany: companyData?.name || 'Unknown Company'
@@ -92,50 +106,53 @@ export async function getInternLogbookData() {
 }
 
 export async function submitNewLogEntry(formData) {
-    const supabase = createSupabaseServerClient(); 
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return { success: false, error: 'User not authenticated' };
+  const supabase = createSupabaseServerClient(); 
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { success: false, error: 'User not authenticated' };
 
-    // Gatekeeper: Check for ongoing internship
-    const { data: activeApp } = await supabase
-        .from('job_applications')
-        .select('id, company_id')
-        .eq('intern_id', user.id)
-        .eq('status', 'ongoing') 
-        .maybeSingle();
+  const { data: activeApp } = await supabase
+    .from('job_applications')
+    .select('id, company_id')
+    .eq('intern_id', user.id)
+    .eq('status', 'ongoing') 
+    .maybeSingle();
 
-    if (!activeApp) {
-        return { success: false, error: 'No active internship found. Please check your history page.' };
-    }
+  if (!activeApp) return { success: false, error: 'No active internship found.' };
 
-    const date = formData.get('date');
-    const attendance_status = formData.get('attendance_status');
-    const hours_worked = parseFloat(formData.get('hours_worked'));
-    const tasks_completed = formData.get('tasks_completed');
+  const date = formData.get('date');
+  const attendance_status = formData.get('attendance_status');
+  const hours_worked = parseFloat(formData.get('hours_worked'));
+  const tasks_completed = formData.get('tasks_completed');
+  const time_in = formData.get('time_in') || null;
+  const time_out = formData.get('time_out') || null;
 
-    if (!date || !attendance_status || isNaN(hours_worked) || !tasks_completed) {
-        return { success: false, error: 'All fields must be filled out correctly.' };
-    }
+  try {
+    // Insert and return the inserted row
+    const { data: insertedLog, error } = await supabase
+      .from('logbooks')
+      .insert({
+        intern_id: user.id,
+        application_id: activeApp.id,
+        company_id: activeApp.company_id,
+        date,
+        attendance_status,
+        hours_worked,
+        tasks_completed,
+        status: 'Pending',
+        time_in,
+        time_out,
+      })
+      .select()
+      .single();
 
-    try {
-        const { error } = await supabase.from('logbooks').insert({
-            intern_id: user.id,
-            application_id: activeApp.id,
-            company_id: activeApp.company_id,
-            date,
-            attendance_status,
-            hours_worked,
-            tasks_completed,
-            status: 'Pending' 
-        });
+    if (error) throw error;
 
-        if (error) throw error;
+    // Convert time to 12-hour format before returning
+    insertedLog.time_in = formatTime12Hour(insertedLog.time_in);
+    insertedLog.time_out = formatTime12Hour(insertedLog.time_out);
 
-        // Force refresh so the new entry shows up immediately
-        revalidatePath('/intern/logbook');
-
-        return { success: true, message: 'Logbook entry submitted!' };
-    } catch (e) {
-        return { success: false, error: e.message };
-    }
+    return { success: true, log: insertedLog };
+  } catch (e) {
+    return { success: false, error: e.message };
+  }
 }

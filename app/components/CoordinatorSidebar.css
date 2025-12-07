@@ -1,79 +1,96 @@
-/* CompanyNav.css */
-
-/* 1. MATCHED CLASS NAME TO JSX */
-.company-sidebar-icon-only {
-  width: 80px; /* Slightly wider for better spacing */
+/* Core Sidebar Container */
+.coordinator-sidebar-icon-only {
+  width: 70px; /* Match Company width */
   background: var(--bg-card);
   height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 24px 0;
+  padding: 20px 0;
   border-right: 1px solid var(--border-color);
   
-  /* 2. POSITIONING & SCROLL LOCK */
+  /* --- CRITICAL LAYOUT FIXES --- */
   position: sticky;
   top: 0;
-  overflow: hidden; /* ⛔️ Disables scrolling */
-  flex-shrink: 0;   /* Prevents sidebar from being squashed */
-  z-index: 50;
+  overflow: visible; /* ALLOW tooltips to pop outside */
+  z-index: 10000;    /* Ensure it sits on top of main content */
+  flex-shrink: 0;
 }
 
+/* Nav Link Container */
 .sidebar-nav {
   display: flex;
   flex-direction: column;
-  align-items: center; /* Center items horizontally */
-  gap: 16px;
+  align-items: center;
+  gap: 20px; /* Match Company gap */
   flex-grow: 1;
-  width: 100%; /* 3. FIXED WIDTH ISSUE */
+  width: 100%;
 }
 
+/* Individual Nav Item */
 .nav-item {
   position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
-  color: var(--text-muted);
-  width: 48px;       /* Fixed square size for hover effect */
-  height: 48px;
-  border-radius: 12px;
+  color: var(--text-main, #F1F5F9);
+  width: 100%;       /* Full width for the border indicator */
+  padding: 12px 0;   /* Vertical spacing */
   transition: all 0.2s ease;
+  border-left: 3px solid transparent; /* The active indicator line */
+  
+  /* Ensure item handles z-index for tooltips */
+  z-index: 1;
 }
 
+/* Active State - Matches Company Style */
 .nav-item.active {
-  background: rgba(238, 116, 40, 0.15); /* Orange Tint */
-  color: var(--primary-orange);
+  color: var(--primary-orange, #EE7428);
+  border-left: 3px solid var(--primary-orange, #EE7428);
+  background: rgba(238, 116, 40, 0.1); /* Subtle orange tint */
 }
 
+/* Hover State */
 .nav-item:hover {
-  background: rgba(255, 255, 255, 0.05);
-  color: var(--text-main);
-}
-
-.nav-item.active:hover {
-  background: rgba(238, 116, 40, 0.25);
-  color: var(--primary-orange);
+  color: var(--primary-orange, #EE7428);
+  z-index: 2000; /* Bring to front so tooltip shows over neighbors */
 }
 
 /* Tooltip (Popping out to the right) */
 .tooltip {
   position: absolute;
-  left: 60px; /* Push it outside the sidebar */
-  background: var(--bg-card);
-  color: var(--text-main);
+  left: 60px; /* Match Company tooltip position */
+  background: var(--primary-orange, #EE7428); /* Match Company: Orange BG */
+  color: white;
   padding: 6px 12px;
   border-radius: 8px;
   white-space: nowrap;
   opacity: 0;
   pointer-events: none;
-  transform: translateY(-50%) translateX(10px);
+  
+  /* Center vertically */
   top: 50%;
+  transform: translateY(-50%) translateX(-10px);
+  
   transition: all 0.2s ease;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
   font-size: 0.85rem;
-  font-weight: 500;
-  z-index: 10001;
+  font-weight: 600;
+  
+  /* Ensure tooltip is on top of everything */
+  z-index: 10001; 
+}
+
+/* Tooltip Arrow */
+.tooltip::before {
+  content: '';
+  position: absolute;
+  left: -4px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-width: 5px 5px 5px 0;
+  border-style: solid;
+  border-color: transparent var(--primary-orange, #EE7428) transparent transparent;
 }
 
 /* Show tooltip on hover */
@@ -83,31 +100,39 @@
   transform: translateY(-50%) translateX(0);
 }
 
+/* Bottom Section */
 .sidebar-bottom {
   margin-top: auto;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
   width: 100%;
+  padding-bottom: 40px;
 }
 
+/* Logout Button - Matches Company Style */
 .logout-btn {
   position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
-  background: transparent; /* Cleaner look */
-  color: var(--color-danger); /* Use your danger color red */
+  background: var(--bg-input, #1e293b);
+  color: var(--text-muted, #94A3B8);
   border: 1px solid var(--border-color);
   border-radius: 12px;
-  padding: 0;
+  padding: 10px;
   cursor: pointer;
-  width: 48px;
-  height: 48px;
-  transition: all 0.2s;
+  width: 45px;
+  height: 45px;
+  transition: all 0.2s ease;
+  z-index: 1;
 }
 
 .logout-btn:hover {
-  background: var(--color-danger);
+  background: var(--primary-orange, #EE7428);
   color: white;
-  border-color: var(--color-danger);
+  border-color: var(--primary-orange, #EE7428);
+  box-shadow: 0 0 15px rgba(238, 116, 40, 0.4);
+  z-index: 2000;
 }
