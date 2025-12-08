@@ -232,14 +232,7 @@ input:checked + .slider::before { transform: translateX(23px); background-color:
     margin-bottom: 10px;
 }
 
-.company-location {
-    color: var(--text-muted);
-    font-size: 0.95rem;
-    margin-bottom: 25px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
+
 
 .card-actions {
     margin-top: auto; /* Push buttons to the bottom */
@@ -314,6 +307,13 @@ input:checked + .slider::before { transform: translateX(23px); background-color:
 | Modal (Glassmorphism)
 |--------------------------------------------------------------------------
 */
+.modal-contact-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 8px; /* Slightly looser spacing in modal */
+    margin-top: 15px;
+}
+
 .modal-overlay {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
@@ -403,15 +403,39 @@ input:checked + .slider::before { transform: translateX(23px); background-color:
 }
 .company-name-modal {
     font-size: 1.8rem;
-    margin-bottom: 8px;
+    margin-bottom: 0;
 }
-.company-location-modal {
-    font-size: 1rem;
+.card-info-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 5px; /* Tighter spacing for detailed lines */
+    margin-bottom: 25px; /* Matches old company-location margin */
+}
+
+/* Replaces .company-location with a more generic detailed-line style */
+.company-detail-line {
     color: var(--text-muted);
+    font-size: 0.95rem;
     display: flex;
     align-items: center;
     gap: 8px;
+    font-size: 0.85rem; /* Small text size */
 }
+
+.company-detail-line strong {
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.company-detail-line .icon-muted {
+    font-size: 1rem;
+    color: var(--secondary-cyan); /* Cyan for contact details */
+}
+
+.card-actions {
+    margin-top: auto;
+}
+
 
 .profile-section h3, .job-posts-container h3 {
     display: flex;

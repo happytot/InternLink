@@ -127,20 +127,7 @@ const StatsSummary = ({ applications }) => {
           <span className="stat-label">Applied</span>
         </div>
       </Link>
-      <Link href="/intern/history?status=Interview" className="stat-card stat-interviews">
-        <div className="stat-icon-bg"><Users size={20} strokeWidth={2.5} /></div>
-        <div className="stat-content">
-          <span className="stat-value">{interviews}</span>
-          <span className="stat-label">Interviews</span>
-        </div>
-      </Link>
-      <Link href="/intern/history?status=Accepted" className="stat-card stat-offers">
-        <div className="stat-icon-bg"><CheckCircle size={20} strokeWidth={2.5} /></div>
-        <div className="stat-content">
-          <span className="stat-value">{offers}</span>
-          <span className="stat-label">Offers</span>
-        </div>
-      </Link>
+     
       <Link href="/intern/listings" className="stat-card stat-find-jobs">
         <div className="stat-icon-bg"><Briefcase size={20} strokeWidth={2.5} /></div>
         <div className="stat-content">

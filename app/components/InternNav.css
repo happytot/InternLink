@@ -157,6 +157,7 @@
 .brand-mobile span { color: var(--primary-orange); }
 
 .mobile-toggle-btn {
+  margin-right: 25px;
   background: transparent;
   border: none;
   color: var(--text-main);

@@ -29,6 +29,7 @@
   width: 60%;
   display: flex;
   margin-bottom: 2.5rem;
+  align-items: center; /* Added for alignment */
 }
 
 .search-input {
@@ -318,16 +319,20 @@
 
 /* ---------- MODAL FOOTER ---------- */
 .modal-footer {
+  width: 100%;
   display: flex;
   justify-content: flex-end;
   gap: 15px;
   padding-top: 15px;
+  padding-bottom: 15px;
+  padding-right: 10px;
+
   /* Sticky footer within the pane */
   position: sticky;
   bottom: 0;
   background: var(--bg-card);
   backdrop-filter: blur(5px);
-  z-index: 10;
+  z-index: 12;
   border-top: 1px solid var(--border-color);
 }
 
@@ -475,7 +480,7 @@
 
 /* Right Pane Container */
 .desktop-details-container {
-    height: 100%;
+   height: 100%;
 }
 
 /* Right Pane scrolls internally */
@@ -603,6 +608,12 @@
 }
 .mobile-back-btn:hover { color: var(--primary-orange); }
 
+/* =========================================
+   📱 MOBILE & TABLET BREAKPOINTS
+   (Responsive Tiers: 992px, 700px, 600px, 500px, 400px)
+   ========================================= */
+
+/* --- 1. Tablet & Large Mobile (< 992px) --- */
 @media (max-width: 992px) {
   .listings-container {
     max-width: 95%;
@@ -628,6 +639,11 @@
     padding: 0;
   }
 
+  /* Force search bar to fill width on mobile */
+  .search-filter-bar {
+    width: 100%;
+  }
+
   .view-details-btn-mobile {
     display: block;
     width: 100%;
@@ -646,5 +662,171 @@
   .view-details-btn-mobile:hover {
     background: var(--primary-orange);
     color: #fff;
+  }
+}
+
+/* --- 2. Mobile Tier A (< 700px) --- */
+@media (max-width: 700px) {
+  .listings-container h1 {
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
+  }
+
+  /* Break the Search Bar Layout */
+  .search-filter-bar {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .search-input {
+    min-width: 90%; /* Force input to its own row */
+    order: 1;
+  }
+
+  .filter-select {
+    order: 2;
+    flex-grow: 1;
+    width: auto;
+    margin-left: 0; /* Remove left margin since it wraps */
+  }
+
+  .saved-jobs-btn {
+    order: 3;
+    flex-grow: 1;
+    margin-left: 0;
+    text-align: center;
+  }
+
+  /* Modal Adjustments */
+  .modal-overlay {
+    padding-top: 0; /* Full screen feel */
+    align-items: flex-end; /* Sheet-like behavior */
+  }
+
+  .modal-content {
+    max-height: 85vh; /* Increase height for mobile */
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    padding: 20px;
+  }
+}
+
+/* --- 3. Mobile Tier B (< 600px) --- */
+@media (max-width: 600px) {
+  .listings-container {
+    padding: 1rem;
+    margin-top: 60px;
+  }
+
+  /* Search bar elements stack fully vertical */
+ /* Break the Search Bar Layout */
+  .search-filter-bar {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .search-input {
+    min-width: 90%; /* Force input to its own row */
+    order: 1;
+  }
+
+  .filter-select {
+    order: 2;
+    flex-grow: 1;
+    width: auto;
+    margin-left: 0; /* Remove left margin since it wraps */
+  }
+
+  .saved-jobs-btn {
+    order: 3;
+    flex-grow: 1;
+    margin-left: 0;
+    text-align: center;
+  }
+
+  /* Adjust Grid Columns */
+  .internship-results {
+    grid-template-columns: 1fr; /* Force single column */
+  }
+
+
+  .listing-card {
+    padding: 1.5rem;
+    min-height: auto;
+  }
+  
+  .job-detail-secondary-grid {
+    grid-template-columns: 1fr; /* Stack detail items */
+    gap: 10px;
+  }
+
+  .modal-footer {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .primary-btn, .secondary-btn {
+    width: 100%;
+  }
+}
+
+/* --- 4. Mobile Tier C (< 500px) --- */
+@media (max-width: 500px) {
+  .listings-container h1 {
+    font-size: 1.5rem;
+  }
+
+  .job-title {
+    font-size: 1.2rem;
+  }
+
+  .search-input { width: 90%;}
+
+  /* Wrap pills if titles are long */
+  .job-meta {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  /* Reduce modal padding further */
+  .modal-content {
+    padding: 15px;
+  }
+  
+  .detail-card {
+    padding: 15px;
+  }
+  
+  .job-detail-title {
+    font-size: 1.5rem;
+  }
+}
+
+/* --- 5. Smallest Devices (< 400px) --- */
+@media (max-width: 400px) {
+  .listings-container {
+    padding: 0.8rem;
+    margin-top: 50px;
+  }
+
+  .listing-card {
+    padding: 1.2rem;
+  }
+
+  .job-company {
+    font-size: 0.9rem;
+  }
+
+  /* Compact button styling */
+  .btn-details {
+    width: 100%;
+    text-align: center;
+    padding: 0.6rem;
+  }
+
+  /* Hide specialized badges if too crowded, or make them tiny */
+  .location-pill, .work-setup-pill {
+    font-size: 0.65rem;
+    padding: 0.2rem 0.5rem;
   }
 }

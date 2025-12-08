@@ -6,7 +6,7 @@
 
 /* Page Container */
 .pageWrapper {
-  width: 100%;
+  width: 95%;
   max-width: 1300px;
   margin: 0 auto;
   padding: 32px 24px;
@@ -480,6 +480,7 @@
   border-bottom: 1px solid var(--border-color);
   transition: background-color 0.2s ease, border-color 0.2s ease;
   align-items: start;
+  color: var(--text-main);
 }
 
 .tableRow:last-child {
@@ -624,15 +625,13 @@
 }
 
 /* ==========================================================================
-   8. RESPONSIVE MEDIA QUERIES
+   8. RESPONSIVE MEDIA QUERIES (Mobile & Tablet)
    ========================================================================== */
 
 /* Tablet (Max 900px) */
 @media (max-width: 900px) {
 
-  .pageWrapper {
-    padding-top: 50px;
-  }
+  .pageWrapper { width: 95%;}
   /* Stack Bento Grid */
   .bentoGrid {
     grid-template-columns: 1fr;
@@ -663,15 +662,15 @@
   .evaluationsTable :global(.mobile-hide) {
     display: none;
   }
-
-
 }
 
 /* Mobile (Max 768px - inherited mostly from 600px rules in original) */
 @media (max-width: 768px) {
+
+    .pageWrapper { width: 95%; padding: 5rem 12px;}
+
   .header {
     font-size: 1.75rem;
-    padding-top: 1rem;
   }
   .statValue {
     font-size: 2.5rem;
@@ -679,17 +678,33 @@
   .formContainer, .entryCard {
     padding: 20px;
   }
-  .performanceBoard { padding: 15px; width: 90% }
-  .statsGrid { width: 95%; }
-  .formContainer { width: 89%; }
-  .rightPane { width: 88%; }
 }
 
-/* Small Mobile (Max 600px) */
+/* ==========================================================================
+   9. ADDITIONAL MOBILE BREAKPOINTS (Accurate Padding Adjustments)
+   ========================================================================== */
+
+/* --- 700px --- */
+@media (max-width: 700px) {
+  .pageWrapper {
+    padding: 28px 20px; /* Reduced from 32px 24px */
+    padding-top: 20px;
+  }
+  .performanceBoard {
+    padding: 24px;
+  }
+  .boardRight {
+    gap: 16px;
+  }
+  .header {
+    font-size: 1.9rem;
+  }
+}
+
+/* --- 600px --- */
 @media (max-width: 600px) {
   .pageWrapper {
-    padding: 20px 16px;
-    padding-top: 60px;
+    padding: 5rem 12px;
   }
 
   .header { font-size: 1.8rem; }
@@ -697,18 +712,15 @@
   .statsGrid { grid-template-columns: 1fr; }
 
   /* Performance Board Mobile */
-  .performanceBoard { padding: 15px; width: 90% }
+  .performanceBoard { padding: 20px; }
   .boardRight { grid-template-columns: 1fr; gap: 12px; }
   .overallScoreCircle { width: 120px; height: 120px; }
   .bigScore { font-size: 3rem; }
 
   /* --- Mobile Card View for Table --- */
   .tableHeader { display: none; }
-  .evaluationsTable { width: 90%; gap: 16px; }
+  .evaluationsTable { min-width: 100%; gap: 16px; }
 
-  .statsGrid { width: 96%; }
-  .formContainer { width: 88%;}
-  .rightPane { width: 86%; }
   .tableRow {
     display: flex;
     flex-direction: column;
@@ -759,5 +771,57 @@
     font-weight: 700;
     color: var(--text-muted);
     margin-bottom: 4px;
+  }
+}
+
+/* --- 500px --- */
+@media (max-width: 500px) {
+  .pageWrapper {
+    padding: 5rem 12px; /* Even tighter padding */
+  }
+  .header {
+    font-size: 1.6rem;
+  }
+  .subHeader {
+    font-size: 1rem;
+    margin-bottom: 30px;
+  }
+  .formContainer, .entryCard, .statCard, .performanceBoard {
+    padding: 16px; /* Reduce internal card padding */
+  }
+  /* Make buttons stacked if needed, though mostly already handled by block layout */
+  .bentoGrid {
+    gap: 24px;
+  }
+}
+
+/* --- 400px --- */
+@media (max-width: 400px) {
+  .pageWrapper {
+    padding: 16px 10px; /* Minimal padding for very small screens */
+    padding-top: 5px;
+  }
+  .header {
+    font-size: 1.4rem;
+    margin-bottom: 6px;
+  }
+  .subHeader {
+    font-size: 0.9rem;
+    margin-bottom: 24px;
+  }
+  .overallScoreCircle {
+    width: 100px;
+    height: 100px;
+  }
+  .bigScore {
+    font-size: 2.5rem;
+  }
+  .statValue {
+    font-size: 2rem;
+  }
+  /* Ensure inputs don't overflow */
+  .input, .select, .textarea {
+    padding: 12px;
+    font-size: 0.9rem;
   }
 }

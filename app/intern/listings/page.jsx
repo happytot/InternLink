@@ -1,25 +1,22 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react'; // 1. Added Suspense here
+import { useState, useEffect, Suspense } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import './Listings.css';
 import { useSearchParams } from "next/navigation";
 import FloatingAIChatWithCharts from '../../components/chatbot';
 
-// 2. Renamed your original component to 'ListingsContent'
-// This component keeps all your logic and useSearchParams
 function ListingsContent() {
   const supabase = createClientComponentClient();
 
   const [user, setUser] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
-  // 🔑 State now tracks the ID of the selected job, not the object
   const [selectedJobId, setSelectedJobId] = useState(null);
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [savedJobs, setSavedJobs] = useState([]); // Stores saved job objects
-  const [showSavedJobs, setShowSavedJobs] = useState(false); // Toggle modal/panel
-  const [postTimeFilter, setPostTimeFilter] = useState(''); // '', '24h', '7d', '30d'
+  const [savedJobs, setSavedJobs] = useState([]); 
+  const [showSavedJobs, setShowSavedJobs] = useState(false); 
+  const [postTimeFilter, setPostTimeFilter] = useState(''); 
   const [filterType, setFilterType] = useState('');
   
   // 📱 Mobile View State
@@ -96,13 +93,12 @@ function ListingsContent() {
         }));
 
         setListings(transformedData);
-        // 🆕 Set the first job as automatically selected
+        // Set the first job as automatically selected
         if (transformedData.length > 0) {
           setSelectedJobId(transformedData[0].id);
         }
       } catch (err) {
         console.error('Error fetching job listings:', err.message);
-        toast.error('Failed to load job listings.');
       } finally {
         setLoading(false);
       }
@@ -114,7 +110,7 @@ function ListingsContent() {
   // --- Apply to Job Function ---
   const applyToJob = async (jobId, companyId) => {
     if (!user) {
-      toast.error("Please login first.");
+      // toast.error("Please login first.");
       return;
     }
     const { data: profile, error: profileError } = await supabase
@@ -123,7 +119,7 @@ function ListingsContent() {
       .eq("id", user.id)
       .single();
     if (profileError || !profile?.resume_url) {
-      toast.error("Please upload your resume in your profile before applying.");
+      // toast.error("Please upload your resume...");
       return;
     }
     const { error } = await supabase
@@ -138,13 +134,8 @@ function ListingsContent() {
         },
       ]);
     if (error) {
-      if (error.code === "23505") {
-        toast("You already applied for this job.", { description: "Cannot apply twice." });
-      } else {
-        console.error(error);
-        toast.error("Failed to apply. Try again.");
-      }
-      return;
+       console.error(error);
+       return;
     }
     // Re-fetch listings to update 'Applied' status
     setListings(prev => prev.map(job => 
@@ -152,7 +143,6 @@ function ListingsContent() {
             ? { ...job, job_applications: [...(job.job_applications || []), { intern_id: user.id }] }
             : job
     ));
-    toast.success("Application submitted successfully! 🚀");
   };
 
   // --- New Job Select Function ---
@@ -187,10 +177,8 @@ function ListingsContent() {
       return true;
     });
 
-  // 🔑 Get the currently selected job object
   const selectedJob = listings.find(job => job.id === selectedJobId);
 
-  // Helper function to render list items
   const renderList = (items) => (
     <ul className="job-detail-list">
       {items.map((item, index) => (
@@ -199,8 +187,8 @@ function ListingsContent() {
     </ul>
   );
 
-  // --- Job Detail Component ---
-  const JobDetailsPane = ({ job, applyFn, user }) => {
+  // --- Job Detail Component (UPDATED with onClose prop) ---
+  const JobDetailsPane = ({ job, applyFn, user, onClose }) => {
     if (!job) {
         return (
             <div className="job-details-pane no-job-selected">
@@ -214,6 +202,17 @@ function ListingsContent() {
       <div className="job-details-pane">
         <div className="modal-header">
             <h2>Job Details</h2>
+            
+            {/* 🆕 ADDED: Close button logic */}
+            {onClose && (
+               <button 
+                 className="close-btn" 
+                 onClick={onClose}
+                 aria-label="Close Details"
+               >
+                 ×
+               </button>
+            )}
         </div>
 
         <div className="modal-body">
@@ -286,10 +285,8 @@ function ListingsContent() {
             onClick={() => {
               if (!savedJobs.some(j => j.id === job.id)) {
                 setSavedJobs([...savedJobs, job]);
-                toast.success("Job saved! ❤️");
               } else {
                 setSavedJobs(savedJobs.filter(j => j.id !== job.id));
-                toast("Job removed from saved list");
               }
             }}
           >
@@ -383,7 +380,7 @@ function ListingsContent() {
                     <button 
                       className="view-details-btn-mobile"
                       onClick={(e) => {
-                        e.stopPropagation(); // Prevent triggering the card click
+                        e.stopPropagation(); 
                         handleMobileView(job.id);
                       }}
                     >
@@ -397,6 +394,7 @@ function ListingsContent() {
 
           {/* ➡️ Right Pane: Job Details (Hidden on Mobile) */}
           <div className="desktop-details-container">
+             {/* No onClose passed here, so no X button on desktop */}
              <JobDetailsPane 
                job={selectedJob} 
                applyFn={applyToJob} 
@@ -411,11 +409,13 @@ function ListingsContent() {
         <button className="mobile-back-btn" onClick={() => setShowMobileDetail(false)}>
             ← Back to Listings
         </button>
-        {/* Re-using the same component, but inside the mobile wrapper */}
+        
+        {/* 🆕 PASSED onClose HERE */}
         <JobDetailsPane 
           job={selectedJob} 
           applyFn={applyToJob} 
           user={user} 
+          onClose={() => setShowMobileDetail(false)}
         />
       </div>
 
@@ -465,10 +465,8 @@ function ListingsContent() {
   );
 }
 
-// 3. This is the new Export that satisfies Next.js 13+ Build requirements
 export default function Listings() {
   return (
-    // You can customize this fallback to match your app's loading style
     <Suspense fallback={
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
         Loading Application...

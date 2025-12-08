@@ -318,7 +318,7 @@ export default function CoordinatorCompanies() {
                         </p>
                         <p className="company-detail-line">
                             <FaPhone className="icon-muted" /> 
-                            *Phone:** {selectedCompany.phone || "N/A"}
+                            Phone: {selectedCompany.phone || "N/A"}
                         </p>
                     </div>
                     </div>

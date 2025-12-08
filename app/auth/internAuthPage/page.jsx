@@ -102,7 +102,7 @@ export default function InternAuthPage() {
       }
 
       if (isStudent) {
-        router.replace('/intern/listings'); // Or /intern/dashboard
+        router.replace('/intern/dashboard'); // Or /intern/dashboard
         toast.success("Welcome back!");
       } else {
         // If they are not an Admin AND not a Student, kick them out
