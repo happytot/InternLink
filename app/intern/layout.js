@@ -1,13 +1,14 @@
 // src/app/intern/layout.js
-import InternSidebar from '../components/InternNav';
+import InternNav from '../components/InternNav'; // ✅ Correct Import Name
 import '../globals.css';
-import { Toaster } from 'sonner'; // 1. Import Sonner
+import { Toaster } from 'sonner';
 
 export default function InternLayout({ children }) {
   return (
-    <div className="company-shell"> 
+    // 1. Renamed Shell
+    <div className="intern-shell"> 
       
-      {/* 2. Global Toast Notification Component */}
+      {/* Global Toast */}
       <Toaster 
         position="bottom-right" 
         richColors 
@@ -22,17 +23,15 @@ export default function InternLayout({ children }) {
         }} 
       />
 
-      {/* Sidebar Wrapper */}
-      <div className="company-sidebar-wrapper">
-        <InternSidebar />
+      {/* 2. Sidebar Wrapper */}
+      <div className="intern-sidebar-wrapper">
+        <InternNav /> {/* ✅ Correct Component Usage */}
       </div>
       
-      {/* Main Content */}
-      <main className="company-main-content">
-        {/* Padding top is for mobile header clearance */}
-        <div style={{ paddingTop: '60px' }} className="md:pt-0"> 
+      {/* 3. Main Content */}
+      <main className="intern-main-content">
+        {/* Padding top matches the mobile header height */}
           {children}
-        </div>
       </main>
       
     </div>

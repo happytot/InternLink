@@ -1,0 +1,17 @@
+{
+  "excludeFiles": [
+    "**/node_modules", 
+    "**/dist",         
+    "**/out",
+    "**/*.log",
+    "**/temp",
+    "**/.git",         
+    "**/.vscode-test", 
+    "**/build",
+    "**/coverage",
+    "**/*.rar",        
+    "**/*.zip",
+    "**/*.tar.gz",
+    "**/*.psd"
+  ]
+}

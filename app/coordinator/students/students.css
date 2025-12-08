@@ -117,11 +117,7 @@
 }
 
 /* Divider */
-.theme-divider {
-    width: 1px;
-    height: 30px;
-    background-color: var(--border-color);
-}
+
 
 /* Theme Toggle Switch */
 .switch {
@@ -266,6 +262,11 @@ input:checked + .slider:before { transform: translateX(24px); }
 /* -------------------------------------- */
 /* --- Buttons --- */
 /* -------------------------------------- */
+.resume-btn {
+    width: 90%;
+    text-decoration: none;
+}
+
 .btn {
     border: none;
     padding: 10px 20px;
@@ -324,8 +325,8 @@ input:checked + .slider:before { transform: translateX(24px); }
     background: var(--bg-card); 
     border: 1px solid var(--border-color);
     border-radius: var(--radius-card);
-    width: 95%; max-width: 800px;
-    max-height: 90vh;
+    width: 95%; max-width: 1200px;
+    max-height: 80vh;
     overflow-y: auto;
     padding: 40px;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
@@ -353,7 +354,8 @@ input:checked + .slider:before { transform: translateX(24px); }
     background: var(--bg-input);
     border-radius: 16px;
     padding: 25px;
-    margin-bottom: 20px;
+    /* Removed margin-bottom here, using gap in profile-column instead */
+    margin-bottom: 0; 
     border: 1px solid var(--border-color);
 }
 
@@ -457,3 +459,29 @@ input:checked + .slider:before { transform: translateX(24px); }
 @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 .skeleton-line { height: 16px; border-radius: 4px; margin: 8px 0; }
 .short { width: 30%; } .medium { width: 60%; } .long { width: 80%; } .full { width: 100%; }
+
+.profile-content-columns {
+    display: grid;
+    /* Two columns, with the left column slightly wider than the right */
+    grid-template-columns: 2fr 1fr; 
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.profile-column {
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Space between the profile-section elements */
+}
+
+@media (max-width: 900px) {
+    .profile-content-columns {
+        /* Collapse to a single column on smaller screens */
+        grid-template-columns: 1fr;
+    }
+    
+    .profile-column {
+        /* On a single column, ensure there's clear separation */
+        margin-bottom: 10px;
+    }
+}

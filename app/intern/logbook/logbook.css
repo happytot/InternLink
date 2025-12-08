@@ -1,147 +1,143 @@
-/* --- Intern Logbook Dark/Light Mode Self-Contained --- */
+/* ==========================================================================
+   INTERN LOGBOOK STYLES (Adapted to Globals)
+   ========================================================================== */
 
-/* === Theme Variables === */
-:root {
-    /* Light Mode */
-    --bg-main: #f8fafc;
-    --bg-card: #ffffff;
-    --bg-input: #f1f5f9;
-    --text-main: #0f172a;
-    --text-muted: #475569;
-    --primary-orange: #ea580c;
-    --status-pending: #facc15;
-    --status-approved: #22c55e;
-    --status-rejected: #ef4444;
-    --border-color: #e2e8f0;
-    --radius-card: 20px;
-    --radius-sm: 8px;
-    --shadow-card: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
-}
-
-body.dark-mode {
-    --bg-main: #021217;
-    --bg-card: rgba(20, 30, 35, 0.7);
-    --bg-input: rgba(255, 255, 255, 0.03);
-    --text-main: #f1f5f9;
-    --text-muted: #94a3b8;
-    --primary-orange: #ee7428;
-    --status-pending: rgba(238, 116, 40, 0.3);
-    --status-approved: rgba(52, 199, 89, 0.3);
-    --status-rejected: rgba(255, 59, 48, 0.3);
-    --border-color: rgba(255, 255, 255, 0.1);
-    --shadow-card: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-}
+/* NOTE: Local :root variables have been removed. 
+   This file now relies on app/globals.css for:
+   --bg-main, --bg-card, --text-main, --primary-orange, etc.
+*/
 
 /* === Container === */
 .logbook-container {
     width: 100%;
-    max-width: 1900px;
-    margin: 40px auto;
-    padding: 20px;
-    font-family: Arial, sans-serif;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 32px 24px; /* Matches other layouts */
+    font-family: var(--font-body, sans-serif);
     color: var(--text-main);
     background-color: var(--bg-main);
-    transition: background-color 0.3s ease, color 0.3s ease;
+    min-height: 100vh;
 }
 
 /* Headers */
 .page-header {
-    font-size: 2em;
+    font-family: var(--font-heading, sans-serif);
+    font-size: 2rem;
+    font-weight: 700;
     color: var(--text-main);
     margin-bottom: 30px;
-    border-bottom: 2px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
     padding-bottom: 10px;
 }
 
 .section-header {
+    font-family: var(--font-heading, sans-serif);
     font-size: 1.5em;
     color: var(--text-muted);
-    margin-top: 30px;
+    margin-top: 40px;
     margin-bottom: 20px;
 }
 
-/* Hours Tracking Card */
+/* === Hours Tracking Card === */
 .hours-tracking-card {
     background-color: var(--bg-card);
     border: 1px solid var(--border-color);
-    padding: 20px;
+    padding: 24px;
     border-radius: var(--radius-card);
     margin-bottom: 30px;
     text-align: center;
-    transition: background-color 0.3s ease, border-color 0.3s ease;
+    box-shadow: var(--shadow-card);
+    
+    /* Glass Effect */
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
 }
 
 .hours-tracking-card h2 {
     margin-top: 0;
     color: var(--text-main);
+    font-family: var(--font-heading);
 }
 
 .progress-bar-container {
     background-color: var(--bg-input);
-    border-radius: 10px;
+    border-radius: 99px; /* Pill shape */
     overflow: hidden;
     height: 20px;
-    margin: 10px 0;
+    margin: 16px 0;
+    border: 1px solid var(--border-color);
 }
 
 .progress-bar {
     height: 100%;
     background-color: var(--primary-orange);
     transition: width 0.5s ease-in-out;
+    box-shadow: 0 0 10px rgba(238, 116, 40, 0.4);
 }
 
 .hours-text {
     font-size: 1.1em;
     color: var(--text-muted);
+    margin-top: 10px;
 }
 
 .current-hours {
-    font-weight: bold;
+    font-weight: 800;
     color: var(--primary-orange);
-    font-size: 1.2em;
+    font-size: 1.3em;
 }
 
 .progress-percent {
     font-size: 0.9em;
     color: var(--text-muted);
+    margin-top: 5px;
+    display: block;
 }
 
-/* Form */
+/* === Form === */
 .logbook-form {
     background-color: var(--bg-card);
-    padding: 25px;
+    padding: 30px;
     border-radius: var(--radius-card);
     box-shadow: var(--shadow-card);
+    border: 1px solid var(--border-color);
+    backdrop-filter: blur(16px);
 }
 
 .form-header {
     color: var(--primary-orange);
     border-bottom: 1px solid var(--border-color);
-    padding-bottom: 10px;
-    margin-bottom: 20px;
+    padding-bottom: 15px;
+    margin-bottom: 25px;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 1.2rem;
 }
 
 .form-group {
-    margin-bottom: 15px;
+    margin-bottom: 20px;
 }
 
 .form-group label {
     display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-    color: var(--text-main);
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--text-muted);
+    font-size: 0.9rem;
 }
 
 .form-group input,
 .form-group select,
 .form-group textarea {
     width: 100%;
-    padding: 10px;
+    padding: 12px 16px;
     border: 1px solid var(--border-color);
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-btn);
     background-color: var(--bg-input);
     color: var(--text-main);
     box-sizing: border-box;
+    font-family: inherit;
+    transition: all 0.2s ease;
 }
 
 .form-group input:focus,
@@ -149,32 +145,38 @@ body.dark-mode {
 .form-group textarea:focus {
     outline: none;
     border-color: var(--primary-orange);
+    box-shadow: 0 0 0 1px var(--primary-orange);
+    background-color: var(--bg-card);
 }
 
 /* Submit Button */
 .submit-btn {
     background-color: var(--primary-orange);
-    color: var(--text-main);
-    padding: 12px 20px;
+    color: #ffffff;
+    padding: 14px 20px;
     border: none;
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-btn);
     cursor: pointer;
     font-size: 1em;
+    font-weight: 600;
     width: 100%;
-    transition: background-color 0.3s ease;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(238, 116, 40, 0.2);
 }
 
 .submit-btn:hover:not(:disabled) {
-    opacity: 0.9;
+    background-color: var(--primary-orange-hover);
+    transform: translateY(-2px);
 }
 
 .submit-btn:disabled {
     background-color: var(--bg-input);
     color: var(--text-muted);
     cursor: not-allowed;
+    box-shadow: none;
 }
 
-/* Log History List */
+/* === Log History List === */
 .log-history-list {
     display: grid;
     gap: 15px;
@@ -183,67 +185,83 @@ body.dark-mode {
 .log-entry-card {
     background-color: var(--bg-card);
     padding: 20px;
-    border-left: 5px solid var(--primary-orange);
-    border-radius: var(--radius-sm);
+    /* Use primary orange for the accent border */
+    border-left: 4px solid var(--primary-orange); 
+    border-radius: var(--radius-card);
+    border-top: 1px solid var(--border-color);
+    border-right: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
+    
     box-shadow: var(--shadow-card);
-    transition: transform 0.2s ease, background-color 0.3s ease, border-color 0.3s ease;
+    transition: transform 0.2s ease, background-color 0.3s ease;
 }
 
 .log-entry-card:hover {
     transform: translateY(-2px);
+    border-color: var(--primary-orange); /* Highlight border on hover */
 }
 
 .log-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 10px;
-    padding-bottom: 5px;
-    border-bottom: 1px dotted var(--border-color);
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px dashed var(--border-color);
 }
 
 .log-date {
-    font-weight: bold;
+    font-weight: 700;
     color: var(--text-main);
+    font-family: monospace;
+    font-size: 1rem;
 }
 
 .log-status {
-    padding: 4px 10px;
-    border-radius: 15px;
-    font-size: 0.8em;
-    font-weight: bold;
-    color: var(--text-main);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75em;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
-/* Status Colors */
+/* Status Colors (Mapped to Global Palette) */
 .status-pending {
-    background-color: var(--status-pending);
+    background-color: rgba(238, 116, 40, 0.15); /* Orange Tint */
+    color: var(--primary-orange);
+    border: 1px solid rgba(238, 116, 40, 0.3);
 }
 
 .status-approved {
-    background-color: var(--status-approved);
-    color: #fff;
+    background-color: rgba(34, 197, 94, 0.15); /* Green Tint */
+    color: #22c55e;
+    border: 1px solid rgba(34, 197, 94, 0.3);
 }
 
 .status-rejected {
-    background-color: var(--status-rejected);
-    color: #fff;
+    background-color: rgba(239, 68, 68, 0.15); /* Red Tint */
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.3);
 }
 
 /* Supervisor Feedback */
 .supervisor-feedback {
-    margin-top: 10px;
-    padding-top: 10px;
-    border-top: 1px dashed var(--border-color);
+    margin-top: 15px;
+    padding: 15px;
+    background: var(--bg-input);
+    border-radius: var(--radius-sm);
     font-style: italic;
     color: var(--text-muted);
+    font-size: 0.9rem;
+    border-left: 3px solid var(--secondary-cyan);
 }
 
 /* Divider */
 .divider {
     border: 0;
     height: 1px;
-    background-image: linear-gradient(to right, rgba(255,255,255,0), rgba(255,255,255,0.1), rgba(255,255,255,0));
+    background: var(--border-color);
     margin: 30px 0;
 }
 
@@ -252,17 +270,18 @@ body.dark-mode {
     padding: 15px;
     border-radius: var(--radius-sm);
     margin-bottom: 20px;
-    font-weight: bold;
+    font-weight: 600;
+    font-size: 0.9rem;
 }
 
 .message.success {
-    background-color: rgba(52,199,89,0.2);
-    color: #34C759;
-    border: 1px solid rgba(52,199,89,0.4);
+    background-color: rgba(34, 197, 94, 0.15);
+    color: #22c55e;
+    border: 1px solid rgba(34, 197, 94, 0.3);
 }
 
 .message.error {
-    background-color: rgba(255,59,48,0.2);
-    color: #FF3B30;
-    border: 1px solid rgba(255,59,48,0.4);
+    background-color: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.3);
 }

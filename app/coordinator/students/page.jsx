@@ -164,12 +164,7 @@ export default function CoordinatorStudents() {
                    <div className="theme-divider"></div>
 
                    {/* Theme Toggle */}
-                   <div className="theme-toggle-wrapper">
-                       <label className="switch">
-                           <input type="checkbox" checked={isLightMode} onChange={() => setIsLightMode(!isLightMode)} />
-                           <span className="slider round"></span>
-                       </label>
-                   </div>
+                 
                </div>
            </div>
        </section>
@@ -208,7 +203,7 @@ export default function CoordinatorStudents() {
                                className="btn primary-btn info-btn"
                                onClick={() => handleOpenModal(s)}
                            >
-                               <Info size={16} /> Info
+                               <Info size={16} /> View Profile
                            </button>
                            </td>
                        </tr>
@@ -244,7 +239,7 @@ export default function CoordinatorStudents() {
            )}
        </div>
 
-      {/* --- MODAL --- */}
+   {/* --- MODAL --- */}
       {selectedStudent && (
         <div
           className={`modal-overlay glass-bg ${isClosing ? 'modal-exit' : 'modal-enter'}`}
@@ -262,57 +257,68 @@ export default function CoordinatorStudents() {
                 className="profile-picture"
               />
             </div>
-
-            <div className="profile-section">
-              <h3>Personal & Contact Details</h3>
-              <div className="info-grid">
-                <p><Building2 size={16} className="icon-accent" /> <strong>Department:</strong> {selectedStudent.department || "N/A"}</p>
-                <p><Mail size={16} className="icon-accent" /> <strong>Email:</strong> {selectedStudent.email || "N/A"}</p>
-                <p><Phone size={16} className="icon-accent" /> <strong>Phone:</strong> {selectedStudent.phone || "N/A"}</p>
-                <p><Calendar size={16} className="icon-accent" /> <strong>Joined:</strong> {selectedStudent.created_at ? new Date(selectedStudent.created_at).toLocaleDateString() : "N/A"}</p>
-              </div>
-            </div>
             
-            <div className="profile-section">
-              <h3>Professional Summary</h3>
-              <p className="summary-text">{selectedStudent.summary || "N/A"}</p>
-            </div>
+            {/* --- NEW: Two-Column Layout Container --- */}
+            <div className="profile-content-columns"> 
+                
+                {/* LEFT COLUMN: Personal, Summary, Education */}
+                <div className="profile-column left-column">
+                    <div className="profile-section">
+                        <h3>Personal & Contact Details</h3>
+                        <div className="info-grid">
+                            <p><Building2 size={16} className="icon-accent" /> <strong>Department:</strong> {selectedStudent.department || "N/A"}</p>
+                            <p><Mail size={16} className="icon-accent" /> <strong>Email:</strong> {selectedStudent.email || "N/A"}</p>
+                            <p><Phone size={16} className="icon-accent" /> <strong>Phone:</strong> {selectedStudent.phone || "N/A"}</p>
+                            <p><Calendar size={16} className="icon-accent" /> <strong>Joined:</strong> {selectedStudent.created_at ? new Date(selectedStudent.created_at).toLocaleDateString() : "N/A"}</p>
+                        </div>
+                    </div>
+                    
+                    <div className="profile-section">
+                        <h3>Professional Summary</h3>
+                        <p className="summary-text">{selectedStudent.summary || "N/A"}</p>
+                    </div>
 
-            <div className="profile-section">
-              <h3>Education History</h3>
-              {Array.isArray(selectedStudent.education) && selectedStudent.education.length > 0 ? (
-                selectedStudent.education.map((edu, idx) => (
-                  <div key={idx} className="info-grid border-bottom-light" style={{marginBottom: '10px'}}>
-                    <p><strong>Institution:</strong> {edu.institution || "N/A"}</p>
-                    <p><strong>Degree:</strong> {edu.degree || "N/A"}</p>
-                    <p><strong>Years:</strong> {edu.years || "N/A"}</p>
-                  </div>
-                ))
-              ) : ( <p className="text-muted">No education listed.</p> )}
-            </div>
-
-            <div className="profile-section">
-              <h3>Key Skills</h3>
-              {Array.isArray(selectedStudent.skills) && selectedStudent.skills.length > 0 ? (
-                <div className="skills-list">
-                  {selectedStudent.skills.map((skill, idx) => (
-                    <span key={idx} className="skill-tag">{skill}</span>
-                  ))}
+                    <div className="profile-section">
+                        <h3>Education History</h3>
+                        {Array.isArray(selectedStudent.education) && selectedStudent.education.length > 0 ? (
+                            selectedStudent.education.map((edu, idx) => (
+                                <div key={idx} className="info-grid border-bottom-light" style={{marginBottom: '10px'}}>
+                                    <p><strong>Institution:</strong> {edu.institution || "N/A"}</p>
+                                    <p><strong>Degree:</strong> {edu.degree || "N/A"}</p>
+                                    <p><strong>Years:</strong> {edu.years || "N/A"}</p>
+                                </div>
+                            ))
+                        ) : ( <p className="text-muted">No education listed.</p> )}
+                    </div>
                 </div>
-              ) : ( <p className="text-muted">No skills listed.</p> )}
-            </div>
 
-            <div className="profile-section">
-              <h3>Resume</h3>
-              {selectedStudent.resume_url ? (
-                <a href={selectedStudent.resume_url} target="_blank" rel="noopener noreferrer" className="btn secondary-btn resume-btn" style={{justifyContent: 'center'}}>
-                  <FileText size={16} /> View Resume
-                </a>
-              ) : ( <p className="text-muted">Resume not uploaded.</p> )}
-            </div>
+                {/* RIGHT COLUMN: Skills, Resume */}
+                <div className="profile-column right-column">
+                    <div className="profile-section">
+                        <h3>Key Skills</h3>
+                        {Array.isArray(selectedStudent.skills) && selectedStudent.skills.length > 0 ? (
+                            <div className="skills-list">
+                                {selectedStudent.skills.map((skill, idx) => (
+                                    <span key={idx} className="skill-tag">{skill}</span>
+                                ))}
+                            </div>
+                        ) : ( <p className="text-muted">No skills listed.</p> )}
+                    </div>
+
+                    <div className="profile-section resume-section"> {/* Added class for potential styling */}
+                        <h3>Resume</h3>
+                        {selectedStudent.resume_url ? (
+                            <a href={selectedStudent.resume_url} target="_blank" rel="noopener noreferrer" className="btn primary-btn resume-btn full-width" style={{justifyContent: 'center'} }>
+                                <FileText size={16} /> View Resume
+                            </a>
+                        ) : ( <p className="text-muted">Resume not uploaded.</p> )}
+                    </div>
+                </div>
+
+            </div> {/* --- END profile-content-columns --- */}
 
             <div className="modal-actions">
-                 <button className="btn tertiary-btn" onClick={handleCloseModal}>Close</button>
+                  <button className="btn tertiary-btn" onClick={handleCloseModal}>Close</button>
             </div>
           </div>
         </div>

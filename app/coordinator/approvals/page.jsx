@@ -1,10 +1,9 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-// 1. UPDATED IMPORT: Use the component client helper
+import React, { useEffect, useState, useMemo } from "react"; // Added useMemo
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { finalizeApplicationStatus } from "../actions";
-import { Search } from 'lucide-react';
+import { Search, ArrowDownUp, ChevronUp, ChevronDown } from 'lucide-react'; // Added icons
 import { toast } from 'sonner'; 
 import "./approvals.css";
 
@@ -22,11 +21,13 @@ export default function CoordinatorInternships() {
   const [loading, setLoading] = useState(true);
   const [applications, setApplications] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
+  
+  // NEW STATE: Sort configuration
+  const [sortConfig, setSortConfig] = useState({ key: 'status', direction: 'ascending' }); 
 
   const fetchApplications = async () => {
     setLoading(true);
     try {
-      // This call now uses the authenticated session automatically
       const { data, error } = await supabase
         .from("job_applications")
         .select(`
@@ -34,25 +35,32 @@ export default function CoordinatorInternships() {
           created_at,
           status,
           resume_url,
-          student:profiles!fk_job_applications_intern ( fullname, email, department ),
-          job:job_posts!fk_job_applications_job ( 
-            title, 
+
+          student:profiles!job_applications_intern_id_fkey (
+            fullname,
+            email,
+            department
+          ),
+
+          job:job_posts!fk_job_applications_job (
+            title,
             location,
-            company:companies ( name ) 
-          ) 
+            company:companies (
+              name
+            )
+          )
         `)
-        .in("status", ["Company_Approved_Waiting_Coordinator", "ongoing", "active_intern"])
-        .order('created_at', { ascending: false });
+        .in("status", [
+          "Company_Approved_Waiting_Coordinator",
+          "ongoing",
+          "active_intern"
+        ])
+        .order("created_at", { ascending: false }); // Initial fetch order
 
       if (error) throw error;
       
-      const sortedData = (data || []).sort((a, b) => {
-         if (a.status === 'Company_Approved_Waiting_Coordinator' && b.status !== 'Company_Approved_Waiting_Coordinator') return -1;
-         if (a.status !== 'Company_Approved_Waiting_Coordinator' && b.status === 'Company_Approved_Waiting_Coordinator') return 1;
-         return 0;
-      });
-
-      setApplications(sortedData);
+      // We no longer pre-sort here, we rely on the useMemo hook below
+      setApplications(data || []);
     } catch (err) {
       console.error("Error fetching applications:", err);
       toast.error(`Error fetching applications: ${err.message}`);
@@ -74,8 +82,6 @@ export default function CoordinatorInternships() {
     const newStatus = action === "approve" ? "active_intern" : "rejected_by_coordinator";
     const toastId = toast.loading("Updating status...");
 
-    // Note: If 'finalizeApplicationStatus' is a Server Action, it handles its own auth.
-    // If it is a client-side utility helper, you might need to check if it needs updating too.
     const result = await finalizeApplicationStatus(applicationId, newStatus);
 
     if (result.success) {
@@ -85,27 +91,107 @@ export default function CoordinatorInternships() {
       );
       
       if (action === "reject") {
-          setApplications((prev) => prev.filter((app) => app.id !== applicationId));
+        setApplications((prev) => prev.filter((app) => app.id !== applicationId));
       } else {
-          setApplications((prev) => prev.map(app => 
-              app.id === applicationId ? { ...app, status: newStatus } : app
-          ));
+        setApplications((prev) => prev.map(app => 
+            app.id === applicationId ? { ...app, status: newStatus } : app
+        ));
       }
     } else {
       toast.error(`Failed: ${result.error}`, { id: toastId });
     }
   };
 
-  const filteredApplications = applications.filter((app) => {
-    const query = searchQuery.toLowerCase();
-    return (
-      app.student?.fullname?.toLowerCase().includes(query) ||
-      app.student?.email?.toLowerCase().includes(query) ||
-      app.student?.department?.toLowerCase().includes(query) ||
-      app.job?.title?.toLowerCase().includes(query) ||
-      app.job?.company?.name?.toLowerCase().includes(query)
+  // --- SORTING LOGIC ---
+  const handleSort = (key) => {
+    let direction = 'ascending';
+    if (sortConfig.key === key && sortConfig.direction === 'ascending') {
+      direction = 'descending';
+    } else if (sortConfig.key === key && sortConfig.direction === 'descending') {
+        // Third click returns to default sort by status (priority)
+        setSortConfig({ key: 'status', direction: 'ascending' });
+        return;
+    }
+    setSortConfig({ key, direction });
+  };
+
+  const getSortIcon = (key) => {
+    if (sortConfig.key !== key) {
+        return <ArrowDownUp size={14} className="sort-icon-default" />;
+    }
+    return sortConfig.direction === 'ascending' ? (
+        <ChevronUp size={14} className="sort-icon-active" />
+    ) : (
+        <ChevronDown size={14} className="sort-icon-active" />
     );
-  });
+  };
+  // -----------------------
+
+  // --- FILTERING AND SORTING MEMO ---
+  const sortedAndFilteredApplications = useMemo(() => {
+    const filtered = applications.filter((app) => {
+        const query = searchQuery.toLowerCase();
+        return (
+            app.student?.fullname?.toLowerCase().includes(query) ||
+            app.student?.email?.toLowerCase().includes(query) ||
+            app.student?.department?.toLowerCase().includes(query) ||
+            app.job?.title?.toLowerCase().includes(query) ||
+            app.job?.company?.name?.toLowerCase().includes(query)
+        );
+    });
+
+    // Make a shallow copy for sorting
+    let sortableItems = [...filtered];
+
+    if (sortConfig.key !== null) {
+        sortableItems.sort((a, b) => {
+            let aVal, bVal;
+
+            if (sortConfig.key === 'student') {
+                aVal = a.student?.fullname || "";
+                bVal = b.student?.fullname || "";
+            } else if (sortConfig.key === 'department') {
+                aVal = a.student?.department || "";
+                bVal = b.student?.department || "";
+            } else if (sortConfig.key === 'job') {
+                aVal = a.job?.title || "";
+                bVal = b.job?.title || "";
+            } else if (sortConfig.key === 'company') {
+                aVal = a.job?.company?.name || "";
+                bVal = b.job?.company?.name || "";
+            } else if (sortConfig.key === 'status') {
+                // Priority: Company_Approved_Waiting_Coordinator always comes first
+                const statusPriority = {
+                    "Company_Approved_Waiting_Coordinator": 3,
+                    "active_intern": 2,
+                    "ongoing": 1,
+                    // Use a low number for others if they somehow show up
+                };
+                aVal = statusPriority[a.status] || 0;
+                bVal = statusPriority[b.status] || 0;
+
+                // If status is the same, fall back to sorting by date
+                if (aVal === bVal) {
+                    aVal = a.created_at;
+                    bVal = b.created_at;
+                }
+            } else {
+                return 0;
+            }
+
+            // Standard string/number comparison
+            if (aVal < bVal) {
+                return sortConfig.direction === 'ascending' ? -1 : 1;
+            }
+            if (aVal > bVal) {
+                return sortConfig.direction === 'ascending' ? 1 : -1;
+            }
+            return 0;
+        });
+    }
+
+    return sortableItems;
+  }, [applications, searchQuery, sortConfig]);
 
   return (
     // ✅ 1. Standard Dashboard Inner Container (Layout wrapper handles the rest)
@@ -149,12 +235,32 @@ export default function CoordinatorInternships() {
                 <table className="approvals-table">
                 <thead>
                     <tr>
-                    <th>Student Name</th>
-                    <th>Department</th>
-                    <th>Job Title</th>
-                    <th>Company</th>
-                    <th>Resume</th>
-                    <th>Status / Actions</th>
+                        <th onClick={() => handleSort('student')} className="sortable-header">
+                            <div className="header-content">
+                                Student Name {getSortIcon('student')}
+                            </div>
+                        </th>
+                        <th onClick={() => handleSort('department')} className="sortable-header">
+                            <div className="header-content">
+                                Department {getSortIcon('department')}
+                            </div>
+                        </th>
+                        <th onClick={() => handleSort('job')} className="sortable-header">
+                            <div className="header-content">
+                                Job Title {getSortIcon('job')}
+                            </div>
+                        </th>
+                        <th onClick={() => handleSort('company')} className="sortable-header">
+                            <div className="header-content">
+                                Company {getSortIcon('company')}
+                            </div>
+                        </th>
+                        <th>Resume</th>
+                        <th onClick={() => handleSort('status')} className="sortable-header">
+                            <div className="header-content">
+                                Status / Actions {getSortIcon('status')}
+                            </div>
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -165,14 +271,14 @@ export default function CoordinatorInternships() {
                         </td>
                     </tr>
                     )}
-                    {!loading && filteredApplications.length === 0 && (
+                    {!loading && sortedAndFilteredApplications.length === 0 && (
                     <tr>
                         <td colSpan="6" className="no-data-cell">
                             No applications found matching your criteria.
                         </td>
                     </tr>
                     )}
-                    {!loading && filteredApplications.map((app) => (
+                    {!loading && sortedAndFilteredApplications.map((app) => (
                     <tr key={app.id}>
                         <td>
                             <p className="student-name">{app.student?.fullname || "N/A"}</p>

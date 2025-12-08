@@ -345,3 +345,27 @@
         flex-direction: column;
     }
 }
+
+.sortable-header {
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.sortable-header:hover {
+    background-color: rgba(238, 116, 40, 0.1); /* Light highlight on hover */
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    user-select: none; /* Prevent text selection on click */
+}
+
+.sort-icon-default {
+    opacity: 0.4; /* Dim default icon */
+}
+
+.sort-icon-active {
+    color: var(--primary-orange); /* Highlight active icon */
+}

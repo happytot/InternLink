@@ -171,15 +171,15 @@ input:checked + .slider::before { transform: translateX(23px); background-color:
 }
 
 .btn-secondary {
-    background-color: var(--bg-input);
+    background-color: var(--primary-orange);
     color: var(--text-muted);
     border-color: var(--border-color);
 }
 .btn-secondary:hover {
     background-color: var(--bg-card);
     transform: translateY(-2px);
-    border-color: var(--secondary-cyan);
-    color: var(--secondary-cyan);
+    border-color: var(--primary-orange-hover);
+    color: var(--primary-orange-hover);
 }
 
 
@@ -626,3 +626,4 @@ input:checked + .slider::before { transform: translateX(23px); background-color:
     .card-container { grid-template-columns: 1fr; }
     .data-table th, .data-table td { padding: 12px 15px; }
 }
+

@@ -219,43 +219,42 @@ h1, h2, h3, h4, h5, h6 {
    ========================================= */
 
 /* 1. The Container */
-.company-shell {
+.company-shell,
+.intern-shell {  /* 👈 Added intern-shell */
   display: flex;
   height: 100vh;
   width: 100vw;
-  overflow: hidden; /* This keeps the whole app from scrolling the window */
+  overflow: hidden; 
   background-color: var(--bg-main);
 }
 
 /* 2. The Sidebar Wrapper */
-.company-sidebar-wrapper {
+.company-sidebar-wrapper,
+.intern-sidebar-wrapper { /* 👈 Added intern-sidebar-wrapper */
   flex-shrink: 0;
   height: 100%;
   border-right: 1px solid var(--border-color);
   background-color: var(--bg-card);
   
-  /* ✅ Z-INDEX & OVERFLOW FIXES */
   position: relative;   
   z-index: 9999 !important; /* Force top layer */
-  
-  /* This allows tooltips to "spill out" of the box */
   overflow: visible !important; 
 }
 
-/* ⚠️ CRITICAL: Ensure the Nav component INSIDE the wrapper doesn't clip either */
-.company-sidebar-wrapper > * {
+/* Ensure children don't clip tooltips */
+.company-sidebar-wrapper > *,
+.intern-sidebar-wrapper > * {
   overflow: visible !important;
 }
 
 /* 3. The Main Content Area */
-.company-main-content {
+.company-main-content,
+.intern-main-content { /* 👈 Added intern-main-content */
   flex: 1;
   height: 100%;
   overflow-y: auto;     
   overflow-x: hidden;   
   position: relative;
-  
-  /* Push this layer down so Sidebar floats over it */
   z-index: 1;           
   scroll-behavior: smooth;
 }
@@ -267,20 +266,16 @@ h1, h2, h3, h4, h5, h6 {
 /* 1. Disable the default cross-fade animation */
 ::view-transition-old(root),
 ::view-transition-new(root) {
-  animation: none;
-  mix-blend-mode: normal;
+    animation: none;
+    mix-blend-mode: normal;
 }
 
 /* 2. Ensure the "new" theme sits on top during animation */
 ::view-transition-new(root) {
-  z-index: 9999; 
+    z-index: 9999; 
 }
 
 /* 3. Ensure the "old" theme stays put underneath */
 ::view-transition-old(root) {
-  z-index: 1;
+    z-index: 1;
 }
-
-/* Note: The actual 'circle' animation is handled 
-   inside the AdminSidebar.jsx JavaScript! 
-*/

@@ -163,7 +163,7 @@
 /******/ 		// This function allow to reference async chunks
 /******/ 		__webpack_require__.u = function(chunkId) {
 /******/ 			// return url for filenames based on template
-/******/ 			return undefined;
+/******/ 			return "static/chunks/" + chunkId + ".js";
 /******/ 		};
 /******/ 	}();
 /******/ 	
@@ -192,7 +192,7 @@
 /******/ 	
 /******/ 	/* webpack/runtime/getFullHash */
 /******/ 	!function() {
-/******/ 		__webpack_require__.h = function() { return "b13119244424c34b"; }
+/******/ 		__webpack_require__.h = function() { return "4725e52f6e452b6c"; }
 /******/ 	}();
 /******/ 	
 /******/ 	/* webpack/runtime/global */
@@ -830,15 +830,14 @@
 /******/ 		// [resolve, reject, Promise] = chunk loading, 0 = chunk loaded
 /******/ 		var installedChunks = __webpack_require__.hmrS_jsonp = __webpack_require__.hmrS_jsonp || {
 /******/ 			"webpack": 0,
-/******/ 			"css-app_company_jobs_listings_listings_css": 0,
-/******/ 			"css-app_components_CompanyNav_css-app_globals_css": 0,
-/******/ 			"css-app_index_css": 0,
-/******/ 			"css-app_company_dashboard_CompanyDashboard_css": 0,
 /******/ 			"css-app_LandingPage_css": 0,
+/******/ 			"css-app_index_css": 0,
 /******/ 			"css-app_components_AuthPage_module_css": 0,
-/******/ 			"css-app_intern_listings_Listings_css": 0,
-/******/ 			"css-app_intern_dashboard_Dashboard_css": 0,
-/******/ 			"css-app_components_InternNav_css": 0
+/******/ 			"css-app_coordinator_dashboard_dashboard_css-node_modules_fontsource_inter_400_css-node_module-55e726": 0,
+/******/ 			"css-app_components_CoordinatorSidebar_css-app_coordinator_coordinator-layout_css": 0,
+/******/ 			"css-app_coordinator_companies_companies_css": 0,
+/******/ 			"css-app_intern_components_Logbook_module_css": 0,
+/******/ 			"css-app_components_InternNav_css-app_globals_css": 0
 /******/ 		};
 /******/ 		
 /******/ 		__webpack_require__.f.j = function(chunkId, promises) {
@@ -850,7 +849,7 @@
 /******/ 					if(installedChunkData) {
 /******/ 						promises.push(installedChunkData[2]);
 /******/ 					} else {
-/******/ 						if(!/^(css\-app_(comp(any_(dashboard_CompanyDashboard|jobs_listings_listings)_css|onents_(AuthPage_module|CompanyNav_css\-app_globals|InternNav)_css)|in(tern_(dashboard_Dashboard|listings_Listings)_css|dex_css)|LandingPage_css)|webpack)$/.test(chunkId)) {
+/******/ 						if(/^(app(\/(coordinator\/((companies|dashboard)\/page|layout)|intern\/l(ayout|ogbook\/page)|(|auth\/coordinatorAuthPage\/)page|layout)|\-pages\-internals)|_app\-pages\-browser_node_modules_react\-apexcharts_dist_react\-apexcharts_min_js|main\-app)$/.test(chunkId)) {
 /******/ 							// setup Promise in chunk cache
 /******/ 							var promise = new Promise(function(resolve, reject) { installedChunkData = installedChunks[chunkId] = [resolve, reject]; });
 /******/ 							promises.push(installedChunkData[2] = promise);

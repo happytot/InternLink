@@ -160,12 +160,7 @@ export default function CoordinatorDashboard() {
                 <div className="theme-divider"></div>
                 
                 {/* Toggle */}
-                <div className="theme-toggle-wrapper">
-                    <label className="switch" title="Toggle Theme">
-                        <input type="checkbox" checked={isLightMode} onChange={() => setIsLightMode(!isLightMode)} />
-                        <span className="slider round"></span>
-                    </label>
-                </div>
+             
             </div>
 
         </div>

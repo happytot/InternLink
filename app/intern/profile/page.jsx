@@ -1,19 +1,16 @@
 'use client';
-import './Profile.css';
+
+import './Profile.css'; // Importing the adapted CSS
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { Toaster, toast } from 'sonner';
+import { toast } from 'sonner'; // Use toast logic only
 import { useRouter } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import InternNav from '../../components/InternNav';
 import FloatingAIChatWithCharts from '../../components/chatbot';
-
 
 import { 
     User, Users, Mail, Phone, MapPin, Briefcase, GraduationCap, Wrench, Plus, X, 
-    FileText, Upload, Eye, Trash2, LogOut, Save, Loader2, MinusCircle, FileQuestion, Check, Undo2
+    FileText, Upload, Eye, Trash2, LogOut, Save, Loader2, MinusCircle, Check, Undo2
 } from 'lucide-react';
-
-
 
 const STANDARD_DEPARTMENTS = ['CCS', 'CBA', 'CHTM', 'CEA'];
 
@@ -39,7 +36,7 @@ const INITIAL_STATE = {
 
 const SectionTitle = ({ icon: Icon, title }) => (
     <h2 className="section-title">
-        <Icon size={24} color="var(--primary-orange)" />
+        <Icon size={24} className="section-icon" />
         {title}
     </h2>
 );
@@ -53,6 +50,7 @@ const EducationItem = ({ index, edu, onChange, onRemove }) => (
                 name="institution"
                 value={edu.institution}
                 onChange={(e) => onChange(index, e)}
+                className="input-base"
             />
             <input 
                 type="text" 
@@ -60,6 +58,7 @@ const EducationItem = ({ index, edu, onChange, onRemove }) => (
                 name="degree"
                 value={edu.degree}
                 onChange={(e) => onChange(index, e)}
+                className="input-base"
             />
             <input 
                 type="text" 
@@ -67,6 +66,7 @@ const EducationItem = ({ index, edu, onChange, onRemove }) => (
                 name="years"
                 value={edu.years}
                 onChange={(e) => onChange(index, e)}
+                className="input-base"
             />
         </div>
         {index >= 0 && (
@@ -86,11 +86,11 @@ const EducationItem = ({ index, edu, onChange, onRemove }) => (
 const SkeletonCard = () => (
     <div className="profile-wrapper">
         <div className="profile-content-area is-loading">
-             <div className="page-title-skeleton"></div>
+             <div className="page-title-skeleton skeleton-pulse"></div>
              <div className="profile-bento-grid">
-                <div className="profile-card skeleton-card"></div>
-                <div className="profile-card skeleton-card"></div>
-                <div className="profile-card skeleton-card"></div>
+                <div className="profile-card skeleton-card skeleton-pulse"></div>
+                <div className="profile-card skeleton-card skeleton-pulse"></div>
+                <div className="profile-card skeleton-card skeleton-pulse"></div>
              </div>
         </div>
     </div>
@@ -275,19 +275,15 @@ export default function Profile() {
     };
 
     // FILES
-    // Inside Profile.js
-
     const handleProfilePicChange = async (e) => {
         const file = e.target.files[0];
         if (!file) return;
 
-        // 1. Check User ID
         if (!userId) {
             toast.error("User session not found. Please refresh.");
             return;
         }
 
-        // 2. Check File Size (Limit to 2MB)
         if (file.size > 2 * 1024 * 1024) {
             toast.error("Image size should be less than 2MB.");
             return;
@@ -296,25 +292,19 @@ export default function Profile() {
         const uploadToast = toast.loading('Uploading picture...');
 
         try {
-            // We use a consistent name per user so it overwrites the old one
-            // or you can use a unique name if you prefer keeping history.
             const fileExt = file.name.split('.').pop();
             const filePath = `${userId}/avatar.${fileExt}`;
 
-            // 3. Upload to Supabase Storage
             const { error: uploadError } = await supabase.storage
-                .from('avatars') // Make sure this bucket exists (see Step 2)
+                .from('avatars')
                 .upload(filePath, file, { upsert: true });
 
             if (uploadError) throw uploadError;
 
-            // 4. Get the Public URL
             const { data } = supabase.storage
                 .from('avatars')
                 .getPublicUrl(filePath);
 
-            // 5. Add Cache Buster
-            // Appending "?t=timestamp" forces the browser to re-fetch the image immediately
             const newUrl = `${data.publicUrl}?t=${new Date().getTime()}`;
 
             setProfileData(prev => ({ ...prev, profilePicURL: newUrl }));
@@ -429,7 +419,6 @@ export default function Profile() {
 
     return (
         <div className="profile-wrapper">
-            <Toaster position="top-center" richColors />
             
             <form onSubmit={handleSubmit}>
                 
@@ -480,7 +469,7 @@ export default function Profile() {
                 <div className="profile-content-area">
                     <div className="page-header-row">
                          <h1 className="page-title">
-                            <Users size={32} color="var(--primary-dark)" className="page-title-icon" />
+                            <Users size={32} className="page-title-icon" />
                             My Profile
                         </h1>
                         <button 
@@ -507,7 +496,7 @@ export default function Profile() {
                                             <div className="profile-avatar placeholder-avatar">👤</div>
                                         )}
                                     </div>
-                                    <label htmlFor="profilePicUpload" className="btn-icon-upload" disabled={isSubmitting} title="Upload Photo">
+                                    <label htmlFor="profilePicUpload" className="btn-icon-upload" title="Upload Photo">
                                         <Upload size={16} />
                                         <input type="file" id="profilePicUpload" accept="image/*" onChange={handleProfilePicChange} className="visually-hidden" disabled={isSubmitting} />
                                     </label>
@@ -516,23 +505,23 @@ export default function Profile() {
                                 <div className="personal-details-stack">
                                     <div className="form-group">
                                         <label htmlFor="fullName"><User size={16} /> Full Name</label>
-                                        <input type="text" id="fullName" name="fullName" placeholder="John Doe" value={profileData.fullName} onChange={handleFieldChange} disabled={isSubmitting} />
+                                        <input className="input-base" type="text" id="fullName" name="fullName" placeholder="John Doe" value={profileData.fullName} onChange={handleFieldChange} disabled={isSubmitting} />
                                     </div>
                                     <div className="form-group">
                                         <label htmlFor="email"><Mail size={16} /> Email</label>
-                                        <input type="email" value={profileData.email} disabled className="input-disabled" />
+                                        <input className="input-base input-disabled" type="email" value={profileData.email} disabled />
                                     </div>
                                     <div className="form-group">
                                         <label htmlFor="phone"><Phone size={16} /> Phone</label>
-                                        <input type="tel" name="phone" placeholder="(+63)" value={profileData.phone} onChange={handleFieldChange} disabled={isSubmitting} />
+                                        <input className="input-base" type="tel" name="phone" placeholder="(+63)" value={profileData.phone} onChange={handleFieldChange} disabled={isSubmitting} />
                                     </div>
                                     <div className="form-group">
                                         <label htmlFor="location"><MapPin size={16} /> Location</label>
-                                        <input type="text" name="location" placeholder="City" value={profileData.location} onChange={handleFieldChange} disabled={isSubmitting} />
+                                        <input className="input-base" type="text" name="location" placeholder="City" value={profileData.location} onChange={handleFieldChange} disabled={isSubmitting} />
                                     </div>
                                     <div className="form-group">
                                         <label htmlFor="department"><Briefcase size={16} /> Department</label>
-                                        <select name="department" value={profileData.department} onChange={handleFieldChange} disabled={isSubmitting}>
+                                        <select className="input-base" name="department" value={profileData.department} onChange={handleFieldChange} disabled={isSubmitting}>
                                             <option value="" disabled>Select</option>
                                             {STANDARD_DEPARTMENTS.map(dept => <option key={dept} value={dept}>{dept}</option>)}
                                             <option value="Other">Other</option>
@@ -540,7 +529,7 @@ export default function Profile() {
                                     </div>
                                     {profileData.department === 'Other' && (
                                         <div className="form-group">
-                                            <input type="text" name="customDepartment" placeholder="Specify Dept" value={profileData.customDepartment} onChange={handleFieldChange} disabled={isSubmitting} />
+                                            <input className="input-base" type="text" name="customDepartment" placeholder="Specify Dept" value={profileData.customDepartment} onChange={handleFieldChange} disabled={isSubmitting} />
                                         </div>
                                     )}
                                 </div>
@@ -552,7 +541,7 @@ export default function Profile() {
                              {/* Summary */}
                              <section className="profile-card section-summary">
                                 <SectionTitle icon={Briefcase} title="Professional Summary" />
-                                <textarea name="summary" className="summary-textarea" placeholder="Describe your professional background..." value={profileData.summary} onChange={handleFieldChange} disabled={isSubmitting}></textarea>
+                                <textarea name="summary" className="input-base summary-textarea" placeholder="Describe your professional background..." value={profileData.summary} onChange={handleFieldChange} disabled={isSubmitting}></textarea>
                             </section>
 
                             {/* Education (Scrollable) */}
@@ -590,7 +579,7 @@ export default function Profile() {
                                     </div>
                                 ) : (
                                     <div className="no-file-mini">
-                                        <span className="text-sm text-gray-500">No resume uploaded</span>
+                                        <span className="text-sm text-muted">No resume uploaded</span>
                                     </div>
                                 )}
                                 <label htmlFor="resumeFileUpload" className="btn-secondary full-width-btn mt-2">
@@ -603,7 +592,7 @@ export default function Profile() {
                             <section className="profile-card section-skills flex-grow-card">
                                 <SectionTitle icon={Wrench} title="Key Skills" />
                                 <div className="skill-input-group">
-                                    <input type="text" placeholder="Add skill..." name="newSkillInput" value={profileData.newSkillInput} onChange={handleFieldChange} onKeyDown={(e) => e.key === 'Enter' && addSkill()} disabled={isSubmitting} />
+                                    <input className="input-base" type="text" placeholder="Add skill..." name="newSkillInput" value={profileData.newSkillInput} onChange={handleFieldChange} onKeyDown={(e) => e.key === 'Enter' && addSkill()} disabled={isSubmitting} />
                                     <button type="button" onClick={addSkill} className="btn-primary-icon" disabled={isSubmitting}><Plus size={18} /></button>
                                 </div>
                                 
@@ -625,8 +614,6 @@ export default function Profile() {
             </form>
             <FloatingAIChatWithCharts studentId={userId} />
 
-            <InternNav /> 
-            
             {/* Resume Modal */}
             {isResumeModalOpen && (
                 <div className="modal-backdrop">

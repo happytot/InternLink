@@ -1,571 +1,313 @@
-/* ----------------------------
-   InternLink Design System - Dark & Light Mode
------------------------------ */
-:root {
-    /* Dark Mode Defaults */
-    --bg-primary: #021217;
-    --text-primary: #F1F5F9;
-    --card-bg: #0F2027;
-    --border-color: rgba(241, 245, 249, 0.1);
+/* app/intern/companies/companies.css */
 
-    --accent-primary: #EE7428;
-    --accent-primary-hover: #D96924;
-
-    --accent-secondary: #00d4ff;
-    --accent-secondary-light: #67e8f9;
-
-    --shadow-deep: 0 16px 30px rgba(0, 0, 0, 0.4);
-    --shadow-lift: 0 10px 20px rgba(0, 0, 0, 0.2);
-}
-
-.light-mode {
-    --bg-primary: #F8FAFC;
-    --text-primary: #0F172A;
-    --card-bg: #FFFFFF;
-    --border-color: rgba(15, 23, 42, 0.1);
-
-    --accent-primary: #EA580C;
-    --accent-primary-hover: #C2410C;
-
-    --accent-secondary: #3b82f6;
-    --accent-secondary-light: #60a5fa;
-
-    --shadow-deep: 0 16px 30px rgba(15, 23, 42, 0.1);
-    --shadow-lift: 0 10px 20px rgba(15, 23, 42, 0.08);
-}
-
-/* ----------------------------
-   Base Typography
------------------------------ */
-body {
-    background-color: var(--bg-primary);
-    color: var(--text-primary);
-    font-family: 'Inter', sans-serif;
-    line-height: 1.6;
-    margin: 0;
-    padding: 0;
-}
-
-h1, h2, h3, h4 {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-weight: 800;
-    color: var(--text-primary);
-    letter-spacing: -0.02em;
-}
-
-.text-muted {
-    color: rgba(241, 245, 249, 0.6);
-}
-.light-mode .text-muted {
-    color: #64748B;
-}
-.text-cyan {
-    color: var(--accent-secondary);
-    font-weight: 600;
-}
-
-/* ----------------------------
-   Stars & Ratings
------------------------------ */
-.rating-stars .star-full {
-    color: #FFC700;
-}
-.star-empty {
-    color: rgba(241, 245, 249, 0.2);
-}
-
-/* ----------------------------
-   Inputs & Buttons
------------------------------ */
-.input-base {
-    width: 90%;
-    padding: 14px 20px;
-    border-radius: 12px;
-    border: 1px solid var(--border-color);
-    background: var(--card-bg);
-    color: var(--text-primary);
-    font-size: 1rem;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    transition: all 0.3s ease;
-}
-.input-base:focus {
-    border-color: var(--accent-primary);
-    box-shadow: 0 0 0 3px rgba(238,116,40,0.3);
-    outline: none;
-}
-
-.btn-primary {
-    padding: 14px 26px;
-    background-color: var(--accent-primary);
-    color: #fff;
-    border: none;
-    border-radius: 12px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(238,116,40,0.3);
-    margin-top: 10px;
-}
-.btn-primary:hover:not(:disabled) {
-    background: var(--accent-primary-hover);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(238,116,40,0.4);
-}
-.btn-primary:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
-}
-
-.btn-secondary {
-    padding: 10px 20px;
-    background: var(--border-color);
-    color: var(--accent-secondary);
-    border: none;
-    border-radius: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
-}
-.btn-secondary:hover:not(:disabled) {
-    background: rgba(0,212,255,0.2);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(0,212,255,0.2);
-}
-.btn-secondary.save-btn {
-    padding: 8px 16px;
-    font-size: 0.9rem;
-    margin-top: 5px;
-}
-
-/* ----------------------------
-   Badges
------------------------------ */
-.badge {
-    padding: 6px 14px;
-    border-radius: 50px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-}
-.badge-cyan { background: rgba(0,212,255,0.15); color: var(--accent-secondary); }
-.badge-orange { color: var(--accent-primary); }
-.badge-default { margin-right: 10px; color: var(--text-primary); }
-
-/* ----------------------------
-   Layout
------------------------------ */
+/* =========================================
+   1. MAIN CONTAINER (Unified Gradient)
+   ========================================= */
 .companies-page-container {
-    padding: 40px 40px;
-    position: relative;
-    min-height: 100vh;
-    width: 100%;
-    max-width: 1800px;
-    margin: 0 auto;
+  height: calc(100vh - 60px); 
+  display: flex;
+  flex-direction: column;
+  
+  /* ✨ UNIFIED GRADIENT BACKGROUND */
+  background: radial-gradient(
+    circle at top left, 
+    var(--bg-card) 0%, 
+    var(--bg-main) 100%
+  );
+  
+  color: var(--text-main);
+  overflow: hidden; 
 }
 
-.main-layout {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 30px;
-    height: calc(100vh - 70px);
-}
-.main-layout.details-visible { grid-template-columns: 1fr 3fr; }
-
-.list-column {
-    overflow-y: auto;
-    max-height: 100%;
-    padding-right: 15px;
-    border-right: 1px solid var(--border-color);
-}
-@media (max-width: 1024px) { .list-column { border-right: none; } }
-
-.companies-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px,1fr));
-    gap: 24px;
+@media (min-width: 1024px) {
+  .companies-page-container { height: 100vh; }
 }
 
-/* ----------------------------
-   Company Cards
------------------------------ */
-.company-card, .section-card, .job-card {
-    background: var(--card-bg);
-    padding: 30px;
-    border-radius: 24px;
-    border: 1px solid var(--border-color);
-    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-}
-.company-card:hover {
-    transform: translateY(-8px);
-    box-shadow: var(--shadow-lift);
-    border-color: var(--accent-primary);
-}
-.company-card.card-selected { border-color: var(--accent-secondary); }
-
-.company-card .company-logo-container {
-    width: 60px; height: 60px;
-    border-radius: 12px;
-    background: var(--border-color);
-    display: flex; align-items: center; justify-content: center;
-    overflow: hidden; margin-bottom: 15px;
-}
-.company-card .company-logo {
-    max-width: 80%; max-height: 80%; object-fit: contain;
-}
-.company-card h2 { font-size: 1.5rem; margin: 0 0 8px 0; }
-.company-description {
-    color: var(--text-muted);
-    font-size: 0.95rem; line-height: 1.4;
-    overflow: hidden; display: -webkit-box;
-    
-    margin: 0;
-}
-.company-card .card-metrics-row {
-    display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap;
+.loading-container {
+  display: flex; justify-content: center; align-items: center; height: 100vh;
+  color: var(--text-muted); font-size: 1.2rem;
 }
 
-/* ----------------------------
-   Details Panel
------------------------------ */
-.details-panel-container { display: none; }
-.main-layout.details-visible .details-panel-container { display: block; height: 100%; }
-
-.details-content {
-    padding: 40px;
-    border-radius: 24px;
-    height: 100%;
-    box-sizing: border-box;
-    position: relative;
-    background: rgba(15,32,39,0.85);
-    backdrop-filter: blur(12px) saturate(150%);
-    -webkit-backdrop-filter: blur(12px) saturate(150%);
-    border: 1px solid rgba(241,245,249,0.15);
-    box-shadow: var(--shadow-deep);
-    overflow-y: auto;
+/* --- SCROLLBAR HIDING UTILITY --- */
+/* This removes visual scrollbars but keeps scrolling functional */
+.companies-ribbon,
+.left-panel-stack,
+.jobs-section {
+  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none;  /* IE/Edge */
 }
 
-.light-mode .glass-component { background: rgba(255,255,255,0.85); border: 1px solid rgba(15,23,42,0.15); }
-
-.details-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 30px;
-    margin-top: 30px;
-}
-.details-grid-column .section-card { margin-bottom: 30px; }
-
-/* ----------------------------
-    Job Card & List Enhancements
------------------------------ */
-.jobs-list {
-    display: flex;
-    flex-direction: column;
-    gap: 15px; /* Tighter spacing for list items */
+.companies-ribbon::-webkit-scrollbar,
+.left-panel-stack::-webkit-scrollbar,
+.jobs-section::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
 }
 
-.job-section-column .job-card {
-    padding: 20px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
+/* =========================================
+   2. TOP BAR (Glass Effect)
+   ========================================= */
+.top-bar-layout {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 16px 24px;
+  
+  /* ✨ GLASS EFFECT: Lets gradient show through */
+  background: rgba(0, 0, 0, 0.2); 
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  
+  z-index: 10;
 }
 
-.job-section-column .job-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
-    border-color: var(--accent-primary);
+.companies-ribbon {
+  flex: 1;
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 0; /* Removed padding for scrollbar */
 }
 
-.job-card h4 {
-    color: var(--accent-primary); /* Colorize job titles */
-    font-size: 1.3rem;
-    margin: 0;
+/* Compact Card (Pill Shape) */
+.company-card-compact {
+  display: flex; 
+  align-items: center; 
+  gap: 12px; 
+  padding: 8px 20px; /* Adjusted padding for better pill proportions */
+  
+  /* Semi-transparent card */
+  background: rgba(255, 255, 255, 0.03); 
+  border: 1px solid var(--border-color);
+  
+  /* ✨ PILL SHAPE */
+  border-radius: 50px; 
+  
+  min-width: 200px; 
+  max-width: 240px;
+  cursor: pointer; 
+  transition: all 0.2s ease; 
+  flex-shrink: 0;
 }
 
-.job-card .job-meta-grid {
-   display: grid;
-    grid-template-columns: repeat(2, 1fr); /* Two items per row */
-    gap: 10px;
-    margin-top: 10px;
-    padding-top: 10px;
-    border-top: 1px dotted var(--border-color);
-    font-size: 0.9rem;
-    color: var(--text-muted);
-    
+.company-card-compact:hover {
+  border-color: var(--primary-orange);
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-2px);
 }
 
-.job-meta-grid .lucide-icon {
-    color: var(--accent-secondary-light);
+.company-card-compact.card-selected {
+  background: var(--bg-card); 
+  border-color: var(--primary-orange);
+  box-shadow: 0 4px 12px rgba(238, 116, 40, 0.15);
 }
 
-.job-card .apply-btn {
-    width: 100%;
-    margin-top: 15px;
+.company-logo-small {
+  width: 36px; height: 36px; /* Slightly smaller to fit pill */
+  border-radius: 50%; /* Circular logo fits pill better */
+  object-fit: contain;
+  background: white; 
+  padding: 4px; 
+  border: 1px solid var(--border-color);
+}
+.company-logo-small.placeholder { display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+
+.card-info-compact h3 {
+  font-size: 0.95rem; margin: 0 0 2px 0; color: var(--text-main);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.mini-rating { font-size: 0.75rem; color: #eab308; font-weight: 600; }
+
+/* Search */
+.search-wrapper { position: relative; flex-shrink: 0; width: 260px; }
+.search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none; }
+.search-input {
+  width: 100%; padding: 12px 16px 12px 40px; border-radius: 20px;
+  border: 1px solid var(--border-color); 
+  background: rgba(0, 0, 0, 0.2); /* Dark transparent input */
+  color: var(--text-main); outline: none; font-size: 0.9rem; transition: all 0.2s;
+}
+.search-input:focus { border-color: var(--primary-orange); background: rgba(0, 0, 0, 0.4); }
+
+/* =========================================
+   3. DETAILS AREA (Transparent Container)
+   ========================================= */
+.details-area {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  background: transparent; /* ✨ Transparent so main gradient shows */
 }
 
-.meta-badge {
-    padding: 6px 12px;
-    border-radius: 50px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
+.details-panel-inner {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
-.meta-badge.badge-default {
-    color: var(--text-primary);
-    background: rgba(241, 245, 249, 0.08);
+.empty-state {
+  height: 100%; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; color: var(--text-muted);
+  text-align: center; padding: 40px;
 }
 
-.meta-badge.badge-orange {
-    color: var(--accent-primary);
-    background: rgba(238, 116, 40, 0.1);
+/* --- THE GRID LAYOUT --- */
+.details-content-grid {
+  display: grid;
+  grid-template-columns: 40% 60% 1fr;
+  height: 100%;
+  overflow: hidden;
+  gap: 0;
 }
 
-.btn-primary.apply-btn {
-    padding: 12px 20px;
-    margin-top: 10px;
-    border-radius: 12px;
-    font-weight: 700;
-    font-size: 0.95rem;
-    text-align: center;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(238, 116, 40, 0.3);
+/* --- LEFT PANEL (Hero + Widgets) --- */
+.left-panel-stack {
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid rgba(255, 255, 255, 0.05); /* Subtle border */
+  overflow-y: auto; 
+  
+  /* ✨ Subtle dark tint to distinguish from right side */
+  background: rgba(0, 0, 0, 0.15); 
 }
 
-.btn-primary.apply-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(238, 116, 40, 0.4);
+.details-hero {
+  padding: 30px;
+  border-bottom: 1px solid var(--border-color);
+  background: transparent; /* Transparent so it blends */
 }
 
-/* Optional: Add a subtle divider for long job cards */
-.job-card .job-box {
-    padding: 10px 15px;
-    border-radius: 12px;
-    border: 1px solid rgba(0, 212, 255, 0.15);
-    background: rgba(0, 212, 255, 0.05);
-    font-size: 0.95rem;
-    color: var(--text-primary);
+.widgets-column {
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
+.hero-content { display: flex; flex-direction: column; gap: 20px; align-items: flex-start; }
+.hero-logo {
+  width: 80px; height: 80px; border-radius: 16px; background: white;
+  padding: 8px; object-fit: contain; box-shadow: var(--shadow-card);
+}
+.hero-logo.placeholder { display: flex; align-items: center; justify-content: center; font-size: 3rem; }
 
-/* ----------------------------
-   Reviews
------------------------------ */
+.hero-text h1 { font-size: 2rem; margin: 0 0 12px 0; color: var(--text-main); }
+.hero-stats { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+.hero-desc { font-size: 0.95rem; line-height: 1.6; color: var(--text-muted); }
+
+/* --- RIGHT PANEL (Job List) --- */
+.jobs-section {
+  padding: 30px 40px;
+  overflow-y: auto; 
+  background: transparent; /* ✨ Fully transparent right side */
+}
+
+.section-title {
+  font-size: 1.5rem; margin-bottom: 24px; display: flex; align-items: center;
+  gap: 12px; color: var(--text-main); padding-bottom: 16px; 
+  border-bottom: 1px solid var(--border-color);
+  
+  /* Sticky title needs background or it overlaps ugly */
+  position: sticky; top: -30px; 
+  z-index: 5; 
+  margin-top: -10px; /* Adjust for padding */
+}
+
+.jobs-list { display: flex; flex-direction: column; gap: 20px; }
+
+/* Job Card Styling */
+.job-card-detailed {
+  /* Glass card for jobs */
+  background: rgba(255, 255, 255, 0.03); 
+  border: 1px solid var(--border-color);
+  border-radius: 16px; padding: 24px; transition: transform 0.2s ease;
+}
+.job-card-detailed:hover { 
+  border-color: var(--primary-orange); 
+  transform: translateY(-2px); 
+  background: var(--bg-card); /* Solid on hover */
+  box-shadow: var(--shadow-card); 
+}
+
+.job-header { display: flex; justify-content: space-between; margin-bottom: 12px; }
+.job-header h3 { margin: 0; font-size: 1.2rem; color: var(--text-main); }
+
+.job-tags { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+.tag {
+  background: rgba(255,255,255,0.05); padding: 4px 10px; border-radius: 6px;
+  font-size: 0.8rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px;
+}
+.job-desc { font-size: 0.95rem; color: var(--text-muted); margin-bottom: 20px; line-height: 1.6; }
+
+/* Widgets Styling */
+.widget-card {
+  background: rgba(255, 255, 255, 0.03); 
+  border: 1px solid var(--border-color);
+  border-radius: 16px; padding: 20px;
+}
+.widget-card h4 { margin: 0 0 16px 0; font-size: 1rem; color: var(--text-main); display: flex; gap: 8px; }
+
+.chat-box textarea {
+  width: 94%; background: rgba(0,0,0,0.2); border: 1px solid var(--border-color);
+  border-radius: 12px; padding: 12px; color: var(--text-main); margin-bottom: 12px; resize: none;
+}
+
+.input-base {
+    width: 94%; background: rgba(0,0,0,0.2); border: 1px solid var(--border-color);
+  border-radius: 12px; padding: 12px; color: var(--text-main); margin-bottom: 12px; resize: none;
+}
+
+/* Reviews */
 .review-bubble {
-    background: rgba(241,245,249,0.08);
-    padding: 20px;
-    border-radius: 20px;
-    margin-bottom: 15px;
-   
+  background: rgba(0,0,0,0.2); padding: 12px; border-radius: 12px; margin-bottom: 10px;
 }
-.light-mode .review-bubble { background: #F1F5F9; }
-.review-comment { color: var(--text-primary); font-style: italic; margin-bottom: 10px; }
+.review-comment { font-style: italic; font-size: 0.9rem; color: var(--text-main); margin-bottom: 6px; }
+.review-meta { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); }
 
-.review-controls {
-    display: flex; align-items: center; gap: 10px; margin: 15px 0;
+/* Buttons */
+.btn-primary {
+  background: var(--primary-orange); color: white; border: none; padding: 10px 20px;
+  border-radius: 10px; font-weight: 600; cursor: pointer; width: 100%;
 }
-.review-controls .rating-label {
-    display: flex; align-items: center; gap: 10px; font-weight: 600; color: var(--text-muted); white-space: nowrap;
-}
-.review-controls .select-input { width: 120px; padding: 8px 12px; font-size: 0.95rem; }
-
-/* ----------------------------
-   Background Orb & Animations
------------------------------ */
-.bg-gradient-orb {
-    position: absolute; top: 50%; left: 50%; width: 600px; height: 600px;
-    background: radial-gradient(circle, rgba(238,116,40,0.15) 0%, rgba(0,212,255,0.1) 50%, transparent 100%);
-    border-radius: 50%;
-    transform: translate(-50%,-50%);
-    filter: blur(80px);
-    z-index: 0;
-    animation: float-animation 8s ease-in-out infinite;
+.btn-primary:hover:not(:disabled) { background: var(--primary-orange-hover); }
+.btn-secondary {
+  background: var(--primary-orange); border: 1px solid var(--border-color); color: var(--text-main);
+  padding: 5px 10px; border-radius: 10px; cursor: pointer; width: 100%;
 }
 
-.reveal-on-scroll {
-    opacity: 0; transform: translateY(30px);
-    animation: slideUpFadeIn 0.6s cubic-bezier(0.25,1,0.5,1) forwards;
+/* Badge */
+.badge {
+  padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;
+  display: inline-flex; align-items: center; gap: 4px;
 }
+.badge-cyan { background: rgba(6,182,212,0.15); color: #06b6d4; }
+.badge-default { background: rgba(255,255,255,0.05); color: var(--text-muted); border: 1px solid var(--border-color); }
 
-@keyframes slideUpFadeIn { to { opacity:1; transform:translateY(0); } }
-@keyframes float-animation {
-    0% { transform: translate(-50%, -50%) scale(1); }
-    50% { transform: translate(-55%, -45%) scale(1.05); }
-    100% { transform: translate(-50%, -50%) scale(1); }
-}
+/* =========================================
+   4. RESPONSIVE (< 1024px)
+   ========================================= */
+.mobile-header-controls { display: none; }
 
-/* ----------------------------
-   Responsive
------------------------------ */
-@media (max-width: 1200px) { .details-grid { display: block; } }
 @media (max-width: 1024px) {
-    .main-layout { grid-template-columns: 1fr; height: auto; }
-    .companies-page-container { padding: 40px 15px; }
-
-    .main-layout.details-visible .details-panel-container {
-        display: block; position: fixed; top:0; left:0;
-        width: 100%; height:100%; z-index:1010; padding:0;
-        overflow-y:auto; background-color: var(--bg-primary);
-    }
-    .main-layout.details-visible .list-column { display: none; }
-
-    .details-content { max-height:none; position:static; border-radius:0; min-height:100vh; padding:30px 20px; }
-    .close-btn { display: none; }
+  .details-content-grid { 
+    grid-template-columns: 1fr; 
+    overflow-y: auto; 
+  }
+  
+  .left-panel-stack, .jobs-section {
+    overflow: visible; height: auto; border-right: none; background: transparent;
+  }
+  
+  .left-panel-stack { display: contents; } 
+  .details-hero { order: 1; }
+  .jobs-section { order: 2; padding: 20px; }
+  .widgets-column { order: 3; padding: 20px; }
 }
 
-/* ----------------------------
-   Search Bar
------------------------------ */
-.search-bar {
-    max-width: 100%;
-    margin-bottom: 30px;
-    display: flex;
-    justify-content: center;
-}
-
-.search-bar input {
-    width: 100%;
-    max-width: 500px;
-    padding: 14px 20px;
-    border-radius: 12px;
-    border: 1px solid var(--border-color);
-    background-color: var(--card-bg);
-    color: var(--text-primary);
-    font-size: 1rem;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-}
-
-.search-bar input::placeholder {
-    color: var(--text-muted);
-}
-
-.search-bar input:focus {
-    border-color: var(--accent-primary);
-    box-shadow: 0 0 0 3px rgba(238, 116, 40, 0.25);
-    outline: none;
-}
-
-/* Optional: Add a small search icon inside the input */
-.search-bar {
-    position: relative;
-}
-
-.search-bar input {
-    padding-left: 40px; /* space for icon */
-}
-
-.search-bar::before {
-    content: '🔍';
-    position: absolute;
-    left: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 1rem;
-    pointer-events: none;
-    color: var(--text-muted);
-}
-.lucide-icon {
-  vertical-align: middle;
-  margin-right: 4px;
-  stroke-width: 2;
-}
-
-/* ----------------------------
-    Details Panel (Refined Company Profile)
------------------------------ */
-
-/* Adjusting the main container for the profile section */
-.company-profile {
-    display: flex; /* Enable flex for initial alignment */
-    flex-direction: column; /* Stack elements by default */
-    align-items: flex-start;
-    padding-bottom: 20px;
-    border-bottom: 1px solid var(--border-color);
-    margin-bottom: 30px;
-}
-
-/* Flex row for logo and title/stats block */
-.profile-header-group {
-    display: flex;
-    align-items: center;
-    gap: 25px;
-    margin-bottom: 20px;
-    width: 100%;
-}
-
-.profile-logo {
-    width: 80px;
-    height: 80px;
-    min-width: 80px; /* Ensures logo doesn't shrink */
-    border-radius: 50%;
-    object-fit: contain;
-    background: var(--card-bg); /* Add background for visibility */
-    padding: 5px;
-    border: 3px solid var(--accent-primary);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-}
-
-.company-profile h2 {
-    font-size: 2.2rem; /* Larger, more prominent title */
-    margin: 0;
-    line-height: 1.1;
-    flex-grow: 1;
-}
-
-/* Styling for CEO/contact info */
-.company-profile p:not(.description-text) {
-    font-size: 0.95rem;
-    color: var(--text-muted);
-    margin: 5px 0;
-}
-
-/* Enhanced description text */
-.description-text {
-    font-size: 1.05rem;
-    line-height: 1.6;
-    margin-top: 15px;
-    margin-bottom: 25px;
-    padding: 15px;
-    background: rgba(241, 245, 249, 0.05); /* Subtle background for description */
-    border-left: 4px solid var(--accent-secondary);
-    border-radius: 8px;
-}
-.light-mode .description-text {
-    background: rgba(15, 23, 42, 0.03);
-}
-
-.company-profile .stats {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    margin-top: 10px;
-    padding-top: 15px;
-    border-top: 1px dashed var(--border-color);
-    width: 100%;
-}
-
-/* Specific styling for stats badges in the profile */
-.company-profile .stats .badge {
-    padding: 8px 16px;
-    font-size: 0.9rem;
-    font-weight: 700;
-}
-.company-profile .stats .badge .lucide-icon {
-    margin-right: 6px;
-}
-.contact-info-block {
-    flex-shrink: 0; /* Prevents shrinking */
-    text-align: left; /* Aligns text within the block to the right */
-    font-size: 0.9rem;
-    padding: 10px 0;
-    
-    /* Subtle border to separate it visually */
-    border-left: 1px solid var(--border-color); 
-    padding-left: 20px;
+@media (max-width: 600px) {
+  .top-bar-layout { flex-direction: column-reverse; gap: 16px; padding: 16px; }
+  .search-wrapper, .companies-ribbon { width: 100%; }
+  .details-hero { padding: 20px; }
+  .hero-text h1 { font-size: 1.8rem; }
 }

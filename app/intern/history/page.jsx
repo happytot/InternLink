@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import './ApplicationHistory.css'; 
-import InternNav from '../../components/InternNav';
 import { useState, useEffect, useCallback } from 'react';
 import { getApplicationHistory, startInternship, cancelApplication } from './actions';
 import { RefreshCcw, CheckCircle, Clock, XCircle, ChevronRight, Loader2, PlayCircle, Filter, Zap } from 'lucide-react';
@@ -11,62 +10,49 @@ import FloatingAIChatWithCharts from '../../components/chatbot';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 
 // ... (Status Helpers remain the same) ...
-
 const formatStatusText = (status) => {
     switch (status) {
-        case 'Pending':
-            return 'Pending Review';
-        case 'Company_Approved_Waiting_Coordinator':
-            return 'Company Approved (Awaiting Coordinator)';
-        case 'approved_by_coordinator': 
-            return 'Ready to Start';
-        case 'ongoing': 
-            return 'Active Internship';
-        case 'Accepted':
-            return 'Accepted (Deprecated)';
-        case 'Rejected':
-            return 'Application Rejected';
-        default:
-            return status;
+        case 'Pending': return 'Pending Review';
+        case 'Company_Approved_Waiting_Coordinator': return 'Company Approved (Awaiting Coordinator)';
+        case 'approved_by_coordinator': return 'Ready to Start';
+        case 'ongoing': return 'Active Internship';
+        case 'Accepted': return 'Accepted (Deprecated)';
+        case 'Rejected': return 'Application Rejected';
+        default: return status;
     }
 };
 
 const getStatusClass = (status) => {
     switch (status) {
         case 'Pending':
-        case 'Company_Approved_Waiting_Coordinator':
-            return 'pending'; 
-        case 'approved_by_coordinator':
-            return 'ready'; 
+        case 'Company_Approved_Waiting_Coordinator': return 'pending'; 
+        case 'approved_by_coordinator': return 'ready'; 
         case 'ongoing':
-        case 'Accepted':
-            return 'ongoing'; 
-        case 'Rejected':
-            return 'rejected'; 
-        default:
-            return 'pending';
+        case 'Accepted': return 'ongoing'; 
+        case 'Rejected': return 'rejected'; 
+        default: return 'pending';
     }
 };
 
 export default function ApplicationHistory() {
-     const supabase = createClientComponentClient(); 
+    const supabase = createClientComponentClient(); 
     const [applications, setApplications] = useState([]);
     const [loading, setLoading] = useState(true);
     const [message, setMessage] = useState('');
     const [processingId, setProcessingId] = useState(null);
     const [filterStatus, setFilterStatus] = useState('All'); 
     const [lastUpdated, setLastUpdated] = useState(Date.now()); 
- const [user, setUser] = useState(null);
+    const [user, setUser] = useState(null);
 
-  // Fetch logged-in user
-  useEffect(() => {
-    const getUser = async () => {
-      const { data } = await supabase.auth.getUser();
-      if (data?.user) setUser(data.user);
-    };
-    getUser();
-  }, [supabase]);
-    // Fetch, Start, Cancel logic remains the same...
+    // Fetch logged-in user
+    useEffect(() => {
+        const getUser = async () => {
+            const { data } = await supabase.auth.getUser();
+            if (data?.user) setUser(data.user);
+        };
+        getUser();
+    }, [supabase]);
+
     const fetchApplications = useCallback(async () => {
         setLoading(true);
         const result = await getApplicationHistory();
@@ -89,8 +75,7 @@ export default function ApplicationHistory() {
     }, [fetchApplications]);
 
     const handleStartInternship = async (appId) => {
-        const confirmed = window.confirm("Are you ready to officially start your OJT hours? This will unlock your logbook.");
-        if (!confirmed) return;
+        if (!confirm("Are you ready to officially start your OJT hours? This will unlock your logbook.")) return;
 
         setProcessingId(appId);
         try {
@@ -102,20 +87,18 @@ export default function ApplicationHistory() {
                 toast.error(result.error);
             }
         } catch (error) {
-            toast.error("An unexpected error occurred while starting the internship.");
+            toast.error("An unexpected error occurred.");
         } finally {
             setProcessingId(null);
         }
     };
 
     const handleCancelApplication = async (appId) => {
-        const confirmed = window.confirm("Are you sure you want to cancel this application?");
-        if (!confirmed) return;
+        if (!confirm("Are you sure you want to cancel this application?")) return;
 
         setProcessingId(appId);
         try {
             const result = await cancelApplication(appId);
-
             if (result.success) {
                 toast.info(result.message);
                 setApplications(prev => prev.filter(app => app.id !== appId));
@@ -124,7 +107,7 @@ export default function ApplicationHistory() {
                 toast.error(result.error);
             }
         } catch (err) {
-            toast.error("An unexpected error occurred while canceling.");
+            toast.error("An unexpected error occurred.");
         } finally {
             setProcessingId(null);
         }
@@ -132,19 +115,16 @@ export default function ApplicationHistory() {
 
     const filteredApplications = applications.filter(app => {
         if (filterStatus === 'All') return true;
-        
         const statusMap = {
             'Pending': ['Pending', 'Company_Approved_Waiting_Coordinator'],
             'Ready': ['approved_by_coordinator'],
             'Ongoing': ['ongoing'],
             'Rejected': ['Rejected'],
         };
-
         return statusMap[filterStatus]?.includes(app.status) || false;
     });
 
-
-    // --- Table View ---
+    // --- Components ---
     const ApplicationTable = ({ applications }) => (
         <div className="history-table-wrapper table-view">
             <table>
@@ -164,7 +144,6 @@ export default function ApplicationHistory() {
                             <td colSpan="6" className="empty-state-cell"> 
                                 <Filter size={32} className="text-muted" style={{ marginBottom: '10px' }}/>
                                 <p>No applications found matching the {filterStatus} filter.</p>
-                                {filterStatus !== 'All' && <p>Try switching your filter back to All.</p>}
                                 {filterStatus === 'All' && <Link href="/intern/listings" className="link-button">Browse Internships</Link>}
                             </td>
                         </tr>
@@ -187,11 +166,7 @@ export default function ApplicationHistory() {
                                             disabled={processingId === app.id}
                                             className="btn-start-internship"
                                         >
-                                            {processingId === app.id ? (
-                                                <Loader2 className="icon-spin" size={16} />
-                                            ) : (
-                                                <PlayCircle size={14} />
-                                            )} Start
+                                            {processingId === app.id ? <Loader2 className="icon-spin" size={16} /> : <PlayCircle size={14} />} Start
                                         </button>
                                     ) : app.status === 'ongoing' ? (
                                         <span className="text-active"><CheckCircle size={14} /> Active</span>
@@ -204,7 +179,6 @@ export default function ApplicationHistory() {
                                             {processingId === app.id ? <Loader2 className="icon-spin" size={14} /> : <XCircle size={14} />} Cancel
                                         </button>
                                     ) : (
-                                        // Icon-only link for table view
                                         <Link href={`/intern/jobs/${app.job_post_id}`} className="view-link" title="View Details">
                                             <ChevronRight size={16} />
                                         </Link>
@@ -218,15 +192,12 @@ export default function ApplicationHistory() {
         </div>
     );
 
-    // --- Card View ---
     const ApplicationCards = ({ applications }) => (
         <div className="job-grid card-view">
             {applications.length === 0 ? (
                 <div className="empty-state-card">
                     <Filter size={32} className="text-muted" style={{ marginBottom: '10px' }}/>
                     <p>No applications found matching the **'{filterStatus}'** filter.</p>
-                    {filterStatus !== 'All' && <p>Try switching your filter back to '**All**'.</p>}
-                    {filterStatus === 'All' && <Link href="/intern/listings" className="link-button">Browse Internships</Link>}
                 </div>
             ) : (
                 applications.map(app => (
@@ -239,8 +210,7 @@ export default function ApplicationHistory() {
                         </div>
                         <p className="company-name">{app.companies?.name || 'Unknown Company'}</p>
                         <p className="date-applied">Applied: {new Date(app.created_at).toLocaleDateString()}</p>
-                        <p className="date-applied">Updated: {new Date(app.updated_at || app.created_at).toLocaleDateString()}</p> 
-
+                        
                         <div className="card-action-area">
                             {app.status === 'approved_by_coordinator' ? (
                                 <button 
@@ -248,7 +218,7 @@ export default function ApplicationHistory() {
                                     disabled={processingId === app.id}
                                     className="btn-start-internship full-width"
                                 >
-                                    {processingId === app.id ? <Loader2 className="icon-spin" size={14} /> : <PlayCircle size={14} />} Start Internship
+                                    Start Internship
                                 </button>
                             ) : app.status === 'ongoing' ? (
                                 <div className="text-active center-text"><CheckCircle size={14} /> Internship Active</div>
@@ -258,7 +228,7 @@ export default function ApplicationHistory() {
                                     disabled={processingId === app.id}
                                     className="btn-cancel full-width"
                                 >
-                                    {processingId === app.id ? <Loader2 className="icon-spin" size={14} /> : <XCircle size={14} />} Cancel
+                                    Cancel
                                 </button>
                             ) : (
                                 <Link href={`/intern/jobs/${app.job_post_id}`} className="view-link full-width">
@@ -272,74 +242,32 @@ export default function ApplicationHistory() {
         </div>
     );
 
-    if (loading) {
-        // ... (Loading state will use the new layout structure) ...
-        return (
-            <>
-              <div className="history-container loading-state">
-                <div className="header-area">
-                    <div className="title-group">
-                        <h1><Clock size={28} className="icon-inline"/> Loading History...</h1>
-                    </div>
-                   
-                </div>
-                
-                <div className="main-content-area">
-                    {/* Skeleton for Filters */}
-                    <div className="filter-controls-container" style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <div className="filter-buttons">
-                            <div className="skeleton-cell" style={{ width: '50px', height: '30px', borderRadius: '20px' }}/>
-                            <div className="skeleton-cell" style={{ width: '80px', height: '30px', borderRadius: '20px' }}/>
-                            <div className="skeleton-cell" style={{ width: '70px', height: '30px', borderRadius: '20px' }}/>
-                        </div>
-                        <div className="skeleton-cell" style={{ width: '36px', height: '36px', borderRadius: '50%' }}/>
-                    </div>
-                    {/* Table Skeleton */}
-                    <div className="history-table-wrapper table-view">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Internship Title</th>
-                                <th>Company</th>
-                                <th>Date Applied</th>
-                                <th>Last Updated</th> 
-                                <th>Status</th>
-                                <th className="action-cell">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {[1,2,3].map((_, idx) => (
-                                <tr key={idx}>
-                                    <td><div className="skeleton-cell" style={{ width: '90%' }}/></td>
-                                    <td><div className="skeleton-cell" style={{ width: '70%' }}/></td>
-                                    <td><div className="skeleton-cell" style={{ width: '50%' }}/></td>
-                                    <td><div className="skeleton-cell" style={{ width: '50%' }}/></td> 
-                                    <td><div className="skeleton-cell" style={{ width: '70%' }}/></td>
-                                    <td><div className="skeleton-cell" style={{ width: '60px', height: '30px' }}/></td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                    </div>
-                </div>
-
-              </div>
-              <InternNav />
-            </>
-          );
-    }
-
     const totalCount = applications.length;
     const activeCount = applications.filter(a => a.status === 'ongoing').length;
     const readyCount = applications.filter(a => a.status === 'approved_by_coordinator').length;
 
+    // --- Loading State ---
+    if (loading) {
+        return (
+            <div className="history-container loading-state">
+                <div className="header-area">
+                    <h1><Clock size={28} className="icon-inline"/> Loading History...</h1>
+                </div>
+                <div className="main-content-area">
+                    {/* Simple Skeleton Representation */}
+                    <div className="skeleton-cell" style={{ width: '100%', height: '200px', borderRadius: '12px' }}/>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <>
             <div className="history-container">
-                
                 <div className="main-grid">
-                    
                     <div className="main-table-container">
+                        
+                        {/* Header Area */}
                         <div className="header-area">
                             <div className="title-group">
                                 <h1><Clock size={38} /> Application History</h1>
@@ -347,39 +275,34 @@ export default function ApplicationHistory() {
                                     Last Updated: {new Date(lastUpdated).toLocaleTimeString()}
                                 </p>
                             </div>
-                          <div className="summary-card">
-                        <div>
-                            <p>Total Applications</p>
-                            <span className="count-large">{totalCount}</span>
-                        </div>
-                        
-                        <hr style={{ borderColor: 'var(--border-subtle)', margin: '15px 0' }} />
 
-                        <div>
-                            <p>Ready to Start</p>
-                            <span className="count-large" style={{ color: 'var(--clr-status-cyan)' }}>{readyCount}</span>
-                        </div>
-
-                        <hr style={{ borderColor: 'var(--border-subtle)', margin: '15px 0' }} />
-
-                        {activeCount > 0 ? (
-                            <div className="active-indicator">
-                                <CheckCircle size={20} />
-                                {activeCount} Internship{activeCount > 1 ? 's' : ''} Active
+                            <div className="summary-card">
+                                <div>
+                                    <p>Total Applications</p>
+                                    <span className="count-large">{totalCount}</span>
+                                </div>
+                                <hr style={{ borderColor: 'var(--border-color)', margin: '15px 0' }} />
+                                <div>
+                                    <p>Ready to Start</p>
+                                    <span className="count-large" style={{ color: 'var(--secondary-cyan)' }}>{readyCount}</span>
+                                </div>
+                                <hr style={{ borderColor: 'var(--border-color)', margin: '15px 0' }} />
+                                {activeCount > 0 ? (
+                                    <div className="active-indicator">
+                                        <CheckCircle size={20} />
+                                        {activeCount} Internship{activeCount > 1 ? 's' : ''} Active
+                                    </div>
+                                ) : (
+                                    <div className="active-indicator" style={{ color: 'var(--primary-orange)' }}>
+                                        <Zap size={20} /> Time to Start!
+                                    </div>
+                                )}
                             </div>
-                        ) : (
-                            <div className="active-indicator" style={{ color: 'var(--clr-brand-orange)' }}>
-                                <Zap size={20} />
-                                Time to Start!
-                            </div>
-                        )}
-                    </div>
-                            
                         </div>
 
                         {message && <p className="history-summary error-message">{message}</p>}
 
-                        {/* Filter Controls */}
+                        {/* Filters */}
                         <div className="filter-controls-container">
                             <div className="filter-buttons">
                                 {['All', 'Pending', 'Ready', 'Ongoing', 'Rejected'].map(status => (
@@ -400,13 +323,10 @@ export default function ApplicationHistory() {
                         <ApplicationTable applications={filteredApplications} />
                         <ApplicationCards applications={filteredApplications} />
                     </div>
-
-                    {/* Summary Card (New Feature) */}
-                    
                 </div>
             </div>
-  {user?.id && <FloatingAIChatWithCharts studentId={user.id} />}
-            <InternNav />
+            
+            {user?.id && <FloatingAIChatWithCharts studentId={user.id} />}
         </>
     );
 }

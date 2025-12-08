@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react'; // Added useMemo
 // 1. UPDATED IMPORT: Use the auth helper instead of the static client
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { toast, Toaster } from 'sonner';
 import { FaUserGraduate, FaBuilding, FaBriefcase, FaUniversity } from 'react-icons/fa';
+import { Search, ArrowDownUp } from 'lucide-react'; // Added Search and ArrowDownUp for icons
 import './internships.css';
 
 // Font imports (Keep these if not in your root layout, otherwise remove)
@@ -20,6 +21,11 @@ export default function CoordinatorPlacements() {
 
     const [placements, setPlacements] = useState([]);
     const [loading, setLoading] = useState(true);
+    
+    // NEW STATE FOR SEARCH AND SORT
+    const [searchQuery, setSearchQuery] = useState('');
+    // Default sort is by totalHours, descending (highest first)
+    const [sortCriteria, setSortCriteria] = useState({ key: 'totalHours', direction: 'descending' });
 
     // 1. FETCH LOGIC
     const fetchPlacements = async (isBackgroundUpdate = false) => {
@@ -89,8 +95,8 @@ export default function CoordinatorPlacements() {
                 };
             });
 
-            // Sort by hours (highest first)
-            setPlacements(processedData.sort((a, b) => b.totalHours - a.totalHours));
+            // Set the placements (sorting will be handled by useMemo)
+            setPlacements(processedData);
 
         } catch (err) {
             console.error("Error:", err.message); 
@@ -125,28 +131,108 @@ export default function CoordinatorPlacements() {
 
     const isActive = (status) => {
         const s = status ? status.toLowerCase() : '';
-        return s === 'active_intern' || s === 'ongoing' || s === 'active' || s === 'ongoing';
+        return s === 'active_intern' || s === 'ongoing';
     }
 
+    const handleSortChange = (e) => {
+        const [key, direction] = e.target.value.split(':');
+        setSortCriteria({ key, direction });
+    };
+
+    // 3. FILTERING AND SORTING LOGIC using useMemo
+    const sortedAndFilteredPlacements = useMemo(() => {
+        const query = searchQuery.toLowerCase();
+        
+        // 1. Filter
+        const filtered = placements.filter(app => 
+            app.profiles.fullname.toLowerCase().includes(query) ||
+            app.profiles.department.toLowerCase().includes(query) ||
+            app.job_posts?.title?.toLowerCase().includes(query) ||
+            app.job_posts?.companies?.name?.toLowerCase().includes(query)
+        );
+
+        // 2. Sort
+        return filtered.sort((a, b) => {
+            let aVal, bVal;
+            const { key, direction } = sortCriteria;
+
+            if (key === 'totalHours') {
+                aVal = a.totalHours;
+                bVal = b.totalHours;
+            } else if (key === 'name') {
+                aVal = a.profiles.fullname.toLowerCase();
+                bVal = b.profiles.fullname.toLowerCase();
+            } else if (key === 'company') {
+                aVal = a.job_posts?.companies?.name?.toLowerCase() || '';
+                bVal = b.job_posts?.companies?.name?.toLowerCase() || '';
+            } else {
+                return 0; // No valid key
+            }
+
+            // Comparison
+            if (aVal < bVal) {
+                return direction === 'ascending' ? -1 : 1;
+            }
+            if (aVal > bVal) {
+                return direction === 'ascending' ? 1 : -1;
+            }
+            return 0;
+        });
+
+    }, [placements, searchQuery, sortCriteria]);
+
     return (
-        // ✅ 1. Standard Dashboard Inner Container (Layout wrapper handles the rest)
         <div className="dashboard-inner">
+            <Toaster position="bottom-right" />
             
             {/* Header Section */}
             <div className="header-section">
                 <h2 className="dash-title">Internship Monitoring</h2>
                 <p className="dash-subtitle">Track active interns and their logged hours.</p>
+
+                {/* Search and Sort Bar */}
+                <div className="control-bar">
+                    <div className="search-container">
+                        <Search size={18} className="search-icon" />
+                        <input
+                            type="text"
+                            placeholder="Search by student, company, or role..."
+                            className="search-input"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                        />
+                    </div>
+                    <div className="sort-container">
+                        <ArrowDownUp size={16} className="sort-icon" />
+                        <select 
+                            className="sort-select" 
+                            onChange={handleSortChange} 
+                            value={`${sortCriteria.key}:${sortCriteria.direction}`}
+                        >
+                            <option disabled>SORT BY:</option>
+                            <option value="totalHours:descending">Hours Rendered (Highest)</option>
+                            <option value="totalHours:ascending">Hours Rendered (Lowest)</option>
+                            <option value="name:ascending">Student Name (A-Z)</option>
+                            <option value="name:descending">Student Name (Z-A)</option>
+                            <option value="company:ascending">Company Name (A-Z)</option>
+                            <option value="company:descending">Company Name (Z-A)</option>
+                        </select>
+                    </div>
+                </div>
+
             </div>
 
             {loading ? (
                 <div className="loading-state">Loading placements data...</div>
-            ) : placements.length === 0 ? (
+            ) : sortedAndFilteredPlacements.length === 0 ? (
                 <div className="card empty-state-card">
-                    <p className="empty-state-text">No active placements found.</p>
+                    <p className="empty-state-text">
+                        No active placements found or match your search criteria.
+                    </p>
                 </div>
             ) : (
                 <div className="placements-list">
-                    {placements.map((app) => (
+                    {sortedAndFilteredPlacements.map((app) => (
                         <div key={app.id} className={`placement-card ${isActive(app.status) ? 'active-border' : 'waiting-border'}`}>
                             
                             {/* Card Header */}
@@ -157,7 +243,7 @@ export default function CoordinatorPlacements() {
                                 </h3>
                                 {isActive(app.status) ? 
                                     <span className="status-badge badge-active"><span className="dot green"></span> Active</span> : 
-                                    <span className="status-badge badge-waiting"><span className="dot orange"></span> Waiting</span>
+                                    <span className="status-badge badge-waiting"><span className="dot orange"></span> Ongoing</span>
                                 }
                             </div>
                             
@@ -183,28 +269,24 @@ export default function CoordinatorPlacements() {
                             <div className="card-spacer"></div>
 
                             {/* Progress Bar Section */}
-                            {isActive(app.status) || true ? ( // Showing progress for everyone in list
-                                <div className="progress-section">
-                                    <div className="progress-labels">
-                                        <span className="progress-title">Hours Rendered</span>
-                                        <span className="progress-numbers">
-                                            <strong>{app.totalHours.toFixed(0)}</strong> / {app.required}
-                                        </span>
-                                    </div>
-                                    <div className="progress-track">
-                                        <div 
-                                            className="progress-fill" 
-                                            style={{ 
-                                                width: `${app.progress}%`,
-                                                transition: 'width 1s ease-out',
-                                                backgroundColor: app.progress >= 100 ? 'var(--color-success)' : 'var(--primary-orange)'
-                                            }}
-                                        ></div>
-                                    </div>
+                            <div className="progress-section">
+                                <div className="progress-labels">
+                                    <span className="progress-title">Hours Rendered</span>
+                                    <span className="progress-numbers">
+                                        <strong>{app.totalHours.toFixed(0)}</strong> / {app.required}
+                                    </span>
                                 </div>
-                            ) : (
-                                <div className="waiting-message">Student hasn't started yet.</div>
-                            )}
+                                <div className="progress-track">
+                                    <div 
+                                        className="progress-fill" 
+                                        style={{ 
+                                            width: `${app.progress}%`,
+                                            transition: 'width 1s ease-out',
+                                            backgroundColor: app.progress >= 100 ? 'var(--color-success)' : 'var(--primary-orange)'
+                                        }}
+                                    ></div>
+                                </div>
+                            </div>
                         </div>
                     ))}
                 </div>

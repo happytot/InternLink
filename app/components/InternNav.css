@@ -6,7 +6,7 @@
 
 /* Sidebar Base */
 .intern-sidebar {
-  width: 230px;
+  width: 210px;
   height: 95%;
   background-color: var(--bg-card);
   border-right: 1px solid var(--border-color);
@@ -193,8 +193,8 @@
     position: fixed;
     top: 0;
     left: 0;
-    height: 100vh; /* Full height */
-    width: 280px;  /* Slightly wider for better mobile touch */
+    height: 95%; /* Full height */
+    width: 210px;  /* Slightly wider for better mobile touch */
     transform: translateX(-100%); /* Hide off-screen */
     
     /* 🛠️ FIX: Ensure this is HIGHER than the header (which is usually 1001) */
@@ -238,8 +238,8 @@
   .intern-sidebar {
     position: static; 
     transform: none !important;
-    width: 260px;
-    height: 100%;
+    width: 210px;
+    height: 95%;
     z-index: 1; /* Reset z-index for desktop context */
     box-shadow: none;
   }

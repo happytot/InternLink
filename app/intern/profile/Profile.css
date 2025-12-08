@@ -1,123 +1,93 @@
-/* src/pages/Profile.css */
+/* src/app/intern/profile/Profile.css */
 
 /* =========================================
-   1. ROOT VARIABLES (InternLink Design System)
-   ========================================= */
-:root {
-    /* --- Core Colors: Dark Mode Default (Tailwind Slate/Zinc/Orange) --- */
-    --primary-orange: #EE7428; /* Primary Accent (Dark) */
-    --secondary-cyan: #00d4ff; /* Secondary Accent */
-    
-    --background-dark: #021217; /* InternLink Dark Background */
-    --surface-card: #0F172A; /* Slate-900 (Used for cards in dark mode) */
-    
-    --text-main: #F1F5F9; /* Slate-100 (Main text in dark mode) */
-    --text-muted: #94A3B8; /* Slate-400 (Muted text) */
-    --primary-dark: #F1F5F9; /* Overriding old dark color with white/light text */
-    
-    --border-color: #334155; /* Slate-700 (Dark mode border) */
-    --card-shadow: 0 10px 20px rgba(0, 0, 0, 0.25); /* Deeper shadow for cards */
-    --input-bg: #1E293B; /* Slate-800 for inputs */
-    --input-disabled-bg: #0F172A;
-
-    /* --- UI Components --- */
-    --radius-card: 24px;
-    --radius-button: 12px;
-    --radius-pill: 50px;
-    
-    /* Skeleton (Adjusted for dark background) */
-    --skeleton-light: #1E293B;
-    --skeleton-dark: #334155;
-    
-    /* Glassmorphism Background (Use a subtle dark color with blur) */
-    --bg-glass: rgba(15, 23, 42, 0.8); /* Slate-900 with transparency */
-}
-
-/* =========================================
-   1.1 LIGHT MODE OVERRIDES
-   ========================================= */
-.light-mode {
-    --primary-orange: #EA580C; /* Primary Accent (Light) */
-    --secondary-cyan: #3b82f6; /* Secondary Accent (Blue for light mode) */
-
-    --background-dark: #F8FAFC; /* InternLink Light Background */
-    --surface-card: #FFFFFF; /* White for cards in light mode */
-
-    --text-main: #0F172A; /* Slate-900 (Main text in light mode) */
-    --text-muted: #64748B; /* Slate-500 (Muted text) */
-    --primary-dark: #0F172A; /* Headings in light mode */
-
-    --border-color: #E2E8F0; /* Slate-200 (Light mode border) */
-    --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* Lighter shadow */
-    --input-bg: #FFFFFF;
-    --input-disabled-bg: #F1F5F9;
-
-    /* Glassmorphism Background */
-    --bg-glass: rgba(255, 255, 255, 0.8);
-}
-
-
-/* =========================================
-   2. BASE LAYOUT & TYPOGRAPHY
+   1. BASE LAYOUT & TYPOGRAPHY
    ========================================= */
 
 .profile-wrapper {
-    min-height: 100vh;
-    background-color: var(--background-dark); /* Use new variable */
-    padding-top: 80px;
-    padding-bottom: 90px;
-    color: var(--text-main); /* Ensure base text is main color */
+    /* 🔒 FIX: Make page fixed height (non-scrollable body) */
+    height: 100%; 
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+
+    /* 🎨 ADAPT: Global Colors */
+    background-color: var(--bg-main);
+    color: var(--text-main);
+
+
 }
 
 .profile-content-area {
     width: 95%;
-    max-width: none;
-    margin: 20px auto 0; /* Centered content on wider screens */
+    max-width: 1300px;
+    margin: 20px auto 0; 
     padding: 0 32px;
+    
+    /* 🛠️ FIX: Layout for internal scrolling */
     display: flex;
     flex-direction: column;
     gap: 20px;
- 
+    flex: 1; /* Fill remaining space */
+    min-height: 0; /* Crucial for nested scroll */
 }
-
 
 .page-header-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 0px;
+    margin-bottom: 0px; /* Preserved */
+    flex-shrink: 0; /* Don't shrink header */
 }
 
 .page-title {
-    font-family: 'Plus Jakarta Sans', sans-serif; /* Heading Font */
+    font-family: var(--font-heading);
     font-size: 1.75rem;
     font-weight: 800;
-    color: var(--primary-dark);
+    color: var(--text-main);
     display: flex;
     align-items: center;
     gap: 10px;
 }
 
 /* =========================================
-   3. BENTO GRID (3 COLUMNS)
+   2. BENTO GRID (Scrollable Columns)
    ========================================= */
 
 .profile-bento-grid {
     display: grid;
-    /* Define explicit column widths for desktop */
+    /* 📐 PRESERVED: Your specific columns */
     grid-template-columns: 380px 1fr 340px; 
     gap: 24px;
     align-items: start;
     width: 100%;
+    
+    /* 🛠️ FIX: Internal scrolling logic */
+    flex: 1; 
+    overflow: hidden; /* Prevent grid overflow */
+    height: 100%;
 }
 
 .bento-col {
     display: flex;
     flex-direction: column;
     gap: 24px;
+    
+    /* 🛠️ FIX: Allow columns to scroll independently */
+    height: 100%;
+    overflow-y: auto; 
+    padding-right: 6px; /* Space for scrollbar */
+    padding-bottom: 20px; /* Bottom spacing for scroll */
 }
 
-.bento-col.col-left .form-group { /* Use direct class for better specificity/clarity */
+/* Custom Scrollbar for Columns */
+.bento-col::-webkit-scrollbar { width: 6px; }
+.bento-col::-webkit-scrollbar-thumb { 
+    background: var(--border-color); 
+    border-radius: 4px; 
+}
+
+.bento-col.col-left .form-group {
     width: 90%;
 }
 
@@ -125,30 +95,38 @@
     width: 85%;
 }
 
+/* =========================================
+   3. CARDS & UI
+   ========================================= */
+
 .profile-card {
-    background: var(--surface-card); /* Use surface color */
-    border-radius: var(--radius-card); /* Use new radius */
+    background: var(--bg-card); /* Global */
+    border-radius: 24px; /* Preserved */
     padding: 24px;
-    border: 1px solid var(--border-color);
-    box-shadow: var(--card-shadow);
+    border: 1px solid var(--border-color); /* Global */
+    box-shadow: var(--shadow-card); /* Global */
     position: relative;
-    /* Card Hover Effect */
+    
+    /* Glass Effect */
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
-.profile-card:hover {
-    transform: translateY(-8px); /* Lift */
-    border-color: var(--primary-orange); /* Orange Glow */
-    box-shadow: 0 20px 40px -10px rgba(0,0,0,0.25); /* Deep Shadow */
-}
 
+.profile-card:hover {
+    transform: translateY(-8px);
+    border-color: var(--primary-orange);
+    box-shadow: 0 20px 40px -10px rgba(0,0,0,0.25);
+}
 
 .h-full { height: 100%; }
 
 .section-title {
-    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-family: var(--font-heading);
     font-size: 1.1rem;
     font-weight: 700;
-    color: var(--text-main); /* Use main text color */
+    color: var(--text-main);
     margin-top: 0;
     margin-bottom: 16px;
     display: flex;
@@ -157,46 +135,33 @@
 }
 
 /* =========================================
-   4. SCROLLABLE AREAS
+   4. SCROLLABLE AREAS (Internal)
    ========================================= */
 
-/* Container for scrollable content */
 .scrollable-content-area {
     overflow-y: auto;
-    padding-right: 5px; /* Space for scrollbar */
+    padding-right: 5px;
 }
 
-/* Custom Scrollbar (Adjusted for dark/light themes) */
-.scrollable-content-area::-webkit-scrollbar {
-    width: 8px; /* Slightly wider */
+.scrollable-content-area::-webkit-scrollbar { width: 8px; }
+.scrollable-content-area::-webkit-scrollbar-track { 
+    background: var(--bg-card); border-radius: 4px; 
 }
-.scrollable-content-area::-webkit-scrollbar-track {
-    background: var(--surface-card);
-    border-radius: 4px;
+.scrollable-content-area::-webkit-scrollbar-thumb { 
+    background: var(--border-color); border-radius: 4px; 
 }
-.scrollable-content-area::-webkit-scrollbar-thumb {
-    background: var(--border-color); /* Use border color as thumb */
-    border-radius: 4px;
-}
-.scrollable-content-area::-webkit-scrollbar-thumb:hover {
-    background: var(--text-muted);
+.scrollable-content-area::-webkit-scrollbar-thumb:hover { 
+    background: var(--text-muted); 
 }
 
-/* Specific Heights to keep cards constant */
-.education-scroll {
-    max-height: 400px;
-}
-
-.skills-scroll {
-    max-height: 300px;
-    margin-top: 15px;
-}
+.education-scroll { max-height: 400px; }
+.skills-scroll { max-height: 300px; margin-top: 15px; }
 
 /* =========================================
-   5. COMPONENT SPECIFIC STYLES
+   5. COMPONENT SPECIFICS
    ========================================= */
 
-/* --- LEFT COLUMN: Personal Info --- */
+/* --- Left: Personal Info --- */
 .profile-pic-wrapper {
     display: flex;
     flex-direction: column;
@@ -208,562 +173,333 @@
 .profile-pic-container {
     width: 140px; 
     height: 140px;
-    border-radius: var(--radius-pill); /* Use pill radius for circle */
-    border: 4px solid var(--surface-card); /* Border color based on card surface */
+    border-radius: 50px; /* Preserved radius-pill value */
+    border: 4px solid var(--bg-card);
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     overflow: hidden;
-    background: var(--input-bg);
+    background: var(--bg-input);
 }
+
 .profile-avatar { width: 100%; height: 100%; object-fit: cover; }
 .placeholder-avatar { 
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
-    font-size: 3rem; 
-    color: var(--text-muted); 
+    display: flex; align-items: center; justify-content: center; 
+    font-size: 3rem; color: var(--text-muted); 
 }
 
 .btn-icon-upload {
-    position: absolute;
-    bottom: 0;
-    right: 50%;
+    position: absolute; bottom: 0; right: 50%;
     transform: translateX(50%) translateY(50%);
     background: var(--primary-orange);
-    color: white;
+    color: #ffffff;
     padding: 8px;
-    border-radius: var(--radius-pill);
+    border-radius: 50px; /* Preserved */
     cursor: pointer;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     transition: transform 0.2s;
 }
 .btn-icon-upload:hover { transform: translateX(50%) translateY(50%) scale(1.1); }
 
-.personal-details-stack .form-group {
-    margin-bottom: 16px;
-}
-
-.personal-details-stack .form-group label{
-    margin-bottom: 16px;
-}
+.personal-details-stack .form-group { margin-bottom: 16px; }
+.personal-details-stack .form-group label { margin-bottom: 16px; }
 .personal-details-stack label {
     font-size: 0.85rem;
-    color: var(--text-muted); /* Use muted text for labels */
-   padding-bottom: 5px;
-}
-.input-disabled {
-    background-color: var(--input-disabled-bg) !important;
-    color: var(--text-muted) !important;
-    cursor: not-allowed;
+    color: var(--text-muted);
+    padding-bottom: 5px;
 }
 
-/* --- CENTER COLUMN: Education & Summary --- */
-
+/* --- Center: Education & Summary --- */
 .summary-textarea {
-    width: 96%;
+    width: 94%;
     height: 230px;
     padding: 12px;
     border: 1px solid var(--border-color);
-    border-radius: var(--radius-button); /* Use button radius */
+    border-radius: 12px; /* Preserved radius-button */
     resize: none;
-    background: var(--input-bg); /* Use input background */
+    background: var(--bg-input);
     font-size: 0.95rem;
-    font-family: 'Inter', sans-serif; /* Body Font */
+    font-family: var(--font-body);
     color: var(--text-main);
     line-height: 1.5;
 }
 .summary-textarea:focus { 
     outline: 2px solid rgba(238, 116, 40, 0.2);
     border-color: var(--primary-orange); 
-    background: var(--surface-card); /* Brighter surface on focus */
+    background: var(--bg-card);
 }
 
 .card-header-flex {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16px;
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;
 }
 .card-header-flex .section-title { margin-bottom: 0; }
 
-.education-scroll {
-    max-height: 500px;
-}
-
-.education-list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.edu-input-group {
-    width: 95%;
-}
+.education-list { display: flex; flex-direction: column; gap: 12px; }
+.edu-input-group { width: 95%; }
 
 .education-item-grid {
-    background: var(--input-disabled-bg); /* Use a slightly darker background */
+    background: rgba(255,255,255,0.03); /* Subtle background */
     border: 1px solid var(--border-color);
     padding: 40px 15px 15px 15px;
-    border-radius: var(--radius-button); /* Use button radius */
+    border-radius: 12px; /* Preserved radius-button */
     position: relative;
 }
 
-.edu-input-group {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
+.edu-input-group { display: flex; flex-direction: column; gap: 8px; }
 .edu-input-group input {
-    width: 100%;
-    padding: 8px 12px;
+    width: 100%; padding: 8px 12px;
     border: 1px solid var(--border-color);
-    border-radius: 8px;
-    font-size: 0.9rem;
-    background: var(--input-bg);
-    color: var(--text-main);
+    border-radius: 8px; font-size: 0.9rem;
+    background: var(--bg-input); color: var(--text-main);
 }
 .edu-input-group input:focus { 
-    border-color: var(--primary-orange); 
-    outline: none; 
-    background: var(--surface-card);
+    border-color: var(--primary-orange); outline: none; background: var(--bg-card);
 }
 
 .btn-icon-danger {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    color: #ef4444; /* Red-500 */
-    background: none; border: none; cursor: pointer;
-    transition: color 0.2s;
+    position: absolute; top: 10px; right: 10px;
+    color: var(--color-danger);
+    background: none; border: none; cursor: pointer; transition: color 0.2s;
 }
-.btn-icon-danger:hover {
-    color: #b91c1c; /* Red-700 */
-}
+.btn-icon-danger:hover { color: #b91c1c; }
 
-/* --- RIGHT COLUMN: Resume & Skills --- */
+/* --- Right: Resume & Skills --- */
 .uploaded-file-mini {
-    background: #064E3B; /* Dark Green/Teal for contrast */
+    background: rgba(6, 78, 59, 0.4); /* Dark Green tint */
     border: 1px solid #10B981;
     padding: 12px;
-    border-radius: var(--radius-button);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-.uploaded-file-mini .light-mode {
-    background: #ECFDF5;
-    border: 1px solid #A7F3D0;
+    border-radius: 12px;
+    display: flex; justify-content: space-between; align-items: center;
 }
 .file-info-mini {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.9rem;
-    color: #34D399; /* Green text */
-    overflow: hidden;
-}
-.uploaded-file-mini .light-mode .file-info-mini {
-    color: #065F46;
+    display: flex; align-items: center; gap: 8px; font-size: 0.9rem;
+    color: #34D399; overflow: hidden;
 }
 .truncate-text {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 120px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px;
 }
 .file-actions-mini { display: flex; gap: 5px; }
+
 .btn-icon-mini {
-    background: var(--surface-card);
-    border: 1px solid var(--border-color);
-    padding: 4px;
-    border-radius: 8px;
-    cursor: pointer;
-    color: var(--text-muted);
+    background: var(--bg-card); border: 1px solid var(--border-color);
+    padding: 4px; border-radius: 8px; cursor: pointer; color: var(--text-muted);
 }
-.btn-icon-mini:hover { background: var(--input-bg); }
-.btn-icon-mini.danger { color: #ef4444; border-color: #fca5a5; }
+.btn-icon-mini:hover { background: var(--bg-input); }
+.btn-icon-mini.danger { color: var(--color-danger); border-color: #fca5a5; }
 .btn-icon-mini.danger:hover { background: #fee2e2; }
 
-.skill-input-group {
-    display: flex;
-    gap: 8px;
-}
+.skill-input-group { display: flex; gap: 8px; }
 .skill-input-group input {
-    flex: 1;
-    padding: 8px 12px;
+    flex: 1; padding: 8px 12px;
     border: 1px solid var(--border-color);
-    border-radius: 8px;
-    background: var(--input-bg);
-    color: var(--text-main);
+    border-radius: 8px; background: var(--bg-input); color: var(--text-main);
 }
+
 .btn-primary-icon {
-    background: var(--primary-orange);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    width: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
+    background: var(--primary-orange); color: white; border: none;
+    border-radius: 8px; width: 40px;
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
     transition: transform 0.2s;
 }
-.btn-primary-icon:hover { transform: translateY(-2px); } /* Button Hover */
+.btn-primary-icon:hover { transform: translateY(-2px); }
 
-.skill-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-}
+.skill-tags { display: flex; flex-wrap: wrap; gap: 8px; }
 .skill-badge {
-    background: var(--input-bg);
-    color: white;
-    padding: 6px 12px;
-    border-radius: var(--radius-pill);
-    font-size: 0.85rem;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    
-}
-.skill-tags .light-mode .skill-badge {
-    background: #fff7ed;
-    color: #c2410c;
-    border: 1px solid #ffedd5;
+    background: var(--bg-input); color: white;
+    padding: 6px 12px; border-radius: 50px;
+    font-size: 0.85rem; display: flex; align-items: center; gap: 6px;
 }
 .remove-skill { cursor: pointer; opacity: 0.6; }
 .remove-skill:hover { opacity: 1; }
 
 /* =========================================
-   6. GENERIC FORM & BUTTONS
+   6. FORMS & BUTTONS
    ========================================= */
 .form-group input, .form-group select {
-    width: 90%;
-    padding: 15px 12px;
+    width: 100%; padding: 15px 12px;
     border: 1px solid var(--border-color);
-    border-radius: var(--radius-button);
+    border-radius: 12px;
     font-size: 0.95rem;
-    background: var(--input-bg);
-    color: var(--text-main);
-    font-family: 'Inter', sans-serif;
+    background: var(--bg-input); color: var(--text-main);
+    font-family: var(--font-body);
+}
+.form-group select {
+    width: 110%; padding: 15px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    font-size: 0.95rem;
+    background: var(--bg-input); color: var(--text-main);
+    font-family: var(--font-body);
 }
 .form-group input:focus, .form-group select:focus {
     outline: 2px solid rgba(238, 116, 40, 0.2);
     border-color: var(--primary-orange);
-    background: var(--surface-card);
+    background: var(--bg-card);
 }
-
-.form-group label {
-    padding-bottom: 5px;
-}
+.form-group label { padding-bottom: 5px; }
 
 .btn-danger-outline {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 16px;
-    border: 1px solid #fca5a5;
-    color: #ef4444; /* Red-500 */
-    background: var(--surface-card); /* Card Surface for background */
-    border-radius: var(--radius-pill);
-    font-size: 0.9rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
+    display: flex; align-items: center; gap: 6px; padding: 8px 16px;
+    border: 1px solid var(--color-danger); color: var(--color-danger);
+    background: var(--bg-card); border-radius: 50px;
+    font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
 }
-.btn-danger-outline:hover { background: #fee2e2; } /* Light Red hover */
-.light-mode .btn-danger-outline:hover { background: #fef2f2; }
+.btn-danger-outline:hover { background: rgba(239, 68, 68, 0.1); }
 
 .btn-sm-primary {
     background: var(--secondary-cyan);
-    color: var(--background-dark); /* Dark text on light button */
-    border: none;
-    padding: 6px 12px;
-    border-radius: 8px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    cursor: pointer;
+    color: #021217; /* Dark text on light cyan */
+    border: none; padding: 6px 12px;
+    border-radius: 8px; font-size: 0.8rem; font-weight: 600;
+    display: flex; align-items: center; gap: 4px; cursor: pointer;
     transition: background 0.2s, transform 0.2s;
 }
-.btn-sm-primary:hover { 
-    /* IMPROVEMENT: Changed color-mix to rgba or direct hex for maximum CSS compatibility */
-    background: #79e9ff; /* Calculated lighter cyan */
-    transform: translateY(-1px);
-}
+.btn-sm-primary:hover { background: #79e9ff; transform: translateY(-1px); }
 
 .btn-secondary {
-    background: var(--input-bg);
-    border: 1px solid var(--border-color);
-    color: var(--text-main);
-    padding: 8px 16px;
-    border-radius: var(--radius-button);
-    font-weight: 600;
-    font-size: 0.9rem;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    background: var(--bg-input); border: 1px solid var(--border-color);
+    color: var(--text-main); padding: 8px 16px;
+    border-radius: 12px; font-weight: 600; font-size: 0.9rem;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
     transition: background 0.2s;
 }
-.btn-secondary:hover {
-    /* IMPROVEMENT: Changed color-mix to rgba or direct hex for maximum CSS compatibility */
-    background: #2a3340; /* Slightly mixed input bg with primary orange hue */
-}
-.full-width-btn { width: 88%; 
-margin-top: 10px;}
+.btn-secondary:hover { background: rgba(255,255,255,0.05); }
+
+.full-width-btn { width: 88%; margin-top: 10px; }
 .visually-hidden { display: none; }
+.input-disabled { background: rgba(0,0,0,0.2) !important; color: var(--text-muted) !important; cursor: not-allowed; }
 
 /* =========================================
-   7. FLOATING SAVE TOAST (Glassmorphism)
+   7. FLOATING SAVE TOAST
    ========================================= */
-
 .floating-save-toast {
-    position: fixed;
-    top: 30px;
-    left: 50%;
+    position: fixed; top: 30px; left: 50%;
     transform: translateX(-50%) translateY(-160%);
-    
-    /* --- Glassmorphism Styling --- */
-    background: var(--bg-glass);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    
+    background: rgba(15, 23, 42, 0.8);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
     color: var(--text-main);
-    padding: 8px 8px 8px 16px;
-    border-radius: var(--radius-pill); /* Pill shape */
+    padding: 8px 8px 8px 16px; border-radius: 50px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     border: 1px solid var(--border-color);
-    
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 20px;
-    
-    z-index: 9999;
-    transition: all 0.3s ease;
-    min-width: 340px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 20px; z-index: 9999; transition: all 0.3s ease; min-width: 340px;
 }
+.floating-save-toast.visible { transform: translateX(-50%) translateY(0); }
 
-/* State: Visible */
-.floating-save-toast.visible {
-    transform: translateX(-50%) translateY(0);
-}
+.toast-content { display: flex; align-items: center; gap: 12px; }
+.toast-message { font-size: 0.9rem; font-weight: 500; color: var(--text-main); white-space: nowrap; }
+.toast-message.success-text { color: #4ade80; }
 
-.toast-content {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.toast-message {
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: var(--text-main);
-    white-space: nowrap;
-}
-
-.toast-message.success-text {
-    color: #4ade80; /* Green-400 */
-}
-
-/* Button Group */
-.toast-actions {
-    display: flex;
-    gap: 6px;
-}
-
+.toast-actions { display: flex; gap: 6px; }
 .btn-toast-cancel {
-    background: transparent;
-    color: var(--text-muted);
-    border: none;
-    padding: 8px 12px;
-    border-radius: var(--radius-pill);
-    font-size: 0.85rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: color 0.2s, background 0.2s;
+    background: transparent; color: var(--text-muted); border: none;
+    padding: 8px 12px; border-radius: 50px; font-size: 0.85rem;
+    font-weight: 500; cursor: pointer; transition: color 0.2s;
 }
-.btn-toast-cancel:hover {
-    color: var(--text-main);
-    background: rgba(255,255,255,0.1); /* Light surface hover */
-}
+.btn-toast-cancel:hover { color: var(--text-main); background: rgba(255,255,255,0.1); }
 
 .btn-toast-save {
-    background: var(--primary-orange);
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: var(--radius-pill);
-    font-size: 0.85rem;
-    font-weight: 600;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    transition: background 0.2s;
+    background: var(--primary-orange); color: white; border: none;
+    padding: 8px 16px; border-radius: 50px; font-size: 0.85rem;
+    font-weight: 600; cursor: pointer; display: flex; align-items: center;
+    gap: 6px; transition: background 0.2s;
 }
-.btn-toast-save:hover {
-    /* IMPROVEMENT: Changed color-mix to direct hex */
-    background: #d46524; /* Darker orange */
-}
+.btn-toast-save:hover { background: var(--primary-orange-hover); }
+.btn-toast-save.btn-success-state { background: #4ade80; color: #064e3b; }
 
-.btn-toast-save.btn-success-state {
-    background: #4ade80;
-    color: #064e3b;
-}
-
-/* Animation */
 .spin-icon { animation: spin 1s linear infinite; }
 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-/* Modal Styling */
+/* =========================================
+   8. MODAL
+   ========================================= */
 .modal-backdrop {
     position: fixed; inset: 0; background: rgba(0,0,0,0.6);
     display: flex; justify-content: center; align-items: center; z-index: 2000;
 }
 .modal-content {
-    background: var(--surface-card); padding: 24px; border-radius: var(--radius-card);
+    background: var(--bg-card); padding: 24px; border-radius: 24px;
     width: 90%; max-width: 500px; position: relative;
     border: 1px solid var(--border-color);
 }
 .modal-close-btn {
     position: absolute; top: 16px; right: 16px;
-    background: none; border: none; cursor: pointer;
-    color: var(--text-muted);
+    background: none; border: none; cursor: pointer; color: var(--text-muted);
 }
 .resume-viewer-placeholder {
     margin-top: 20px; text-align: center; padding: 20px;
-    background: var(--input-disabled-bg); border-radius: 8px;
-    color: var(--text-muted);
+    background: rgba(255,255,255,0.05); border-radius: 8px; color: var(--text-muted);
 }
+.btn-primary {
+    background: var(--primary-orange); color: white; padding: 12px 24px;
+    border: none; border-radius: 12px; font-weight: 600; cursor: pointer;
+    box-shadow: 0 4px 12px rgba(238, 116, 40, 0.3); transition: all 0.3s ease;
+    text-decoration: none; display: inline-flex; gap: 8px;
+}
+.btn-primary:hover { background: var(--primary-orange-hover); transform: translateY(-2px); }
 
 /* =========================================
-   8. RESPONSIVENESS (Mobile Optimized Toast)
+   9. RESPONSIVE
    ========================================= */
-
 @media (max-width: 1400px) {
-    /* Slightly wider layout adjustment before tablet break, if content starts feeling cramped */
-    .profile-bento-grid {
-        grid-template-columns: 300px 1fr 300px; /* Reduced side columns slightly */
-    }
+    .profile-bento-grid { grid-template-columns: 300px 1fr 300px; }
 }
 
 @media (max-width: 1100px) {
-    /* --- TABLET BREAKPOINT (Collapses 3 columns to 1 column) --- */
-    .profile-content-area {
-        padding: 0 24px; /* Reduced side padding slightly */
-    }
-
-    .profile-bento-grid {
-        grid-template-columns: 1fr; /* Full width for all columns */
-        gap: 30px; /* Increased gap between the stacked columns */
+    /* TABLET: Stack columns, enable vertical scrolling for the page */
+    .profile-wrapper { 
+        height: auto; 
+        overflow: visible; 
+        padding-bottom: 40px; 
     }
     
-    /* Ensure all inner components now use 100% width or auto-adjust */
-    .bento-col.col-left .form-group {
-        width: 100%; /* Fix input width issues in the former left column */
-    }
-
-    .resumeFileUpload {
-        width: 100%;
+    .profile-content-area { padding: 0 24px; }
+    
+    .profile-bento-grid { 
+        grid-template-columns: 1fr; 
+        gap: 10px; 
+        overflow: visible; /* Grid overflow enabled */
+        height: auto;
     }
     
-    .full-width-btn { 
-        width: 100%; 
-        max-width: 350px; /* Limit button width on wider tablet screens */
-        margin: 10px auto 0; /* Center button */
+    .bento-col { 
+        overflow: visible; /* Disable internal scroll */
+        height: auto; 
     }
     
-    .page-title { font-size: 1.5rem; }
-    
-    /* Allow toast to shrink if needed */
-    .floating-save-toast {
-        min-width: auto;
-        width: fit-content;
-    }
+    /* Full widths for elements */
+    .bento-col.col-left .form-group, .resumeFileUpload, .full-width-btn { width: 100%; }
+    .full-width-btn { max-width: 350px; margin: 10px auto 0; }
+    .floating-save-toast { min-width: auto; width: fit-content; }
 }
 
 @media (max-width: 768px) {
-    /* Further general mobile adjustments for better spacing */
-    .profile-content-area {
-        padding: 20px 20px;
-    }
+    .profile-content-area { padding: 50px 20px; }
+    .profile-card { padding: 20px; border-radius: 16px; }
+    .form-group input  { width: 95%; } 
+    .form-group select { width: 99%; }  
+    .summary-textarea { width: 95%; }
+    .full-width-btn { max-width: 100%; }
+    .btn-secondary { width: 93%; }
 
-    .profile-card {
-        padding: 20px;
-        border-radius: 16px; /* Slightly softer radius on smaller screens */
-    }
-
-    .summary-textarea {
-        width: 100%; /* Ensures 100% width for the text area */
-    }
-    .full-width-btn { max-width: 100%; } /* Full button width on small mobiles */
 }
-
 
 @media (max-width: 600px) {
-    .profile-wrapper { 
-        padding-top: 20px; 
-        padding-bottom: 70px; /* Reduced bottom padding */
-    }
-    .profile-content-area { 
-        padding: 15px 16px; /* Minimal side padding */
-        gap: 15px; /* Reduced gap between stacked cards */
-    }
-
-    /* --- MOBILE TOAST ADJUSTMENTS (Glassmorphism on mobile) --- */
+    .profile-wrapper { padding-top: 40px; padding-bottom: 70px; }
+    .profile-content-area { padding: 15px 16px; gap: 15px; }
+    /* Mobile Toast */
     .floating-save-toast {
-        /* 1. Size & Position */
-        width: 95%; /* Increased width for better use of space */
-        max-width: 400px;
-        top: 15px; /* Moved up slightly */
-        left: 50%;
-        
-        /* 2. Layout: Stack vertically */
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
-        
-        /* 3. Visuals */
-        padding: 16px;
-        border-radius: var(--radius-button); /* Card-like corners on mobile */
+        width: 95%; max-width: 400px; top: 15px; left: 50%;
+        flex-direction: column; align-items: flex-start; gap: 12px;
+        padding: 16px; border-radius: 12px;
     }
-
-    /* Make the text area fill width */
-    .toast-content {
-        width: 100%;
-        justify-content: flex-start;
-    }
-
-    /* Make buttons big and easy to tap */
-    .toast-actions {
-        width: 100%;
-        display: flex;
-        gap: 10px;
-    }
-
-    .btn-toast-cancel, .btn-toast-save {
-        flex: 1; /* Both buttons take equal width (50/50) */
-        justify-content: center;
-        padding: 12px 0; /* Taller touch target */
-        border-radius: 10px;
-    }
-    
-    /* Make cancel button slightly more visible on mobile */
-    .btn-toast-cancel {
-        background: rgba(255,255,255,0.1);
-        color: var(--text-main);
-    }
+    .btn-secondary { width: 93%; }
+    .summary-textarea { width: 95%;}
+    .toast-content { width: 100%; justify-content: flex-start; }
+    .toast-actions { width: 100%; gap: 10px; }
+    .btn-toast-cancel, .btn-toast-save { flex: 1; justify-content: center; padding: 12px 0; border-radius: 10px; }
+    .btn-toast-cancel { background: rgba(255,255,255,0.1); color: var(--text-main); }
 }
 
-/* Ensure all relevant form fields take up 100% of their parent container on mobile */
 @media (max-width: 480px) {
-    .form-group input, .form-group select {
-        width: 100%; 
-    }
-    .edu-input-group {
-        width: 100%;
-    }
+    .form-group input, .form-group select { width: 100%; }
+    .edu-input-group { width: 100%; }
 }

@@ -1,7 +1,6 @@
 // app/intern/logbook/page.jsx
 'use client'; // This page is now a client component, which is fine
-import LogbookClient from '../../components/intern/LogbookClient';
-import InternNav from '../../components/InternNav';
+import LogbookClient from '../components/LogbookClient';
 
 
 
@@ -10,7 +9,6 @@ export default function LogbookPage() {
   return (
     <>
   
-      <InternNav />
       <LogbookClient />
     </>
   );
