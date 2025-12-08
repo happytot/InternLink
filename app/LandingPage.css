@@ -478,6 +478,7 @@ p {
 .delay-200 { transition-delay: 0.2s; }
 .delay-300 { transition-delay: 0.3s; }
 
+/* Existing Desktop/Tablet Logic */
 @media (max-width: 900px) {
     .hero-section { grid-template-columns: 1fr; text-align: center; gap: 40px; padding-top: 40px; }
     .hero-text h1 { font-size: 2.8rem; }
@@ -495,4 +496,133 @@ p {
     .footer-content { flex-direction: column; gap: 30px; text-align: center; }
     .footer-links { margin-top: 20px; }
     .footer-links a { margin: 0 15px; }
+}
+
+/* =================================================================
+   📱 RESPONSIVE BREAKPOINTS (SPECIFIC REQUESTS)
+   ================================================================= */
+
+/* --- 1. Max Width 700px (Large Mobile / Small Tablet) --- */
+@media (max-width: 700px) {
+    /* HEADER: Hide links, Keep Logo + Toggle + CTA */
+    .main-header {
+        padding: 15px 5%;
+        gap: 15px;
+    }
+
+    /* Hide text links to prevent overlap */
+    .desktop-nav .nav-link {
+        display: none; 
+    }
+    
+    .desktop-nav {
+        gap: 15px;
+    }
+
+    /* Hero */
+    .hero-text h1 { font-size: 2.5rem; }
+    
+    /* Bento Cards */
+    .bento-item { padding: 30px; min-height: auto; }
+}
+
+/* --- 2. Max Width 600px (Mid Mobile) --- */
+@media (max-width: 600px) {
+    /* HEADER: Adjust padding */
+    .main-header {
+        padding: 15px 4%;
+    }
+    
+    .logo-container { font-size: 22px; }
+
+    /* HERO: Stack buttons vertically for better touch targets */
+    .hero-actions {
+        flex-direction: column;
+        max-width: 50%;
+        margin-right: 150px;
+        margin-left: auto;
+    }
+    .cta-buttons {width: 85%; }
+
+    .btn { width: 100%; justify-content: center; }
+    
+    /* TEXT SIZES */
+    .hero-text h1 { font-size: 2.2rem; }
+    .section-header h2 { font-size: 2.2rem; }
+    
+    /* Footer */
+    .footer-links { display: flex; flex-direction: column; gap: 15px; }
+    .footer-links a { margin: 0; }
+}
+
+/* --- 3. Max Width 500px (Small Mobile) --- */
+@media (max-width: 500px) {
+    /* HEADER: Extreme Space Saving 
+
+[Image of Responsive Header Layout]
+ */
+    .main-header {
+        padding: 12px 15px;
+    }
+    .hero-actions {
+        max-width: 50%;
+        margin-right: 120px;
+    }
+    .cta-buttons {width: 85%; }
+
+    /* Make CTA smaller */
+    .nav-cta {
+        padding: 8px 16px;
+        font-size: 0.8rem;
+    }
+    
+    /* Hide Theme Toggle border to save space */
+    .theme-toggle-btn {
+        border: none;
+        width: 30px;
+        height: 30px;
+    }
+
+    /* Ecosystem Grid - Force 1 column */
+    .ecosystem-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    /* Reduce Card Padding */
+    .role-card, .bento-item, .cta-box {
+        padding: 24px;
+        border-radius: 16px;
+    }
+}
+
+/* --- 4. Max Width 400px (Very Small Mobile) --- */
+@media (max-width: 400px) {
+    /* HEADER: Minimalist Mode */
+    .logo-container { 
+        font-size: 18px; 
+    }
+    
+    /* Hide CTA text, show only minimal button or just the toggle */
+    .nav-cta {
+        padding: 6px 12px;
+        font-size: 0.75rem;
+    }
+        .cta-buttons {width: 80%; }
+
+
+    /* HERO */
+    .hero-section { padding-top: 20px; }
+    .hero-text h1 { font-size: 1.8rem; margin-bottom: 15px; }
+    .hero-sub { font-size: 1rem; }
+    
+    /* Remove horizontal margins on container to maximize width */
+    .hero-section, .ecosystem-section, .bento-section, .cta-wrapper {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+    
+    /* Ensure BENTO/GRIDS don't overflow */
+    .bento-grid, .ecosystem-grid {
+        gap: 15px;
+    }
 }
