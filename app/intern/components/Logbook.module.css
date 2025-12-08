@@ -631,12 +631,10 @@
 /* Tablet (Max 900px) */
 @media (max-width: 900px) {
 
-  .pageWrapper { width: 95%;}
+  .pageWrapper { width: 95%; padding: 5rem 10px;}
   /* Stack Bento Grid */
-  .bentoGrid {
-    grid-template-columns: 1fr;
-  }
-
+  .bentoGrid { grid-template-columns: 1fr;}
+  .entryCard { margin-bottom: 10px; padding: 15px}
   .rightPane {
     height: auto;
   }
@@ -667,16 +665,12 @@
 /* Mobile (Max 768px - inherited mostly from 600px rules in original) */
 @media (max-width: 768px) {
 
-    .pageWrapper { width: 95%; padding: 5rem 12px;}
-
-  .header {
-    font-size: 1.75rem;
-  }
-  .statValue {
-    font-size: 2.5rem;
-  }
-  .formContainer, .entryCard {
-    padding: 20px;
+  .pageWrapper { width: 95%; padding: 5rem 12px;}
+  .bentoGrid {gap:1px}
+  .header { font-size: 1.75rem;}
+  .statValue { font-size: 2.5rem; }
+  .formContainer {
+    padding: 30px 10px;
   }
 }
 
@@ -688,19 +682,13 @@
 @media (max-width: 700px) {
   .pageWrapper {
     padding: 28px 20px; /* Reduced from 32px 24px */
-    padding-top: 20px;
+    padding-top: 5rem;
   }
-  .performanceBoard {
-    padding: 24px;
-  }
-  .boardRight {
-    gap: 16px;
-  }
-  .header {
-    font-size: 1.9rem;
-  }
+  .performanceBoard { padding: 24px; }
+  .boardRight { gap: 16px; }
+  .header { font-size: 1.9rem; }
+  .inputGroup { margin-bottom:8px; }
 }
-
 /* --- 600px --- */
 @media (max-width: 600px) {
   .pageWrapper {
@@ -823,5 +811,13 @@
   .input, .select, .textarea {
     padding: 12px;
     font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 400px) 
+{
+  .pageWrapper {
+    padding: 16px 8px; /* Further reduce side padding */
+    padding-top: 5rem;
   }
 }

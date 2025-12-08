@@ -667,6 +667,29 @@
 
 /* --- 2. Mobile Tier A (< 700px) --- */
 @media (max-width: 700px) {
+  .modal-content {
+  /* 1. Use 'dvh' instead of 'vh' so it reacts to the address bar resizing */
+  max-height: 85dvh; 
+  
+  width: 90%;
+  margin: 0 auto;
+  border-radius: var(--radius-card);
+  padding: 20px;
+  
+  /* 2. Ensure the container itself scrolls if content is too long */
+  overflow-y: auto; 
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-footer {
+  /* 3. Keep it static (scrolls with content) as you requested */
+  position: static; 
+  margin-top: 20px;
+  
+  /* 4. CRITICAL: Add extra padding for the browser bar/home gesture area */
+  padding-bottom: calc(20px + env(safe-area-inset-bottom)); 
+}
   .listings-container h1 {
     font-size: 1.8rem;
     margin-bottom: 1.5rem;
@@ -679,7 +702,7 @@
   }
 
   .search-input {
-    min-width: 90%; /* Force input to its own row */
+    min-width: 90%;
     order: 1;
   }
 
@@ -687,7 +710,7 @@
     order: 2;
     flex-grow: 1;
     width: auto;
-    margin-left: 0; /* Remove left margin since it wraps */
+    margin-left: 0;
   }
 
   .saved-jobs-btn {
@@ -697,17 +720,27 @@
     text-align: center;
   }
 
-  /* Modal Adjustments */
+  /* 🧊 MODAL UPDATES: Centered & Static Footer */
   .modal-overlay {
-    padding-top: 0; /* Full screen feel */
-    align-items: flex-end; /* Sheet-like behavior */
+    padding-top: 0;
+    align-items: center;     /* Centers vertically */
+    justify-content: center; /* Centers horizontally */
   }
 
   .modal-content {
-    max-height: 85vh; /* Increase height for mobile */
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
+    max-height: 85vh;
+    width: 90%;              /* Prevents it from touching edges */
+    margin: 0 auto;
+    border-radius: var(--radius-card); /* Restore rounded corners on all sides */
     padding: 20px;
+  }
+
+  /* Make footer scroll with content, not stick to bottom */
+  .modal-footer {
+    position: static; 
+    background: transparent;
+    padding-bottom: 0;
+    margin-top: 20px;
   }
 }
 
@@ -768,38 +801,20 @@
   .primary-btn, .secondary-btn {
     width: 100%;
   }
+
+  .job-details-pane { width:100%; }
 }
 
 /* --- 4. Mobile Tier C (< 500px) --- */
 @media (max-width: 500px) {
-  .listings-container h1 {
-    font-size: 1.5rem;
-  }
-
-  .job-title {
-    font-size: 1.2rem;
-  }
-
-  .search-input { width: 90%;}
-
-  /* Wrap pills if titles are long */
-  .job-meta {
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  /* Reduce modal padding further */
-  .modal-content {
-    padding: 15px;
-  }
-  
-  .detail-card {
-    padding: 15px;
-  }
-  
-  .job-detail-title {
-    font-size: 1.5rem;
-  }
+  .listings-container h1 {  font-size: 1.5rem; }
+  .job-title {  font-size: 1.2rem; }
+  .search-input { width: 90%; }
+  .job-meta {  flex-wrap: wrap;  gap: 8px; }
+  .modal-footer { bottom: 1px;}
+  .modal-content {  padding: 5px; }
+  .detail-card {  padding: 15px; }
+  .job-detail-title {  font-size: 1.5rem; }
 }
 
 /* --- 5. Smallest Devices (< 400px) --- */

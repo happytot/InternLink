@@ -1,5 +1,22 @@
 {
-  "node": {},
+  "node": {
+    "5aa6d6f674735536a981bbb4e36d8e4164729ead": {
+      "workers": {
+        "app/intern/logbook/page": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22C%3A%5C%5CUsers%5C%5Cace%5C%5CDocuments%5C%5Cintern-link-next-complete%5C%5Capp%5C%5Cintern%5C%5Clogbook%5C%5Cactions.js%22%2C%5B%22getInternLogbookData%22%2C%22submitNewLogEntry%22%5D%5D%5D&__client_imported__=true!"
+      },
+      "layer": {
+        "app/intern/logbook/page": "action-browser"
+      }
+    },
+    "d9249b375c59c023803d7d63e496c9ad4262fa3f": {
+      "workers": {
+        "app/intern/logbook/page": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22C%3A%5C%5CUsers%5C%5Cace%5C%5CDocuments%5C%5Cintern-link-next-complete%5C%5Capp%5C%5Cintern%5C%5Clogbook%5C%5Cactions.js%22%2C%5B%22getInternLogbookData%22%2C%22submitNewLogEntry%22%5D%5D%5D&__client_imported__=true!"
+      },
+      "layer": {
+        "app/intern/logbook/page": "action-browser"
+      }
+    }
+  },
   "edge": {},
-  "encryptionKey": "UaSeeYTzVGSaUfviL7LxPDO6k+DpKzzvSOUuxz1g+fA="
+  "encryptionKey": "tQ/h9obiioeDz5gGVUNIvM92X40o4ScnBvcagY/IfFc="
 }

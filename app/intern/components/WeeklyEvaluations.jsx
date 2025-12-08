@@ -103,7 +103,7 @@ export default function WeeklyEvaluations() {
   }
 
   return (
-    <div style={{ marginTop: '60px' }}>
+    <div style={{ marginTop: '20px' }}>
       
       <h2 className={styles.listHeader}>
         <BarChart2 size={24} style={{ verticalAlign: 'middle', marginRight: '10px', color: 'var(--primary-orange)' }} />
@@ -179,7 +179,7 @@ export default function WeeklyEvaluations() {
       )}
 
       {/* --- HISTORY TABLE --- */}
-      <h3 className={styles.subHeader} style={{ marginBottom: '20px', marginTop: '40px' }}>
+      <h3 className={styles.subHeader} style={{ marginBottom: '20px', marginTop: '15px' }}>
         <strong>Weekly Evaluation History</strong>
       </h3>
       

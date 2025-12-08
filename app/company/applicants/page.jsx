@@ -4,7 +4,6 @@ import { useEffect, useState, useCallback } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import './applicants.css';
 import { updateJobApplicationStatus } from './actions';
-import { toast, Toaster } from 'sonner';
 import Link from 'next/link';
 
 
@@ -57,18 +56,18 @@ const closeModal = () => {
       const cId = userData.user.id;
       setCompanyId(cId);
 
-      const { data, error } = await supabase
-        .from("job_applications")
-        .select(`
-          id,
-          created_at,
-          status,
-          resume_url,
-          profiles:profiles!fk_job_applications_intern ( fullname, email ),
-          job_posts:job_posts!fk_job_applications_job ( title )
-        `)
-        .eq("company_id", cId)
-        .order("created_at", { ascending: false });
+const { data, error } = await supabase
+  .from("job_applications")
+  .select(`
+    id,
+    created_at,
+    status,
+    resume_url,
+    profiles:profiles!job_applications_intern_id_fkey ( fullname, email ),
+    job_posts:job_posts!fk_job_applications_job ( title )
+  `) // ^ Update the line above with the correct key name
+  .eq("company_id", cId)
+  .order("created_at", { ascending: false });
 
       if (error) throw error;
       
@@ -136,7 +135,6 @@ const filteredApplicants = applicants.filter(app => {
   return (
     <div className="applicants-container">
       {/* 2. ✅ Sonner Toaster (Styling is in globals.css) */}
-      <Toaster position="bottom-right" richColors />
       
       {/* ========================================================
           🍱 NEW BENTO HEADER BOX
