@@ -94,7 +94,6 @@
 .company-card-compact:hover {
   border-color: var(--primary-orange);
   background: rgba(255, 255, 255, 0.08);
-  transform: translateY(-2px);
 }
 
 .company-card-compact.card-selected {

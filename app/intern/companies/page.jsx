@@ -195,48 +195,64 @@ export default function CompaniesPage() {
   const [newRating, setNewRating] = useState(5);
   const [submittingReview, setSubmittingReview] = useState(false);
 
-  // 1. Initial Data Fetching
-  useEffect(() => {
-    const initData = async () => {
-      setLoading(true);
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) setUser(user);
+// 1. Initial Data Fetching
+useEffect(() => {
+  const initData = async () => {
+    setLoading(true);
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) setUser(user);
 
-      try {
-        let { data: companiesData, error } = await supabase
-          .from('companies')
-          .select('id, name, description, logo_url, star_rating, email, phone, ceo');
+    try {
+      let { data: companiesData, error } = await supabase
+        .from('companies')
+        .select('id, name, description, logo_url, star_rating, email, phone, ceo');
 
-        if (error) throw error;
+      if (error) throw error;
 
-        const companiesWithJobs = await Promise.all(
-          (companiesData || []).map(async (company) => {
-            const { data: jobs } = await supabase
-              .from('job_posts')
-              .select('*').eq('company_id', company.id);
+      const companiesWithDetails = await Promise.all(
+        (companiesData || []).map(async (company) => {
+          // 1. Fetch Job Posts
+          const { data: jobs } = await supabase
+            .from('job_posts')
+            .select('*').eq('company_id', company.id);
 
-            const { count } = await supabase
-              .from('job_applications')
-              .select('*', { count: 'exact', head: true })
-              .eq('company_id', company.id);
+          // 2. Fetch Application Count
+          const { count } = await supabase
+            .from('job_applications')
+            .select('*', { count: 'exact', head: true })
+            .eq('company_id', company.id);
 
-            return {
-              ...company,
-              job_posts: jobs || [],
-              applications_count: count || 0,
-            };
-          })
-        );
-        setCompanies(companiesWithJobs);
-        if (companiesWithJobs.length > 0) setSelectedCompany(companiesWithJobs[0]);
-      } catch (err) {
-        console.error('Error fetching companies:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    initData();
-  }, [supabase]);
+          // --- NEW: Fetch Reviews to calculate rating ---
+          const { data: reviews } = await supabase
+             .from('company_reviews')
+             .select('rating')
+             .eq('company_id', company.id);
+
+          // Calculate Average
+          const totalRating = reviews?.reduce((sum, r) => sum + (r.rating || 0), 0) || 0;
+          const avgRating = reviews?.length > 0 ? (totalRating / reviews.length) : 0;
+          // ----------------------------------------------
+
+          return {
+            ...company,
+            job_posts: jobs || [],
+            applications_count: count || 0,
+            star_rating: avgRating, // <--- We overwrite the static DB value with the calculated one
+          };
+        })
+      );
+
+      setCompanies(companiesWithDetails);
+      if (companiesWithDetails.length > 0) setSelectedCompany(companiesWithDetails[0]);
+
+    } catch (err) {
+      console.error('Error fetching companies:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+  initData();
+}, [supabase]);
 
   // 2. Fetch Reviews
   useEffect(() => {
