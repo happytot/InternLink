@@ -192,7 +192,7 @@
 /******/ 	
 /******/ 	/* webpack/runtime/getFullHash */
 /******/ 	!function() {
-/******/ 		__webpack_require__.h = function() { return "23be5ff4b678a088"; }
+/******/ 		__webpack_require__.h = function() { return "ce3c43b018370cd6"; }
 /******/ 	}();
 /******/ 	
 /******/ 	/* webpack/runtime/global */
@@ -852,7 +852,8 @@
 /******/ 			"css-app_components_CompanyNav_css": 0,
 /******/ 			"css-app_company_profile_profile_css": 0,
 /******/ 			"css-app_company_logbook_CompanyLogbook_module_css": 0,
-/******/ 			"css-app_company_applicants_applicants_css": 0
+/******/ 			"css-app_company_applicants_applicants_css": 0,
+/******/ 			"css-app_company_jobs_listings_listings_css": 0
 /******/ 		};
 /******/ 		
 /******/ 		__webpack_require__.f.j = function(chunkId, promises) {
@@ -864,7 +865,7 @@
 /******/ 					if(installedChunkData) {
 /******/ 						promises.push(installedChunkData[2]);
 /******/ 					} else {
-/******/ 						if(/^(app(\/(a(dmin\/((|users\/)page|layout)|uth\/(co(mpany|ordinator)AuthPage\/page|internAuthPage\/page))|co(mpany\/((applicants|dashboard|logbook|profile)\/page|layout)|ordinator\/(((approval|companie|internship|student)s|dashboard)\/page|layout))|intern\/(l((istings|ogbook)\/page|ayout)|(companies|dashboard|history|profile)\/page)|(|_not\-found\/)page|layout)|\-pages\-internals)|main(|\-app)|pages\/_(app|error)|\/_error|_app\-pages\-browser_node_modules_react\-apexcharts_dist_react\-apexcharts_min_js|react\-refresh)$/.test(chunkId)) {
+/******/ 						if(/^(app(\/(a(dmin\/((|users\/)page|layout)|uth\/(co(mpany|ordinator)AuthPage\/page|internAuthPage\/page))|co(mpany\/((applicants|dashboard|jobs\/listings|logbook|profile)\/page|layout)|ordinator\/(((approval|companie|internship|student)s|dashboard)\/page|layout))|intern\/(l((istings|ogbook)\/page|ayout)|(companies|dashboard|history|profile)\/page)|layout|page)|\-pages\-internals)|main(|\-app)|pages\/_(app|error)|\/_error|_app\-pages\-browser_node_modules_react\-apexcharts_dist_react\-apexcharts_min_js|react\-refresh)$/.test(chunkId)) {
 /******/ 							// setup Promise in chunk cache
 /******/ 							var promise = new Promise(function(resolve, reject) { installedChunkData = installedChunks[chunkId] = [resolve, reject]; });
 /******/ 							promises.push(installedChunkData[2] = promise);

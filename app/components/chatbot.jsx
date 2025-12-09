@@ -11,17 +11,44 @@ import {
   Legend
 } from "chart.js";
 
-// Ensure ChartJS is registered (already correct)
+// Ensure ChartJS is registered
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
-// Component to handle the smooth visibility and slide-in of the chat box
-const AnimatedChatBox = ({ isOpen, children }) => {
-    // Style for the container when open/closed
+// --- 1. NEW: Responsive Styling Logic ---
+// We pass windowWidth to this component to calculate styles dynamically
+const AnimatedChatBox = ({ isOpen, children, windowWidth }) => {
+    
+    // Determine dynamic dimensions based on breakpoints
+    let boxWidth = 380; // Default Desktop
+    let rightPos = 24;
+    let bottomPos = 24;
+    let maxHeight = 450;
+    
+    if (windowWidth <= 400) {
+        // Very small screens (iPhone SE, etc)
+        boxWidth = "calc(100vw - 32px)"; // Full width minus margins
+        rightPos = 16;
+        bottomPos = 16;
+        maxHeight = "75vh"; // Prevent it from being too tall on small screens
+    } else if (windowWidth <= 500) {
+        // Small/Medium Mobiles
+        boxWidth = 360; 
+        rightPos = 20;
+        bottomPos = 20;
+        maxHeight = "80vh";
+    } else if (windowWidth <= 600) {
+        // Large Phones / Small Tablets
+        boxWidth = 380;
+        rightPos = 24;
+        bottomPos = 24;
+        maxHeight = "80vh";
+    }
+
     const style = {
         position: "fixed",
-        bottom: 24,
-        right: 24,
-        width: 380,
+        bottom: bottomPos,
+        right: rightPos,
+        width: boxWidth,
         zIndex: 999,
         background: "#1f2937",
         color: "#f1f5f9",
@@ -29,23 +56,33 @@ const AnimatedChatBox = ({ isOpen, children }) => {
         boxShadow: "0 4px 24px rgba(0,0,0,0.5)",
         display: "flex",
         flexDirection: "column",
-        maxHeight: 450,
-        height: 450,
+        maxHeight: maxHeight,
+        height: maxHeight, // Ensure it fills the height on mobile
         overflow: "hidden",
         // Animation properties
         transform: isOpen ? 'scale(1) translateY(0)' : 'scale(0.8) translateY(10px)',
         opacity: isOpen ? 1 : 0,
         pointerEvents: isOpen ? 'auto' : 'none',
-        transition: 'opacity 0.3s ease-in-out, transform 0.3s ease-in-out',
+        transition: 'opacity 0.3s ease-in-out, transform 0.3s ease-in-out, width 0.3s ease, height 0.3s ease', // Added width/height transition
     };
 
-    // We only render the box if it has been opened at least once to handle the initial state smoothly
     if (!isOpen && style.opacity === 0) return null;
 
     return <div style={style}>{children}</div>;
 };
 
 export default function FloatingAIChatWithCharts({ studentId }) {
+  // --- 2. NEW: Window Resize Listener ---
+  const [windowWidth, setWindowWidth] = useState(
+    typeof window !== "undefined" ? window.innerWidth : 1200
+  );
+
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   const [messages, setMessages] = useState([
     {
       sender: "ai",
@@ -60,7 +97,7 @@ export default function FloatingAIChatWithCharts({ studentId }) {
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  }, [messages, isOpen]); // Scroll when opened too
 
   const sendMessage = async () => {
     if (!input.trim() || loading) return;
@@ -119,7 +156,6 @@ export default function FloatingAIChatWithCharts({ studentId }) {
           ]);
         }
       } else {
-        // Show typing indicator for AI
         setMessages(prev => [...prev, { sender: "ai", type: "typing" }]);
 
         const res = await fetch("/api/chatbot", {
@@ -135,10 +171,8 @@ export default function FloatingAIChatWithCharts({ studentId }) {
           data = { reply: "Sorry, I could not process your request at the moment." };
         }
 
-        // Remove typing indicator and add AI response
         setMessages(prev => {
             const newMessages = prev.filter(m => m.type !== "typing");
-            // Add a temporary 'animating' flag to the new message for a smooth fade-in
             return [...newMessages, { sender: "ai", type: "text", content: data.reply, animating: true }]; 
         });
       }
@@ -153,11 +187,15 @@ export default function FloatingAIChatWithCharts({ studentId }) {
 
   return (
     <>
-      {/* Floating Button */}
-      <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 999 }}>
+      {/* Floating Button - Responsive Position */}
+      <div style={{ 
+          position: "fixed", 
+          bottom: windowWidth <= 400 ? 16 : 24, 
+          right: windowWidth <= 400 ? 16 : 24, 
+          zIndex: 999 
+      }}>
         <button
           onClick={() => setIsOpen(prev => !prev)}
-          // 2. IMPROVEMENT: Hover/Active Animation
           style={{
             background: "#fb923c",
             color: "#fff",
@@ -168,9 +206,9 @@ export default function FloatingAIChatWithCharts({ studentId }) {
             fontSize: 24,
             cursor: "pointer",
             boxShadow: "0 6px 16px rgba(0,0,0,0.35)",
-            transition: "transform 0.2s ease, box-shadow 0.2s ease", // Added transition
-            transform: isOpen ? 'rotate(45deg)' : 'rotate(0deg)', // Close button visual
-            opacity: isOpen ? 0.9 : 1, // Slight opacity change when open
+            transition: "transform 0.2s ease, box-shadow 0.2s ease",
+            transform: isOpen ? 'rotate(45deg)' : 'rotate(0deg)',
+            opacity: isOpen ? 0.9 : 1,
           }}
           onMouseEnter={(e) => (e.currentTarget.style.transform = isOpen ? 'rotate(45deg) scale(1.05)' : 'scale(1.05)')}
           onMouseLeave={(e) => (e.currentTarget.style.transform = isOpen ? 'rotate(45deg) scale(1)' : 'scale(1)')}
@@ -179,8 +217,8 @@ export default function FloatingAIChatWithCharts({ studentId }) {
         </button>
       </div>
 
-      {/* 1. IMPROVEMENT: Chat Widget Opening/Closing Animation using AnimatedChatBox */}
-      <AnimatedChatBox isOpen={isOpen}>
+      {/* Responsive Chat Widget */}
+      <AnimatedChatBox isOpen={isOpen} windowWidth={windowWidth}>
         {/* Header */}
         <div
           style={{
@@ -192,6 +230,7 @@ export default function FloatingAIChatWithCharts({ studentId }) {
             borderTopLeftRadius: 12,
             borderTopRightRadius: 12,
             fontWeight: "600",
+            fontSize: windowWidth < 400 ? 14 : 16 // Smaller text on small mobile
           }}
         >
           <span>AI Internship Assistant</span>
@@ -218,23 +257,19 @@ export default function FloatingAIChatWithCharts({ studentId }) {
         {/* Messages Area */}
         <div style={{ flex: 1, padding: 12, overflowY: "auto", display: "flex", flexDirection: "column" }}>
           {messages.map((msg, idx) => (
-            // 3. IMPROVEMENT: Message Entry Animation
             <div 
                 key={idx} 
                 style={{ 
                     textAlign: msg.sender === "user" ? "right" : "left", 
                     marginBottom: 12,
-                    // Apply fade-in effect to new AI messages
                     opacity: msg.animating ? 0 : 1,
                     transform: msg.animating ? 'translateY(10px)' : 'translateY(0)',
                     transition: 'opacity 0.3s ease-out, transform 0.3s ease-out',
-                    // Delay setting the final opacity/transform slightly after initial render
                     animationDelay: '0.1s', 
                     animationFillMode: 'forwards'
                 }}
                 ref={msg.animating ? (el) => {
                     if (el && msg.animating) {
-                        // After mounting, remove the animating flag to start the transition
                         setTimeout(() => {
                             setMessages(prev => prev.map((m, i) => i === idx ? { ...m, animating: false } : m));
                         }, 50); 
@@ -251,7 +286,8 @@ export default function FloatingAIChatWithCharts({ studentId }) {
                     display: "inline-block",
                     maxWidth: "85%",
                     whiteSpace: "pre-wrap",
-                    boxShadow: "0 1px 3px rgba(0,0,0,0.1)"
+                    boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+                    fontSize: windowWidth < 400 ? 13 : 14 // Readable font on mobile
                   }}
                 >
                   {msg.content}
@@ -265,11 +301,13 @@ export default function FloatingAIChatWithCharts({ studentId }) {
                     marginTop: 8, 
                     textAlign: "left"
                 }}>
-                  <Line data={msg.content} options={{ responsive: true, maintainAspectRatio: false }} />
+                  {/* Chart height adjusted for mobile */}
+                  <div style={{ height: windowWidth < 400 ? 180 : 220 }}>
+                     <Line data={msg.content} options={{ responsive: true, maintainAspectRatio: false }} />
+                  </div>
                 </div>
               )}
               {msg.type === "typing" && (
-                // Simple dot animation for typing
                 <span style={{ fontStyle: "italic", color: "#9ca3af" }}>
                     AI is typing<span className="typing-dot">.</span><span className="typing-dot" style={{animationDelay: '0.2s'}}>.</span><span className="typing-dot" style={{animationDelay: '0.4s'}}>.</span>
                 </span>
@@ -285,7 +323,7 @@ export default function FloatingAIChatWithCharts({ studentId }) {
           <input
             value={input}
             onChange={e => setInput(e.target.value)}
-            placeholder="Ask me anything..."
+            placeholder="Ask..." // Shorter placeholder on mobile
             disabled={loading}
             style={{
               flex: 1,
@@ -296,7 +334,7 @@ export default function FloatingAIChatWithCharts({ studentId }) {
               background: "#1e293b",
               color: "#f1f5f9",
               fontSize: 14,
-              transition: "border-color 0.2s", // Input transition
+              transition: "border-color 0.2s",
             }}
             onFocus={(e) => (e.currentTarget.style.borderColor = "#fb923c")}
             onBlur={(e) => (e.currentTarget.style.borderColor = "#4b5563")}
@@ -304,11 +342,10 @@ export default function FloatingAIChatWithCharts({ studentId }) {
           />
           <button
             onClick={sendMessage}
-            // 2. IMPROVEMENT: Send Button Hover Animation
             style={{ 
                 background: "#fb923c", 
                 border: "none", 
-                padding: "8px 12px", 
+                padding: windowWidth < 400 ? "0 10px" : "0 16px", // Compact button on mobile
                 borderRadius: 8, 
                 color: "#fff", 
                 marginLeft: 8,
@@ -316,13 +353,13 @@ export default function FloatingAIChatWithCharts({ studentId }) {
                 fontWeight: "600",
                 cursor: loading ? 'not-allowed' : 'pointer',
                 opacity: loading ? 0.7 : 1,
-                transition: "background-color 0.2s, opacity 0.2s" // Added transition
+                transition: "background-color 0.2s, opacity 0.2s"
             }}
-            onMouseEnter={(e) => (!loading && (e.currentTarget.style.backgroundColor = "#e87e2f"))} // Darker hover color
+            onMouseEnter={(e) => (!loading && (e.currentTarget.style.backgroundColor = "#e87e2f"))}
             onMouseLeave={(e) => (!loading && (e.currentTarget.style.backgroundColor = "#fb923c"))}
             disabled={loading}
           >
-            Send
+            {windowWidth < 400 ? ">" : "Send"} {/* Icon vs Text on small screen */}
           </button>
         </div>
       </AnimatedChatBox>

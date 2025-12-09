@@ -163,10 +163,11 @@
       "static/css/css-app_company_applicants_applicants_css.css",
       "static/chunks/app/company/applicants/page.js"
     ],
-    "/_not-found/page": [
+    "/company/jobs/listings/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/_not-found/page.js"
+      "static/css/css-app_company_jobs_listings_listings_css.css",
+      "static/chunks/app/company/jobs/listings/page.js"
     ]
   }
 }
