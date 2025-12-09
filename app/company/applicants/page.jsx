@@ -6,7 +6,8 @@ import './applicants.css';
 import { updateJobApplicationStatus } from './actions';
 import Link from 'next/link';
 
-
+// ✅ 1. Import Sonner here
+import { Toaster, toast } from 'sonner';
 
 // Icons
 import { 
@@ -28,18 +29,17 @@ export default function ApplicantsPage() {
   const [companyId, setCompanyId] = useState(null);
   const [filterStatus, setFilterStatus] = useState('All');
   const [selectedApplicant, setSelectedApplicant] = useState(null);
-const [modalOpen, setModalOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
 
-const openModal = (applicant) => {
-  setSelectedApplicant(applicant);
-  setModalOpen(true);
-};
+  const openModal = (applicant) => {
+    setSelectedApplicant(applicant);
+    setModalOpen(true);
+  };
 
-const closeModal = () => {
-  setSelectedApplicant(null);
-  setModalOpen(false);
-};
-
+  const closeModal = () => {
+    setSelectedApplicant(null);
+    setModalOpen(false);
+  };
 
   // Stats for the Top Bento Grid
   const [stats, setStats] = useState({ total: 0, pending: 0, approved: 0, rejected: 0 });
@@ -56,18 +56,18 @@ const closeModal = () => {
       const cId = userData.user.id;
       setCompanyId(cId);
 
-const { data, error } = await supabase
-  .from("job_applications")
-  .select(`
-    id,
-    created_at,
-    status,
-    resume_url,
-    profiles:profiles!job_applications_intern_id_fkey ( fullname, email ),
-    job_posts:job_posts!fk_job_applications_job ( title )
-  `) // ^ Update the line above with the correct key name
-  .eq("company_id", cId)
-  .order("created_at", { ascending: false });
+      const { data, error } = await supabase
+        .from("job_applications")
+        .select(`
+          id,
+          created_at,
+          status,
+          resume_url,
+          profiles:profiles!job_applications_intern_id_fkey ( fullname, email ),
+          job_posts:job_posts!fk_job_applications_job ( title )
+        `) 
+        .eq("company_id", cId)
+        .order("created_at", { ascending: false });
 
       if (error) throw error;
       
@@ -122,19 +122,20 @@ const { data, error } = await supabase
   };
 
   // Filter Logic
-const filteredApplicants = applicants.filter(app => {
-  if (filterStatus === 'All') return true;
-  if (filterStatus === 'Pending') return app.status === 'Pending';
-  if (filterStatus === 'Approved') return app.status.includes('Approved');
-  if (filterStatus === 'Rejected') return app.status === 'Rejected';
-  if (filterStatus === 'Ongoing') return app.status === 'ongoing' || app.status === 'Company_Approved_Waiting_Coordinator'; // adjust according to your DB
-  return true;
-});
+  const filteredApplicants = applicants.filter(app => {
+    if (filterStatus === 'All') return true;
+    if (filterStatus === 'Pending') return app.status === 'Pending';
+    if (filterStatus === 'Approved') return app.status.includes('Approved');
+    if (filterStatus === 'Rejected') return app.status === 'Rejected';
+    if (filterStatus === 'Ongoing') return app.status === 'ongoing' || app.status === 'Company_Approved_Waiting_Coordinator'; 
+    return true;
+  });
 
 
   return (
     <div className="applicants-container">
-      {/* 2. ✅ Sonner Toaster (Styling is in globals.css) */}
+      {/* ✅ 2. Added Toaster Component here */}
+      <Toaster position="top-right" richColors />
       
       {/* ========================================================
           🍱 NEW BENTO HEADER BOX
@@ -179,15 +180,14 @@ const filteredApplicants = applicants.filter(app => {
 
       {/* --- FILTERS --- */}
       <div className="filter-bar">
-       <div className="filter-group">
-  <Filter size={16} className="filter-icon"/>
-  <button className={filterStatus === 'All' ? 'active' : ''} onClick={() => setFilterStatus('All')}>All</button>
-  <button className={filterStatus === 'Pending' ? 'active' : ''} onClick={() => setFilterStatus('Pending')}>Pending</button>
-  <button className={filterStatus === 'Approved' ? 'active' : ''} onClick={() => setFilterStatus('Approved')}>Approved</button>
-  <button className={filterStatus === 'Rejected' ? 'active' : ''} onClick={() => setFilterStatus('Rejected')}>Rejected</button>
-  <button className={filterStatus === 'Ongoing' ? 'active' : ''} onClick={() => setFilterStatus('Ongoing')}>Ongoing</button>
-</div>
-
+        <div className="filter-group">
+          <Filter size={16} className="filter-icon"/>
+          <button className={filterStatus === 'All' ? 'active' : ''} onClick={() => setFilterStatus('All')}>All</button>
+          <button className={filterStatus === 'Pending' ? 'active' : ''} onClick={() => setFilterStatus('Pending')}>Pending</button>
+          <button className={filterStatus === 'Approved' ? 'active' : ''} onClick={() => setFilterStatus('Approved')}>Approved</button>
+          <button className={filterStatus === 'Rejected' ? 'active' : ''} onClick={() => setFilterStatus('Rejected')}>Rejected</button>
+          <button className={filterStatus === 'Ongoing' ? 'active' : ''} onClick={() => setFilterStatus('Ongoing')}>Ongoing</button>
+        </div>
       </div>
 
       {/* --- LIST / TABLE --- */}
@@ -297,58 +297,58 @@ const filteredApplicants = applicants.filter(app => {
           </div>
         </>
       )}
+      
       {modalOpen && selectedApplicant && (
-  <div className="modal-overlay" onClick={closeModal}>
-    <div className="profile-modal" onClick={e => e.stopPropagation()}>
-      <div className="modal-header-section">
-        <h2>{selectedApplicant.profiles?.fullname || 'Applicant Profile'}</h2>
-        <button className="modal-close-btn" onClick={closeModal}>×</button>
-      </div>
+        <div className="modal-overlay" onClick={closeModal}>
+          <div className="profile-modal" onClick={e => e.stopPropagation()}>
+            <div className="modal-header-section">
+              <h2>{selectedApplicant.profiles?.fullname || 'Applicant Profile'}</h2>
+              <button className="modal-close-btn" onClick={closeModal}>×</button>
+            </div>
 
-      <div className="profile-content-grid">
-        {/* Sidebar */}
-        <div className="profile-sidebar">
-          <div className="profile-card">
-            <h3>{selectedApplicant.profiles?.fullname}</h3>
-            {/* Displaying Job Title as Department/Role */}
-            <div className="profile-dept">Applied for: {selectedApplicant.job_posts?.title || 'N/A'}</div> 
-            
-            <div className="contact-item">
-              <Mail size={16} /> {selectedApplicant.profiles?.email || 'N/A'}
-            </div>
-            <div className="contact-item">
-              <Briefcase size={16} /> {selectedApplicant.job_posts?.title || 'N/A'}
-            </div>
-            
-            <div className="status-card">
-              <div className="status-title">Current Status</div>
-              <div>
-                <span className={`status-badge ${selectedApplicant.status.toLowerCase().includes('approved') ? 'approved' : selectedApplicant.status.toLowerCase()}`}>
-                  {selectedApplicant.status === 'Company_Approved_Waiting_Coordinator' ? 'Approved' : selectedApplicant.status}
-                </span>
+            <div className="profile-content-grid">
+              {/* Sidebar */}
+              <div className="profile-sidebar">
+                <div className="profile-card">
+                  <h3>{selectedApplicant.profiles?.fullname}</h3>
+                  {/* Displaying Job Title as Department/Role */}
+                  <div className="profile-dept">Applied for: {selectedApplicant.job_posts?.title || 'N/A'}</div> 
+                  
+                  <div className="contact-item">
+                    <Mail size={16} /> {selectedApplicant.profiles?.email || 'N/A'}
+                  </div>
+                  <div className="contact-item">
+                    <Briefcase size={16} /> {selectedApplicant.job_posts?.title || 'N/A'}
+                  </div>
+                  
+                  <div className="status-card">
+                    <div className="status-title">Current Status</div>
+                    <div>
+                      <span className={`status-badge ${selectedApplicant.status.toLowerCase().includes('approved') ? 'approved' : selectedApplicant.status.toLowerCase()}`}>
+                        {selectedApplicant.status === 'Company_Approved_Waiting_Coordinator' ? 'Approved' : selectedApplicant.status}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Main Content */}
+              <div className="profile-main-content">
+                <div className="profile-section">
+                  <h3><FileText size={18} /> Resume & Documents</h3>
+                  {selectedApplicant.resume_url ? (
+                    <a href={selectedApplicant.resume_url} target="_blank" rel="noopener noreferrer" className="resume-btn">
+                      <FileText size={14} /> View Full Resume (PDF)
+                    </a>
+                  ) : (
+                    <p className="text-muted">No Resume uploaded by the applicant.</p>
+                  )}
+                </div>
               </div>
             </div>
           </div>
         </div>
-
-        {/* Main Content */}
-        <div className="profile-main-content">
-          <div className="profile-section">
-            <h3><FileText size={18} /> Resume & Documents</h3>
-            {selectedApplicant.resume_url ? (
-              <a href={selectedApplicant.resume_url} target="_blank" rel="noopener noreferrer" className="resume-btn">
-                <FileText size={14} /> View Full Resume (PDF)
-              </a>
-            ) : (
-              <p className="text-muted">No Resume uploaded by the applicant.</p>
-            )}
-          </div>
-          {/* You can add more profile info here if your profiles table contained it (e.g., Education, Skills, Bio) */}
-        </div>
-      </div>
-    </div>
-  </div>
-)}
+      )}
     </div>
   );
 }
