@@ -488,7 +488,7 @@
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-card);
-  padding: 30px;
+  padding: 15px;
   height: 100%;
   overflow-y: auto;
   box-sizing: border-box;
@@ -582,12 +582,13 @@
   background: var(--bg-main); 
   z-index: 9999;
   overflow-y: auto;
-  padding: 20px;
+  padding: 20px 0px 20px 0px;
   transform: translateX(100%); 
   transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   display: flex;
   flex-direction: column;
 }
+.job-detail-title { margin-top: 8px; }
 
 .mobile-details-overlay.active {
   transform: translateX(0);
@@ -667,29 +668,54 @@
 
 /* --- 2. Mobile Tier A (< 700px) --- */
 @media (max-width: 700px) {
-  .modal-content {
-  /* 1. Use 'dvh' instead of 'vh' so it reacts to the address bar resizing */
-  max-height: 85dvh; 
   
-  width: 90%;
-  margin: 0 auto;
-  border-radius: var(--radius-card);
-  padding: 20px;
-  
-  /* 2. Ensure the container itself scrolls if content is too long */
-  overflow-y: auto; 
-  display: flex;
-  flex-direction: column;
-}
+  /* 🧊 MODAL UPDATES: FULL SCREEN TAKEOVER */
+  .modal-overlay {
+    padding: 0;
+    align-items: flex-start; /* Aligns to top to fill screen */
+    justify-content: center;
+    background: var(--bg-card); /* Match background to prevent gap flickers */
+  }
 
-.modal-footer {
-  /* 3. Keep it static (scrolls with content) as you requested */
-  position: static; 
-  margin-top: 20px;
+  .modal-content {
+    /* 1. Full Screen Dimensions */
+    width: 100% !important;
+    height: 100dvh !important; /* dVH handles mobile browser bars better than vh */
+    max-width: none !important;
+    max-height: none !important;
+    
+    /* 2. Remove "Floating Card" styling */
+    margin: 0;
+    border-radius: 0;
+    border: none;
+    
+    /* 3. Scrolling Logic */
+    overflow-y: auto; /* Allow vertical scroll */
+    overflow-x: hidden; /* 🛑 STRICTLY PREVENT LEFT/RIGHT SCROLL */
+    
+    /* 4. Layout Adjustment */
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    box-sizing: border-box; /* Ensures padding doesn't increase width */
+  }
+
+  /* Ensure internal containers don't push width out */
+  .modal-header, .modal-body, .modal-footer {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* Make footer scroll with content (Static) */
+  .modal-footer {
+    position: static; 
+    background: transparent;
+    padding-bottom: 40px; /* Extra padding for bottom spacing */
+    margin-top: auto; /* Pushes footer to bottom if content is short */
+    border-top: none;
+  }
   
-  /* 4. CRITICAL: Add extra padding for the browser bar/home gesture area */
-  padding-bottom: calc(20px + env(safe-area-inset-bottom)); 
-}
+  /* --- EXISTING LISTING STYLES (Kept from your code) --- */
   .listings-container h1 {
     font-size: 1.8rem;
     margin-bottom: 1.5rem;
@@ -699,11 +725,13 @@
   .search-filter-bar {
     flex-wrap: wrap;
     gap: 10px;
+    width: 100%; /* Ensure bar fits container */
   }
 
   .search-input {
-    min-width: 90%;
+    min-width: 100%; /* Fill row */
     order: 1;
+    box-sizing: border-box;
   }
 
   .filter-select {
@@ -718,29 +746,6 @@
     flex-grow: 1;
     margin-left: 0;
     text-align: center;
-  }
-
-  /* 🧊 MODAL UPDATES: Centered & Static Footer */
-  .modal-overlay {
-    padding-top: 0;
-    align-items: center;     /* Centers vertically */
-    justify-content: center; /* Centers horizontally */
-  }
-
-  .modal-content {
-    max-height: 85vh;
-    width: 90%;              /* Prevents it from touching edges */
-    margin: 0 auto;
-    border-radius: var(--radius-card); /* Restore rounded corners on all sides */
-    padding: 20px;
-  }
-
-  /* Make footer scroll with content, not stick to bottom */
-  .modal-footer {
-    position: static; 
-    background: transparent;
-    padding-bottom: 0;
-    margin-top: 20px;
   }
 }
 

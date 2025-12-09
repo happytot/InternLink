@@ -378,29 +378,39 @@ body {
 }
 
 /* =========================================
-   6. RESPONSIVE BREAKPOINTS
+   6. RESPONSIVE BREAKPOINTS (POLISHED)
    ========================================= */
 
-/* Desktop Layout (Side-by-side summary) */
-
-/* Base Tablet/Mobile Logic (< 1024px) */
+/* --- Tablet & Mobile (< 1024px) --- 
+   This handles the switch from Table View to Card View 
+*/
 @media (max-width: 1023px) {
     .history-container {
-        padding-top: 4.5rem;
-        margin: 0;
+        padding: 5rem 1.5rem 2rem 1.5rem; /* Consistent padding */
+        width: 100%;
+        box-sizing: border-box; /* Ensures padding doesn't increase width */
     }
 
+    /* Stack the Header */
     .header-area {
         flex-direction: column;
         align-items: flex-start;
-        gap: 1.5rem;
+        gap: 0.5rem;
+        border-bottom: none; /* Remove line on mobile for cleaner look */
+        margin-bottom: 1.5rem;
     }
 
+    .title-group h1 { font-size: 2rem; }
+
+    /* Summary Card: Stack vertical, full width */
     .summary-card {
-        width: 93%;
+        width: 100%; /* Fix: Remove 93% */
+        box-sizing: border-box;
         flex-direction: column;
-        gap: 1rem;
-        align-items: flex-start;
+        gap: 0; /* Let internal padding handle spacing */
+        align-items: stretch; /* Stretch children to full width */
+        padding: 0; /* Reset padding to handle internally */
+        overflow: hidden; /* Keeps the green pill contained */
     }
     
     .summary-card > div {
@@ -408,127 +418,96 @@ body {
         display: flex;
         justify-content: space-between;
         align-items: center;
+        padding: 1.2rem 1.5rem;
         border-bottom: 1px solid var(--border-color);
-        padding-bottom: 10px;
+        box-sizing: border-box;
     }
-    .summary-card > div:last-child { border-bottom: none; }
+
+    /* Special styling for the 'Active' green pill row */
+    .summary-card > div:last-child {
+        border-bottom: none;
+        background: rgba(34, 197, 94, 0.05); /* Subtle green bg */
+        justify-content: center; /* Center the text */
+        padding: 1rem;
+    }
     .summary-card hr { display: none; }
 
-    /* Hide Table, Show Cards */
+    /* Switch Views */
     .table-view { display: none; }
     .card-view { display: block; }
     
+    /* Filters Container */
     .filter-controls-container {
         flex-direction: column;
-        align-items: stretch;
+        align-items: flex-start;
         gap: 12px;
-    }
-    .filter-buttons {
-        justify-content: flex-start;
-        overflow-x: auto; /* Scrollable filters on mobile */
-        padding-bottom: 4px;
-    }
-    
-    .btn-filter {
-        white-space: nowrap;
-    }
-}
-
-/* --- 📱 Mobile Breakpoint: 700px --- */
-@media (max-width: 700px) {
-    .history-container { width: 92%; padding: 5rem 1rem }
-    .title-group h1 { font-size: 1.8rem; margin-bottom: 0.1rem;}
-    
-    /* Improve Summary Card spacing for smaller width */
-    .summary-card { padding: 0.8rem;}
-
-    .summary-card .count-large {
-        font-size: 2rem;
-    }
-
-    /* Make search/filters distinct */
-    .filter-controls-container { padding: 10px; width:100%;}
-    .job-grid { width: 103%;}
-}
-
-/* --- 📱 Mobile Breakpoint: 600px --- */
-@media (max-width: 600px) {
-    .summary-card { width: 89%; }
-    .job-grid { grid-template-columns: 1fr; }
-    .filter-controls-container { width: 98.3%}
-    .job-card {
-        /* Ensure card takes full width */
         width: 100%;
-        box-sizing: border-box; 
+        box-sizing: border-box;
     }
+
+    .filter-buttons {
+        width: 100%;
+        justify-content: flex-start;
+        overflow-x: auto; /* Allow horizontal scroll for many filters */
+        padding-bottom: 4px;
+        gap: 8px;
+        
+        /* Hide scrollbar but keep functionality */
+        -ms-overflow-style: none;  /* IE and Edge */
+        scrollbar-width: none;  /* Firefox */
+    }
+    .filter-buttons::-webkit-scrollbar { display: none; }
     
-    .header-area {
-        padding-bottom: 0.5rem;
-        margin-bottom: 1.5rem;
+    .btn-filter { white-space: nowrap; flex-shrink: 0; }
+    
+    /* Grid Layout */
+    .job-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        width: 100%; /* Fix: Remove 103% */
     }
 }
 
-/* --- 📱 Mobile Breakpoint: 500px --- */
-@media (max-width: 500px) {
+/* --- 📱 Mobile Large (< 600px) --- */
+@media (max-width: 600px) {
     .history-container {
-        padding-top: 5rem; /* Tighten container padding */
+        padding: 5rem 1rem 1rem 1rem; /* Tighter padding on small screens */
     }
 
-    .title-group h1 {
-        font-size: 1.75rem;
-    }
+    .title-group h1 { font-size: 1.75rem; }
 
-    .title-group .last-updated-time {
-        font-size: 0.7rem;
+    /* Adjust Job Card padding */
+    .job-card {
+        padding: 1.25rem;
+        width: 100%;
+        box-sizing: border-box;
     }
 
     .active-indicator {
-        font-size: 0.8rem;
-        padding: 6px 12px;
-    }
-    
-    /* Make summary rows tighter */
-    .summary-card > div {
-        padding-bottom: 8px;
+        width: 100%;
+        justify-content: center;
     }
 }
 
-/* --- 📱 Mobile Breakpoint: 400px --- */
+/* --- 📱 Mobile Small (< 400px) --- */
 @media (max-width: 400px) {
-    .history-container {
-        padding-top: 70px;
-    }
-
-    .title-group h1 {
-        font-size: 1.5rem; /* Even smaller title */
-    }
-
-    .job-card {
-        padding: 1.2rem;
-    }
-
-    .job-header h2 {
-        font-size: 1.1rem;
-    }
-
-    .company-name {
-        font-size: 0.85rem;
-    }
-
-    /* Stack buttons inside the card if needed, or make them full width */
-    .btn-start-internship, 
-    .btn-cancel {
-        width: 100%;
-        justify-content: center;
-        margin-bottom: 5px;
-    }
+    .title-group h1 { font-size: 1.5rem; }
     
+    .summary-card .count-large { font-size: 1.8rem; }
+    
+    /* Stack actions */
     .card-action-area {
         flex-direction: column;
-        gap: 5px;
+        gap: 10px;
     }
     
-    /* Filters might be too wide, reduce padding */
+    .btn-start-internship, .btn-cancel {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    /* Make filters smaller */
     .btn-filter {
         padding: 6px 12px;
         font-size: 0.8rem;

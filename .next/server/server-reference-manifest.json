@@ -15,6 +15,30 @@
       "layer": {
         "app/intern/logbook/page": "action-browser"
       }
+    },
+    "7443188031892212336c912f1e31399b8b300d99": {
+      "workers": {
+        "app/intern/history/page": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22C%3A%5C%5CUsers%5C%5Cace%5C%5CDocuments%5C%5Cintern-link-next-complete%5C%5Capp%5C%5Cintern%5C%5Chistory%5C%5Cactions.js%22%2C%5B%22startInternship%22%2C%22cancelApplication%22%2C%22getApplicationHistory%22%5D%5D%5D&__client_imported__=true!"
+      },
+      "layer": {
+        "app/intern/history/page": "action-browser"
+      }
+    },
+    "b965d2da024a98ca2a633a669d4bdeee6d0c38d6": {
+      "workers": {
+        "app/intern/history/page": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22C%3A%5C%5CUsers%5C%5Cace%5C%5CDocuments%5C%5Cintern-link-next-complete%5C%5Capp%5C%5Cintern%5C%5Chistory%5C%5Cactions.js%22%2C%5B%22startInternship%22%2C%22cancelApplication%22%2C%22getApplicationHistory%22%5D%5D%5D&__client_imported__=true!"
+      },
+      "layer": {
+        "app/intern/history/page": "action-browser"
+      }
+    },
+    "f50e0cefdb6052420b649fefb28d62d0e97cea11": {
+      "workers": {
+        "app/intern/history/page": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22C%3A%5C%5CUsers%5C%5Cace%5C%5CDocuments%5C%5Cintern-link-next-complete%5C%5Capp%5C%5Cintern%5C%5Chistory%5C%5Cactions.js%22%2C%5B%22startInternship%22%2C%22cancelApplication%22%2C%22getApplicationHistory%22%5D%5D%5D&__client_imported__=true!"
+      },
+      "layer": {
+        "app/intern/history/page": "action-browser"
+      }
     }
   },
   "edge": {},

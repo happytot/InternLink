@@ -1,7 +1,7 @@
 {
-  "/page": "app/page.js",
-  "/auth/internAuthPage/page": "app/auth/internAuthPage/page.js",
-  "/intern/dashboard/page": "app/intern/dashboard/page.js",
   "/intern/logbook/page": "app/intern/logbook/page.js",
-  "/intern/listings/page": "app/intern/listings/page.js"
+  "/intern/listings/page": "app/intern/listings/page.js",
+  "/intern/history/page": "app/intern/history/page.js",
+  "/intern/profile/page": "app/intern/profile/page.js",
+  "/intern/companies/page": "app/intern/companies/page.js"
 }

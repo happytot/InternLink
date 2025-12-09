@@ -403,7 +403,7 @@ html, body {
 /* Tablets (768px) */
 @media (max-width: 768px) {
   .dashboard-sidebar { grid-template-columns: 1fr; }
-  .welcome-banner { flex-direction: column; align-items: flex-start; max-height: 150px; }
+  .welcome-banner { flex-direction: column; align-items: flex-start; }
   .welcome-date { max-width: 20px; margin-top: 0px; margin-bottom: 0px; text-align: left; }
   .job-card, .app-card { padding: 16px; }
   .welcome-date { width: 10%;}
@@ -412,7 +412,7 @@ html, body {
 
 /* Mobile Phones (600px) */
 @media (max-width: 600px) {
-  .dashboard-container { padding: 70px 16px; }
+  .dashboard-container { padding: 70px 12px 50px 12px; }
   .slider-page { grid-template-columns: 1fr; margin-right: 20px; margin-left: 20px; width: 370px; }
   .job-card, .app-card { padding: 16px; min-height: auto; }
   .bento-grid-stats { grid-template-columns: (2, 1fr); gap: 12px; }
@@ -428,16 +428,31 @@ html, body {
 }
 
 @media (max-width: 500px) {
-  .dashboard-container { padding: 70px 12px 20px 12px; }
+  .dashboard-container { padding: 70px 12px 50px 12px; }
   .welcome-banner { padding: 20px; gap: 12px; }
   .welcome-date { width: 90%; max-width: none; margin-top: 8px; text-align: center; }
   .stat-card { padding: 14px; gap: 12px; }
 }
 
 /* 400px: Stack stats to 1 column and shrink titles */
+/* 400px: Stack stats to 1 column and shrink titles */
 @media (max-width: 400px) {
+  .welcome-banner {
+    max-height: unset; /* ALLOW IT TO GROW TALLER */
+    padding: 20px;     /* Reduce padding to save space */
+  }
+
+  .welcome-date { 
+    width: 80%;       /* Full width */
+    max-width: none; 
+    min-width: 0;
+    margin-top: 12px;
+    text-align: center;
+    align-self: center;
+  }
+
   .bento-grid-stats { grid-template-columns: 1fr; gap: 12px; }
-  .stat-card { flex-direction: row; align-items: center; } /* Revert to row layout since it's full width now */
+  .stat-card { flex-direction: row; align-items: center; } 
   .welcome-text h1 { font-size: 1.25rem; }
   .btn-secondary { font-size: 0.85rem; padding: 8px 12px; }
   .modal-content { border-radius: 16px 16px 0 0; }
@@ -445,7 +460,7 @@ html, body {
 
 /* 300px: Minimal padding and smaller icons for very small screens */
 @media (max-width: 300px) {
-  .dashboard-container { padding: 50px 8px; }
+  .dashboard-container { padding: 70px 12px 50px 12px; }
   .stat-icon-bg { width: 40px; height: 40px; font-size: 1rem; }
   .stat-value { font-size: 1.4rem; }
   .job-card, .app-card { padding: 12px; gap: 10px; }

@@ -503,3 +503,135 @@
     .form-group input, .form-group select { width: 100%; }
     .edu-input-group { width: 100%; }
 }
+
+/* =========================================
+   10. FINE-TUNED MOBILE RESPONSIVE (ADDED)
+   ========================================= */
+
+/* --- 600px: Standardization & Fixing Overflows --- */
+@media (max-width: 600px) {
+    /* Fix the top spacing so content isn't hidden behind navbar */
+    .profile-content-area {
+        padding-top: 80px; 
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* CRITICAL FIX: Prevent Select from pushing off-screen */
+    .form-group select {
+        width: 100%; /* Changed from 110% */
+        min-width: 0;
+    }
+
+    /* Ensure inputs fit perfectly */
+    .form-group input, 
+    .summary-textarea {
+        width: 100%;
+        box-sizing: border-box; /* Includes padding in width calculation */
+    }
+
+    /* Adjust Bento Grid gap */
+    .profile-bento-grid {
+        gap: 16px;
+    }
+}
+
+/* --- 500px: Card Compactness --- */
+@media (max-width: 500px) {
+    .profile-wrapper {
+        padding-bottom: 60px; /* Extra space for bottom nav/toast */
+    }
+
+    .profile-content-area {
+        padding-top: 10px;
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    /* Reduce card padding to gain screen real estate */
+    .profile-card {
+        padding: 16px;
+    }
+
+    /* Stack the header title row */
+    .page-header-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    .page-title {
+        font-size: 1.5rem;
+    }
+}
+
+/* --- 400px: Small Screens (iPhone SE, etc) --- */
+@media (max-width: 400px) {
+    /* Shrink the Profile Picture slightly */
+    .profile-pic-container {
+        width: 110px;
+        height: 110px;
+    }
+
+    .section-title {
+        font-size: 1rem;
+    }
+
+    /* File Upload Section: Stack elements */
+    .uploaded-file-mini {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .file-actions-mini {
+        width: 100%;
+        justify-content: flex-end;
+        padding-top: 5px;
+        border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    /* Education Section: Tighten inputs */
+    .education-item-grid {
+        padding: 40px 10px 15px 10px; /* Reduce side padding */
+    }
+    
+    .edu-input-group input {
+        font-size: 0.85rem; /* Smaller font prevents zoom on iOS */
+    }
+}
+
+/* --- 300px: Ultra Small / Folded Devices --- */
+@media (max-width: 300px) {
+    .profile-content-area {
+        padding: 60px 8px 20px 8px; /* Minimal padding */
+    }
+
+    .page-title {
+        font-size: 1.25rem;
+    }
+
+    .profile-card {
+        padding: 12px;
+        border-radius: 16px;
+    }
+
+    /* Stack buttons that might be side-by-side */
+    .btn-secondary, 
+    .btn-primary {
+        width: 100%;
+        justify-content: center;
+        font-size: 0.85rem;
+    }
+
+    .form-group label {
+        font-size: 0.8rem;
+    }
+
+    /* Hide decorative elements if necessary */
+    .skill-badge {
+        padding: 4px 8px;
+        font-size: 0.75rem;
+    }
+}
