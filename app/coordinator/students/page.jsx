@@ -212,30 +212,30 @@ export default function CoordinatorStudents() {
                    </table>
                </div>
            ) : (
-               <div className="card-container">
-                   {filteredStudents.map((s, index) => (
-                       <div className="student-card reveal-on-scroll" key={s.id} style={{ animationDelay: `${index * 0.05}s` }}>
-                       <img
-                           src={getProfilePic(s.profile_pic_url)}
-                           alt={s.fullname}
-                           className="student-avatar"
-                       />
-                       <h3 className="card-title">{s.fullname || "N/A"}</h3>
-                       <div className="card-info">
-                           <p><Building2 size={12}/> {s.department || "N/A"}</p>
-                           <p><Mail size={12}/> {s.email || "N/A"}</p>
-                       </div>
-                       <div className="card-actions">
-                           <button
-                           className="btn primary-btn info-btn full-width"
-                           onClick={() => handleOpenModal(s)}
-                           >
-                           <Info size={16} /> View Profile
-                           </button>
-                       </div>
-                       </div>
-                   ))}
-               </div>
+           <div className="card-container">
+               {filteredStudents.map((s, index) => (
+                   <div className="student-card reveal-on-scroll" key={s.id} style={{ animationDelay: `${index * 0.05}s` }}>
+                   <img
+                       src={getProfilePic(s.profile_pic_url)}
+                       alt={s.fullname}
+                       className="student-avatar"
+                   />
+                   <h3 className="card-title">{s.fullname || "N/A"}</h3>
+                   <div className="card-info">
+                       <p><Building2 size={12}/> {s.department || "N/A"}</p>
+                       <p><Mail size={12}/> {s.email || "N/A"}</p>
+                   </div>
+                   <div className="card-actions">
+                       <button
+                       className="btn primary-btn info-btn full-width"
+                       onClick={() => handleOpenModal(s)}
+                       >
+                       <Info size={16} /> View Profile
+                       </button>
+                   </div>
+                   </div>
+               ))}
+           </div>
            )}
        </div>
 

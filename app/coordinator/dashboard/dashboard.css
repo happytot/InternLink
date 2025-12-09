@@ -185,7 +185,7 @@
 */
 .charts-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns:1fr 1fr;
     gap: 30px;
 }
 
@@ -201,7 +201,7 @@
     box-sizing: border-box;
 }
 
-.chart-card.full { grid-column: 1 / -1; }
+
 
 .chart-card h3 {
     font-family: var(--font-heading);
@@ -276,5 +276,93 @@ input:checked + .slider:before { transform: translateX(24px); background-color: 
     }
     .dash-title {
         font-size: 2rem;
+    }
+}
+
+/* ========================================
+   ENHANCED ANALYTICS OVERVIEW STYLES
+   ======================================== */
+
+.analytics-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+.analytics-card {
+    padding: 25px 30px 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background: var(--bg-card);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card);
+    border: 1px solid var(--border-color);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.analytics-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 40px -10px rgba(0,0,0,0.2), var(--shadow-glow);
+}
+
+.kpi-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.analytics-card h4 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 0;
+    color: var(--text-main);
+}
+
+.kpi-value {
+    font-family: var(--font-heading);
+    font-size: 2.2rem;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 8px;
+}
+
+.analytics-card.green-accent .kpi-value {
+    color: var(--color-success, #22c55e);
+}
+
+.analytics-card.blue-accent .kpi-value {
+    color: var(--primary-blue, #3b82f6);
+}
+
+.analytics-card.orange-accent .kpi-value {
+    color: var(--primary-orange, #EE7428);
+}
+
+.analytics-card p {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    font-weight: 500;
+    margin-bottom: 18px;
+}
+
+.analytics-card .apexcharts-canvas {
+    align-self: center;
+    width: 100% !important;
+    margin-top: auto;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .analytics-cards {
+        grid-template-columns: 1fr;
+    }
+    .kpi-value {
+        font-size: 2rem;
+    }
+    .analytics-card p {
+        font-size: 0.9rem;
     }
 }

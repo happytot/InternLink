@@ -172,7 +172,7 @@ input:checked + .slider::before { transform: translateX(23px); background-color:
 
 .btn-secondary {
     background-color: var(--primary-orange);
-    color: var(--text-muted);
+    color: white;
     border-color: var(--border-color);
 }
 .btn-secondary:hover {
@@ -232,7 +232,14 @@ input:checked + .slider::before { transform: translateX(23px); background-color:
     margin-bottom: 10px;
 }
 
-
+.company-location {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    margin-bottom: 25px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
 
 .card-actions {
     margin-top: auto; /* Push buttons to the bottom */
@@ -307,13 +314,6 @@ input:checked + .slider::before { transform: translateX(23px); background-color:
 | Modal (Glassmorphism)
 |--------------------------------------------------------------------------
 */
-.modal-contact-stack {
-    display: flex;
-    flex-direction: column;
-    gap: 8px; /* Slightly looser spacing in modal */
-    margin-top: 15px;
-}
-
 .modal-overlay {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
@@ -403,38 +403,26 @@ input:checked + .slider::before { transform: translateX(23px); background-color:
 }
 .company-name-modal {
     font-size: 1.8rem;
-    margin-bottom: 0;
+    margin-bottom: 8px;
 }
-.card-info-stack {
+.company-location-modal {
     display: flex;
     flex-direction: column;
-    gap: 5px; /* Tighter spacing for detailed lines */
-    margin-bottom: 25px; /* Matches old company-location margin */
+    gap: 10px;
+    color: var(--text-muted);
+    font-size: 1rem;
 }
 
-/* Replaces .company-location with a more generic detailed-line style */
-.company-detail-line {
-    color: var(--text-muted);
-    font-size: 0.95rem;
+.detail-row {
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 0.85rem; /* Small text size */
 }
 
-.company-detail-line strong {
-    font-weight: 600;
+.detail-row span {
     color: var(--text-main);
 }
 
-.company-detail-line .icon-muted {
-    font-size: 1rem;
-    color: var(--secondary-cyan); /* Cyan for contact details */
-}
-
-.card-actions {
-    margin-top: auto;
-}
 
 
 .profile-section h3, .job-posts-container h3 {
@@ -544,7 +532,7 @@ input:checked + .slider::before { transform: translateX(23px); background-color:
 }
 
 .close-modal-btn {
-    width: 100%;
+    width: 12%;
     margin-top: 30px;
     background: var(--bg-input);
     color: var(--text-main);
@@ -650,4 +638,3 @@ input:checked + .slider::before { transform: translateX(23px); background-color:
     .card-container { grid-template-columns: 1fr; }
     .data-table th, .data-table td { padding: 12px 15px; }
 }
-

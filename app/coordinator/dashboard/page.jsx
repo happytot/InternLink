@@ -31,6 +31,16 @@ export default function CoordinatorDashboard() {
     activeInternships: 0,
     pendingApprovals: 0,
   });
+const [analytics, setAnalytics] = useState({
+  placementRate: 0,        // % students placed
+  partnerActivity: 0,      // number of active partners
+  studentSuccessRate: 0,   // % students completing internships successfully
+  placementTrend: Array(12).fill(0),    // placements per month
+  partnerTrend: Array(12).fill(0),      // partner activity per month
+  studentOutcomeTrend: Array(12).fill(0), // student outcomes per month
+});
+
+
 
   const [monthlyApplications, setMonthlyApplications] = useState([]);
   const [growthData, setGrowthData] = useState({
@@ -40,77 +50,81 @@ export default function CoordinatorDashboard() {
 
   const [currentTime, setCurrentTime] = useState(new Date());
 
-  useEffect(() => {
-    // Set initial time to avoid hydration mismatch
-    setCurrentTime(new Date());
-    
-    const interval = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000);
-    return () => clearInterval(interval);
-  }, []);
+useEffect(() => {
+  const fetchData = async () => {
+    setLoading(true);
 
-  // Sync theme toggle with body class
-  useEffect(() => {
-    if (isLightMode) {
-      document.body.classList.add('light-mode');
-    } else {
-      document.body.classList.remove('light-mode');
-    }
-  }, [isLightMode]);
+    // 1️⃣ Registered students
+    const { count: studentCount } = await supabase
+      .from("profiles")
+      .select("id", { head: true, count: "exact" })
+      .eq("user_type", "student");
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
+    // 2️⃣ Active internships
+    const { count: activeInternshipsCount } = await supabase
+      .from("job_applications")
+      .select("id", { head: true, count: "exact" })
+      .eq("status", "ongoing");
 
-      // 3. USE AUTHENTICATED CLIENT
-      // Because we use createClientComponentClient, these calls automatically 
-      // use the user's cookies/session.
-      const { count: studentCount } = await supabase.from("profiles").select("id", { head: true, count: "exact" }).eq("user_type", "student");
-      const { count: companyCount } = await supabase.from("companies").select("id", { head: true, count: "exact" });
-      const { count: activeCount } = await supabase.from("job_applications").select("id", { head: true, count: "exact" }).eq("status", "approved_by_coordinator");
-      const { count: pendingCount } = await supabase.from("job_applications").select("id", { head: true, count: "exact" }).eq("status", "Company_Approved_Waiting_Coordinator");
+    // 3️⃣ Total companies
+    const { count: companyCount } = await supabase
+      .from("companies")
+      .select("id", { head: true, count: "exact" });
 
-      setStats({
-        students: studentCount || 0,
-        companies: companyCount || 0,
-        activeInternships: activeCount || 0,
-        pendingApprovals: pendingCount || 0,
-      });
+    // 4️⃣ Active companies = companies that have at least one ongoing internship
+    const { data: activeCompanyApps } = await supabase
+      .from("job_applications")
+      .select("company_id")
+      .eq("status", "ongoing");
 
-      // Data fetching logic for charts
-      const { data: apps } = await supabase.from("job_applications").select("created_at");
-      const monthlyCounts = Array(12).fill(0);
-      apps?.forEach((app) => {
-        const month = new Date(app.created_at).getMonth();
-        monthlyCounts[month]++;
-      });
-      setMonthlyApplications(monthlyCounts);
+    const activeCompanyIds = new Set(activeCompanyApps?.map(app => app.company_id));
+    const activeCompanies = activeCompanyIds.size || 0;
 
-      const { data: studentData } = await supabase.from("profiles").select("created_at").eq("user_type", "student");
-      const studentMonthly = Array(12).fill(0);
-      studentData?.forEach((s) => {
-        const month = new Date(s.created_at).getMonth();
-        studentMonthly[month]++;
-      });
+    // 5️⃣ Applications per month
+    const { data: apps } = await supabase
+      .from("job_applications")
+      .select("created_at");
 
-      const { data: companyData } = await supabase.from("companies").select("updated_at");
-      const companyMonthly = Array(12).fill(0);
-      companyData?.forEach((c) => {
-        const month = new Date(c.updated_at).getMonth();
-        companyMonthly[month]++;
-      });
+    const monthlyApplications = Array(12).fill(0);
+    apps?.forEach(app => {
+      const month = new Date(app.created_at).getMonth();
+      monthlyApplications[month]++;
+    });
+    setMonthlyApplications(monthlyApplications);
 
-      setGrowthData({
-        monthlyStudents: studentMonthly,
-        monthlyCompanies: companyMonthly,
-      });
+    // 6️⃣ Set stats
+    setStats({
+      students: studentCount || 0,
+      companies: companyCount || 0,
+      activeInternships: activeInternshipsCount || 0,
+      pendingApprovals: 0, // optional
+    });
 
-      setLoading(false);
-    };
+    // 7️⃣ Placement Rate
+    const placementRate = studentCount
+      ? Math.round((activeInternshipsCount / studentCount) * 100)
+      : 0;
 
-    fetchData();
-  }, []);
+    // 8️⃣ Set analytics
+    setAnalytics({
+      placementRate,
+      partnerActivity: activeCompanies,
+      studentSuccessRate: 0, // no students completed yet
+      placementTrend: Array(12).fill(placementRate),
+      partnerTrend: Array(12).fill(activeCompanies),
+      studentOutcomeTrend: Array(12).fill(0),
+    });
+
+    setLoading(false);
+  };
+
+  fetchData();
+}, []);
+
+
+
+
+
 
   const chartTheme = {
     theme: { mode: isLightMode ? 'light' : 'dark' },
@@ -186,30 +200,90 @@ export default function CoordinatorDashboard() {
         </div>
       </section>
 
+      {/* Analytics & Reports Overview */}
+
+
+{/* Analytics & Reports Overview */}
+<section className="analytics-overview">
+ 
+
+  <div className="analytics-cards">
+    {/* 1. Placement Rates KPI */}
+    <div className="analytics-card kpi-card green-accent">
+      <div className="kpi-header">
+        <h4>Placement Rate</h4>
+        <span className="kpi-value">{analytics.placementRate}%</span>
+      </div>
+      <p>Students successfully placed</p>
+      
+      {/* Sparkline Chart for Trend */}
+      <ApexChart
+        type="area"
+        height={100}
+        series={[{ name: "Placements", data: analytics.placementTrend }]}
+        options={{
+          ...chartTheme,
+          colors: ['#22c55e'],
+          chart: { sparkline: { enabled: true }, background: 'transparent' },
+          stroke: { curve: 'smooth', width: 2 },
+          fill: { opacity: 0.2 },
+        }}
+      />
+    </div>
+
+    {/* 2. Partner Engagement KPI */}
+    <div className="analytics-card kpi-card blue-accent">
+      <div className="kpi-header">
+        <h4>Partner Engagement</h4>
+        <span className="kpi-value">{analytics.partnerActivity}</span>
+      </div>
+      <p>Active companies posting jobs</p>
+
+      {/* Sparkline Chart for Trend */}
+      <ApexChart
+        type="area"
+        height={100}
+        series={[{ name: "Partners", data: analytics.partnerTrend }]}
+        options={{
+          ...chartTheme,
+          colors: ['#3b82f6'],
+          chart: { sparkline: { enabled: true }, background: 'transparent' },
+          stroke: { curve: 'smooth', width: 2 },
+          fill: { opacity: 0.2 },
+        }}
+      />
+    </div>
+
+    {/* 3. Student Outcomes KPI */}
+    <div className="analytics-card kpi-card orange-accent">
+      <div className="kpi-header">
+        <h4>Student Outcomes</h4>
+        <span className="kpi-value">{analytics.studentSuccessRate}%</span>
+      </div>
+      <p>Completed internships successfully</p>
+      
+      {/* Sparkline Chart for Trend */}
+      <ApexChart
+        type="area"
+        height={100}
+        series={[{ name: "Success Rate", data: analytics.studentOutcomeTrend }]}
+        options={{
+          ...chartTheme,
+          colors: ['#EE7428'],
+          chart: { sparkline: { enabled: true }, background: 'transparent' },
+          stroke: { curve: 'smooth', width: 2 },
+          fill: { opacity: 0.2 },
+        }}
+      />
+    </div>
+  </div>
+</section>
+
+
+
       {/* Charts Grid */}
       <section className="charts-grid">
-        <div className="chart-card">
-          <h3>User Growth (Monthly)</h3>
-          <ApexChart
-            type="area"
-            height={250}
-            series={[
-              { name: "Students", data: growthData.monthlyStudents },
-              { name: "Companies", data: growthData.monthlyCompanies },
-            ]}
-            options={{
-              ...chartTheme,
-              stroke: { curve: "smooth", width: 3 },
-              colors: ["#EE7428", "#3b82f6"],
-              grid: { borderColor: isLightMode ? '#e2e8f0' : '#27343D' },
-              xaxis: {
-                categories: ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
-                labels: { style: { colors: chartTheme.foreColor } },
-              },
-              yaxis: { labels: { style: { colors: chartTheme.foreColor } } },
-            }}
-          />
-        </div>
+       
 
         <div className="chart-card">
           <h3>Internship Status</h3>
