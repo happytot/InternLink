@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useTheme } from 'next-themes'; 
 import { Line, Doughnut } from 'react-chartjs-2';
-import html2canvas from 'html2canvas'; 
 import jsPDF from 'jspdf'; 
 import autoTable from 'jspdf-autotable'; 
 import {
@@ -28,16 +27,18 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   
   // --- PDF & Export State ---
-  const dashboardRef = useRef(null); 
   const [showExportModal, setShowExportModal] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+  
+  // Toggles & Chart Refs
+  const [includeCharts, setIncludeCharts] = useState(true); 
+  const lineChartRef = useRef(null); // Ref to capture Line Chart
+  const pieChartRef = useRef(null);  // Ref to capture Pie Chart
 
   // --- Data State ---
   const [stats, setStats] = useState({ interns: 0, companies: 0, jobs: 0, applications: 0 });
   const [lineData, setLineData] = useState(null);
   const [pieData, setPieData] = useState(null);
-  
-  // Table 4 Data (Recent Activity)
   const [tableData, setTableData] = useState([]); 
 
   const chartTextColor = resolvedTheme === 'dark' ? '#F8FAFC' : '#1e293b';
@@ -46,7 +47,7 @@ export default function AdminDashboard() {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        // --- 1. EXISTING COUNTS ---
+        // --- 1. Counts ---
         const { count: internCount } = await supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('user_type', 'student'); 
         const { count: companyCount } = await supabase.from('companies').select('*', { count: 'exact', head: true });
         const { count: jobCount } = await supabase.from('job_posts').select('*', { count: 'exact', head: true });
@@ -59,7 +60,7 @@ export default function AdminDashboard() {
           applications: appCount || 0
         });
 
-        // --- 2. EXISTING CHART DATA ---
+        // --- 2. Chart Data ---
         const { data: jobDates } = await supabase.from('job_posts').select('created_at').order('created_at', { ascending: true });
         const { data: appDates } = await supabase.from('job_applications').select('created_at').order('created_at', { ascending: true });
         
@@ -113,7 +114,7 @@ export default function AdminDashboard() {
           }],
         });
 
-        // --- 3. FETCH FOR TABLE 4 (Recent Activity) ---
+        // --- 3. Table Data ---
         const { data: rawApps } = await supabase
           .from('job_applications')
           .select('*') 
@@ -121,50 +122,41 @@ export default function AdminDashboard() {
           .limit(15);
 
         if (rawApps && rawApps.length > 0) {
-          // Detect IDs (Using 'intern_id' as confirmed)
-          const firstItem = rawApps[0];
-          const applicantKey = 'intern_id' in firstItem ? 'intern_id' : 
-                               'applicant_id' in firstItem ? 'applicant_id' : 'user_id';
-          const jobKey = 'job_id' in firstItem ? 'job_id' : 'post_id';
+           const firstItem = rawApps[0];
+           const applicantKey = 'intern_id' in firstItem ? 'intern_id' : 'user_id';
+           const jobKey = 'job_id' in firstItem ? 'job_id' : 'post_id';
 
-          const internIds = [...new Set(rawApps.map(a => a[applicantKey]).filter(Boolean))];
-          const jobIds = [...new Set(rawApps.map(a => a[jobKey]).filter(Boolean))];
+           const internIds = [...new Set(rawApps.map(a => a[applicantKey]).filter(Boolean))];
+           const jobIds = [...new Set(rawApps.map(a => a[jobKey]).filter(Boolean))];
 
-          // Fetch Profiles and Jobs
-          const { data: users } = await supabase.from('profiles').select('*').in('id', internIds);
-          const { data: jobs } = await supabase.from('job_posts').select('*').in('id', jobIds);
+           const { data: users } = await supabase.from('profiles').select('*').in('id', internIds);
+           const { data: jobs } = await supabase.from('job_posts').select('*').in('id', jobIds);
 
-          const detailedApps = rawApps.map(app => {
-            const user = users?.find(u => u.id === app[applicantKey]);
-            const job = jobs?.find(j => j.id === app[jobKey]);
-            
-            // 🔍 FIXED: Prioritize 'fullname' as requested
-            let userName = 'Unknown User';
-            
-            if (user) {
-                // 1. Check 'fullname' (Your DB Column)
-                if (user.fullname) userName = user.fullname;
-                // 2. Fallbacks just in case
-                else if (user.full_name) userName = user.full_name;
-                else if (user.first_name) userName = `${user.first_name} ${user.last_name || ''}`;
-                else if (user.email) userName = user.email;
-            }
+           const detailedApps = rawApps.map(app => {
+             const user = users?.find(u => u.id === app[applicantKey]);
+             const job = jobs?.find(j => j.id === app[jobKey]);
+             
+             let userName = 'Unknown User';
+             if (user) {
+                 if (user.fullname) userName = user.fullname;
+                 else if (user.full_name) userName = user.full_name;
+                 else if (user.first_name) userName = `${user.first_name} ${user.last_name || ''}`;
+                 else if (user.email) userName = user.email;
+             }
 
-            const jobTitle = job 
-              ? (job.job_title || job.title || job.role || 'No Title')
-              : 'Unknown Job';
+             const jobTitle = job 
+               ? (job.job_title || job.title || job.role || 'No Title')
+               : 'Unknown Job';
 
-            return {
-              ...app,
-              // We normalize the data here to 'full_name' so the PDF code below is clean
-              profiles: { full_name: userName },
-              job_posts: { job_title: jobTitle }
-            };
-          });
-
-          setTableData(detailedApps);
+             return {
+               ...app,
+               profiles: { full_name: userName },
+               job_posts: { job_title: jobTitle }
+             };
+           });
+           setTableData(detailedApps);
         } else {
-          setTableData([]);
+           setTableData([]);
         }
 
       } catch (error) {
@@ -178,9 +170,8 @@ export default function AdminDashboard() {
   }, [supabase, resolvedTheme]);
 
 
-  // --- 🟢 PDF EXPORT WITH 4 TABLES & HEADER/FOOTER ---
+  // --- 🟢 PDF GENERATION LOGIC ---
   const handleDownloadPDF = async () => {
-    if (!dashboardRef.current) return;
     setIsGenerating(true);
 
     try {
@@ -189,51 +180,46 @@ export default function AdminDashboard() {
       const pageHeight = doc.internal.pageSize.getHeight();
       const today = new Date().toLocaleDateString();
 
-      // --- Helper: Headers & Footers ---
+      // --- A. B&W TABLE STYLES ---
+      // This enforces the black and white look for TABLES only.
+      const bwStyles = {
+        theme: 'plain', 
+        headStyles: { 
+          fillColor: [0, 0, 0], // Black Headers
+          textColor: [255, 255, 255], // White Text
+          fontStyle: 'bold',
+          lineWidth: 0.1,
+          lineColor: [200, 200, 200]
+        },
+        styles: { 
+          fontSize: 10, 
+          cellPadding: 3, 
+          halign: 'center',
+          textColor: [0, 0, 0], // Black Text
+          lineColor: [200, 200, 200], // Gray Borders
+          lineWidth: 0.1,
+        },
+        margin: { top: 20, bottom: 20 },
+      };
+
       const addHeaderFooter = (pageNumber, totalPages) => {
-        // Header
         doc.setFontSize(10);
-        doc.setTextColor(150);
+        doc.setTextColor(50);
         doc.text("Admin Dashboard Report", 14, 10);
         doc.text(today, pageWidth - 14, 10, { align: 'right' });
-        
-        // Footer (Page X of Y)
         doc.setFontSize(8);
         doc.text(`Page ${pageNumber} of ${totalPages}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
       };
 
-      // --- 1. Screenshot (Visuals) ---
-      const canvas = await html2canvas(dashboardRef.current, {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: resolvedTheme === 'dark' ? '#0f172a' : '#ffffff',
-      });
-      const imgData = canvas.toDataURL('image/png');
-      const imgWidth = pageWidth - 28; 
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      
-      // Title Block
+      // --- B. DOCUMENT TITLE ---
       doc.setFontSize(22);
-      doc.setTextColor(40);
+      doc.setTextColor(0, 0, 0); // Black
       doc.text("Analytics Overview", 14, 20);
       
-      // Add Image
-      doc.addImage(imgData, 'PNG', 14, 25, imgWidth, imgHeight);
+      let currentY = 30;
 
-      // --- 2. GENERATE THE 4 TABLES ---
-      let currentY = 25 + imgHeight + 10;
-
-      // Style Configuration
-      const commonTableOpts = {
-        theme: 'grid',
-        headStyles: { fillColor: [238, 116, 40], textColor: 255 }, // Brand Orange
-        styles: { fontSize: 10, cellPadding: 3, halign: 'center' },
-        margin: { top: 20, bottom: 20 },
-      };
-
-      // Table 1: KPI Overview
+      // --- C. TABLE 1: KPI OVERVIEW (B&W) ---
       doc.setFontSize(14);
-      doc.setTextColor(0);
       doc.text("1. General Overview", 14, currentY);
       currentY += 6;
 
@@ -241,37 +227,68 @@ export default function AdminDashboard() {
         startY: currentY,
         head: [['Total Interns', 'Companies', 'Active Listings', 'Total Applications']],
         body: [[stats.interns, stats.companies, stats.jobs, stats.applications]],
-        ...commonTableOpts,
+        ...bwStyles,
       });
 
       currentY = doc.lastAutoTable.finalY + 15;
 
-      // Table 2: Platform Trends
-      if (currentY > pageHeight - 40) { doc.addPage(); currentY = 20; }
+      // --- D. CHARTS (COLORED) ---
+      // We check the toggle. If true, we insert the COLORED images.
       
       doc.text("2. Platform Trends", 14, currentY);
       currentY += 6;
 
+      if (includeCharts && lineChartRef.current) {
+        // 🟢 This captures the canvas EXACTLY as seen (Orange/Blue)
+        const chartBase64 = lineChartRef.current.toBase64Image(); 
+        
+        const imgWidth = 160; 
+        const imgHeight = 80;
+        
+        if (currentY + imgHeight > pageHeight - 20) {
+            doc.addPage();
+            currentY = 20;
+        }
+
+        doc.addImage(chartBase64, 'PNG', (pageWidth - imgWidth) / 2, currentY, imgWidth, imgHeight);
+        currentY += imgHeight + 10;
+      }
+
+      // --- E. TABLE 2: TRENDS (B&W) ---
+      if (currentY > pageHeight - 40) { doc.addPage(); currentY = 20; }
       const trendsBody = lineData ? lineData.labels.map((month, i) => [
         month,
-        lineData.datasets[0].data[i], // New Jobs
-        lineData.datasets[1].data[i]  // Applications
+        lineData.datasets[0].data[i], 
+        lineData.datasets[1].data[i] 
       ]) : [];
 
       autoTable(doc, {
         startY: currentY,
         head: [['Month', 'New Jobs', 'Applications']],
         body: trendsBody,
-        ...commonTableOpts,
+        ...bwStyles,
       });
 
       currentY = doc.lastAutoTable.finalY + 15;
 
-      // Table 3: Job Types
-      if (currentY > pageHeight - 40) { doc.addPage(); currentY = 20; }
-
+      // --- F. JOB TYPES (COLORED CHART + B&W TABLE) ---
       doc.text("3. Job Types Distribution", 14, currentY);
       currentY += 6;
+
+      if (includeCharts && pieChartRef.current) {
+        // 🟢 Capture Pie Chart Colors
+        const chartBase64 = pieChartRef.current.toBase64Image();
+        const imgWidth = 80;
+        const imgHeight = 80;
+
+        if (currentY + imgHeight > pageHeight - 20) {
+            doc.addPage();
+            currentY = 20;
+        }
+
+        doc.addImage(chartBase64, 'PNG', (pageWidth - imgWidth) / 2, currentY, imgWidth, imgHeight);
+        currentY += imgHeight + 10;
+      }
 
       const pieHead = pieData ? pieData.labels : ['Remote', 'On-site', 'Hybrid'];
       const pieBody = pieData ? [pieData.datasets[0].data] : [[0, 0, 0]];
@@ -280,20 +297,19 @@ export default function AdminDashboard() {
         startY: currentY,
         head: [pieHead],
         body: pieBody,
-        ...commonTableOpts,
+        ...bwStyles,
       });
 
       currentY = doc.lastAutoTable.finalY + 15;
 
-      // Table 4: Recent Logs (Using the fixed 'fullname' data)
+      // --- G. TABLE 4: RECENT LOGS (B&W) ---
       if (currentY > pageHeight - 40) { doc.addPage(); currentY = 20; }
-
       doc.text("4. Recent Applications Log", 14, currentY);
       currentY += 6;
 
       const activityBody = tableData.map(row => [
         new Date(row.created_at).toLocaleDateString(),
-        row.profiles?.full_name || 'Unknown', // This now holds the 'fullname' from DB
+        row.profiles?.full_name || 'Unknown',
         row.job_posts?.job_title || 'Unknown',
         row.status || 'Pending'
       ]);
@@ -302,20 +318,18 @@ export default function AdminDashboard() {
         startY: currentY,
         head: [['Date', 'Applicant Name', 'Job Title', 'Status']],
         body: activityBody,
-        ...commonTableOpts,
-        theme: 'striped', 
-        styles: { ...commonTableOpts.styles, halign: 'left' }, 
-        headStyles: { fillColor: [50, 50, 50] }, // Dark header
+        ...bwStyles,
+        styles: { ...bwStyles.styles, halign: 'left' },
       });
 
-      // --- 3. APPLY HEADER/FOOTER TO ALL PAGES ---
+      // --- Finalize ---
       const totalPages = doc.internal.getNumberOfPages();
       for (let i = 1; i <= totalPages; i++) {
         doc.setPage(i);
         addHeaderFooter(i, totalPages);
       }
 
-      doc.save(`Analytics_Full_Report_${new Date().toISOString().split('T')[0]}.pdf`);
+      doc.save(`Report_${new Date().toISOString().split('T')[0]}.pdf`);
       setShowExportModal(false);
 
     } catch (err) {
@@ -326,12 +340,10 @@ export default function AdminDashboard() {
     }
   };
 
-  if (loading) return <div className={styles.loadingContainer}>Loading Dashboard...</div>;
+  if (loading) return <div className={styles.loadingContainer}>Loading...</div>;
 
   return (
     <div className={styles.dashboardWrapper}>
-      
-      {/* Header & Export Button */}
       <div className={styles.header}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
@@ -344,8 +356,7 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* 📸 Screenshot Area */}
-      <div ref={dashboardRef} className={styles.printArea}>
+      <div className={styles.printArea}>
         {/* KPI Cards */}
         <div className={styles.kpiGrid}>
           <StatCard title="Total Interns" value={stats.interns} change="Active" type="positive" />
@@ -359,7 +370,8 @@ export default function AdminDashboard() {
           <div className={styles.chartCard}>
             <h3 className={styles.chartTitle}>Platform Trends</h3>
             <div className={styles.chartContainer}>
-              {lineData && <Line 
+              {/* 🟢 Line Chart with Ref */}
+              {lineData && <Line ref={lineChartRef} 
                   data={lineData} 
                   options={{ 
                       responsive: true, 
@@ -377,7 +389,8 @@ export default function AdminDashboard() {
           <div className={styles.chartCard}>
             <h3 className={styles.chartTitle}>Job Types</h3>
             <div className={styles.pieContainer}>
-              {pieData && <Doughnut 
+               {/* 🟢 Pie Chart with Ref */}
+              {pieData && <Doughnut ref={pieChartRef} 
                   data={pieData} 
                   options={{ 
                       responsive: true, 
@@ -395,7 +408,24 @@ export default function AdminDashboard() {
         <div className={styles.modalOverlay}>
           <div className={styles.modalContent}>
             <h3>Export Analytics Report?</h3>
-            <p>This will generate a PDF containing visuals and 4 detailed data tables.</p>
+            <p>Generate a structured PDF report of your current dashboard data.</p>
+            
+            {/* Toggle Switch */}
+            <div style={{ margin: '20px 0', textAlign: 'left', background: 'var(--bg-input)', padding: '15px', borderRadius: '8px' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', color: 'var(--text-main)' }}>
+                <input 
+                  type="checkbox" 
+                  checked={includeCharts} 
+                  onChange={(e) => setIncludeCharts(e.target.checked)} 
+                  style={{ width: '18px', height: '18px' }}
+                />
+                <span style={{ fontWeight: 500 }}>Include Visual Charts</span>
+              </label>
+              <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginLeft: '28px', marginTop: '4px' }}>
+                Charts will be included in full color.
+              </p>
+            </div>
+
             <div className={styles.modalActions}>
               <button className={styles.cancelBtn} onClick={() => setShowExportModal(false)}>Cancel</button>
               <button className={styles.confirmBtn} onClick={handleDownloadPDF} disabled={isGenerating}>
