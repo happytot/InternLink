@@ -163,7 +163,7 @@
 /******/ 		// This function allow to reference async chunks
 /******/ 		__webpack_require__.u = function(chunkId) {
 /******/ 			// return url for filenames based on template
-/******/ 			return "static/chunks/" + chunkId + ".js";
+/******/ 			return undefined;
 /******/ 		};
 /******/ 	}();
 /******/ 	
@@ -192,7 +192,7 @@
 /******/ 	
 /******/ 	/* webpack/runtime/getFullHash */
 /******/ 	!function() {
-/******/ 		__webpack_require__.h = function() { return "ce3c43b018370cd6"; }
+/******/ 		__webpack_require__.h = function() { return "0c44481547a3b3ea"; }
 /******/ 	}();
 /******/ 	
 /******/ 	/* webpack/runtime/global */
@@ -830,30 +830,9 @@
 /******/ 		// [resolve, reject, Promise] = chunk loading, 0 = chunk loaded
 /******/ 		var installedChunks = __webpack_require__.hmrS_jsonp = __webpack_require__.hmrS_jsonp || {
 /******/ 			"webpack": 0,
-/******/ 			"css-app_LandingPage_css": 0,
-/******/ 			"css-app_index_css": 0,
-/******/ 			"css-app_components_AuthPage_module_css": 0,
-/******/ 			"css-app_intern_dashboard_Dashboard_css": 0,
-/******/ 			"css-app_components_InternNav_css-app_globals_css-app_components_AdminSidebar_module_css": 0,
-/******/ 			"css-app_intern_components_Logbook_module_css": 0,
-/******/ 			"css-app_intern_listings_Listings_css": 0,
-/******/ 			"css-app_intern_history_ApplicationHistory_css": 0,
-/******/ 			"css-app_intern_profile_Profile_css": 0,
-/******/ 			"css-app_intern_companies_companies_css": 0,
-/******/ 			"css-app_admin_AdminDashboard_module_css": 0,
-/******/ 			"css-app_admin_users_Users_module_css": 0,
-/******/ 			"css-app_coordinator_dashboard_dashboard_css-node_modules_fontsource_inter_400_css-node_module-55e726": 0,
-/******/ 			"css-app_components_CoordinatorSidebar_css-app_coordinator_coordinator-layout_css": 0,
-/******/ 			"css-app_coordinator_students_students_css": 0,
-/******/ 			"css-app_coordinator_approvals_approvals_css": 0,
-/******/ 			"css-app_coordinator_internships_internships_css": 0,
-/******/ 			"css-app_coordinator_companies_companies_css": 0,
-/******/ 			"css-app_company_dashboard_CompanyDashboard_css": 0,
-/******/ 			"css-app_components_CompanyNav_css": 0,
-/******/ 			"css-app_company_profile_profile_css": 0,
-/******/ 			"css-app_company_logbook_CompanyLogbook_module_css": 0,
 /******/ 			"css-app_company_applicants_applicants_css": 0,
-/******/ 			"css-app_company_jobs_listings_listings_css": 0
+/******/ 			"css-app_components_CompanyNav_css-app_globals_css": 0,
+/******/ 			"css-app_index_css": 0
 /******/ 		};
 /******/ 		
 /******/ 		__webpack_require__.f.j = function(chunkId, promises) {
@@ -865,7 +844,7 @@
 /******/ 					if(installedChunkData) {
 /******/ 						promises.push(installedChunkData[2]);
 /******/ 					} else {
-/******/ 						if(/^(app(\/(a(dmin\/((|users\/)page|layout)|uth\/(co(mpany|ordinator)AuthPage\/page|internAuthPage\/page))|co(mpany\/((applicants|dashboard|jobs\/listings|logbook|profile)\/page|layout)|ordinator\/(((approval|companie|internship|student)s|dashboard)\/page|layout))|intern\/(l((istings|ogbook)\/page|ayout)|(companies|dashboard|history|profile)\/page)|layout|page)|\-pages\-internals)|main(|\-app)|pages\/_(app|error)|\/_error|_app\-pages\-browser_node_modules_react\-apexcharts_dist_react\-apexcharts_min_js|react\-refresh)$/.test(chunkId)) {
+/******/ 						if(!/^(css\-app_(comp(any_applicants_applicant|onents_CompanyNav_css\-app_global)s_css|index_css)|webpack)$/.test(chunkId)) {
 /******/ 							// setup Promise in chunk cache
 /******/ 							var promise = new Promise(function(resolve, reject) { installedChunkData = installedChunks[chunkId] = [resolve, reject]; });
 /******/ 							promises.push(installedChunkData[2] = promise);

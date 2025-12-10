@@ -19,7 +19,11 @@ import {
   Clock, 
   Briefcase,
   Search,
-  Filter
+  Filter,
+  X,
+  Phone,
+  Calendar,
+  MapPin
 } from 'lucide-react';
 
 export default function ApplicantsPage() {
@@ -30,21 +34,31 @@ export default function ApplicantsPage() {
   const [filterStatus, setFilterStatus] = useState('All');
   const [selectedApplicant, setSelectedApplicant] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+const [isClosing, setIsClosing] = useState(false);
 
-  const openModal = (applicant) => {
-    setSelectedApplicant(applicant);
-    setModalOpen(true);
-  };
 
-  const closeModal = () => {
+const openModal = (applicant) => {
+  setSelectedApplicant(applicant);
+  setIsProfileModalOpen(true);
+  setIsClosing(false);
+};
+
+const handleCloseModal = () => {
+  setIsClosing(true);
+  setTimeout(() => {
+    setIsProfileModalOpen(false);
     setSelectedApplicant(null);
-    setModalOpen(false);
-  };
+  }, 200);
+};
+
+
 
   // Stats for the Top Bento Grid
   const [stats, setStats] = useState({ total: 0, pending: 0, approved: 0, rejected: 0 });
 
-  const fetchApplicants = useCallback(async () => {
+const fetchApplicants = useCallback(() => {
+  const fetchData = async () => {
     setLoading(true);
     try {
       const { data: userData, error: userError } = await supabase.auth.getUser();
@@ -52,7 +66,7 @@ export default function ApplicantsPage() {
         toast.error("Please log in.");
         return;
       }
-      
+
       const cId = userData.user.id;
       setCompanyId(cId);
 
@@ -63,32 +77,48 @@ export default function ApplicantsPage() {
           created_at,
           status,
           resume_url,
-          profiles:profiles!job_applications_intern_id_fkey ( fullname, email ),
+          profiles:profiles!job_applications_intern_id_fkey (
+            fullname,
+            email,
+            phone,
+            department,
+            location,
+            summary,
+            profile_pic_url,
+            skills,
+            education,
+            resume_url
+          ),
           job_posts:job_posts!fk_job_applications_job ( title )
-        `) 
+        `)
         .eq("company_id", cId)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      
-      const apps = data || [];
-      setApplicants(apps);
 
-      // Calculate Stats
+      setApplicants(data || []);
+
+      // Update stats
       setStats({
-        total: apps.length,
-        pending: apps.filter(a => a.status === 'Pending').length,
-        approved: apps.filter(a => a.status.includes('Approved') || a.status === 'Accepted').length,
-        rejected: apps.filter(a => a.status === 'Rejected').length
+        total: data.length,
+        pending: data.filter(a => a.status === 'Pending').length,
+        approved: data.filter(a => a.status.includes('Approved') || a.status === 'Accepted').length,
+        rejected: data.filter(a => a.status === 'Rejected').length
       });
 
     } catch (err) {
-      console.error("❌ Error:", err.message);
-      toast.error("Error loading applicants.");
+      console.error(err);
+      toast.error("Failed to fetch applicants");
     } finally {
       setLoading(false);
     }
-  }, [supabase]); 
+  };
+
+  fetchData(); // Call the async function
+}, [supabase]);
+
+ 
+
 
   useEffect(() => {
     fetchApplicants();
@@ -216,13 +246,14 @@ export default function ApplicantsPage() {
                 {filteredApplicants.map(app => (
                   <tr key={app.id}>
                     <td>
-                      <div className="candidate-info">
-                        <div className="avatar-circle">{app.profiles?.fullname?.[0] || 'U'}</div>
-                        <div>
-                          <div className="name">{app.profiles?.fullname || 'Unknown'}</div>
-                          <div className="email">{app.profiles?.email || 'N/A'}</div>
-                        </div>
-                      </div>
+                     <div className="candidate-info clickable" onClick={() => openModal(app)}>
+  <div className="avatar-circle">{app.profiles?.fullname?.[0] || 'U'}</div>
+  <div>
+    <div className="name link-name">{app.profiles?.fullname || 'Unknown'}</div>
+    <div className="email">{app.profiles?.email || 'N/A'}</div>
+  </div>
+</div>
+
                     </td>
                     <td>
                       <div className="job-info">
@@ -269,13 +300,14 @@ export default function ApplicantsPage() {
             {filteredApplicants.map(app => (
               <div key={app.id} className="mobile-card">
                 <div className="card-top">
-                  <div className="candidate-info">
-                    <div className="avatar-circle">{app.profiles?.fullname?.[0]}</div>
-                    <div>
-                      <div className="name">{app.profiles?.fullname}</div>
-                      <div className="email">{app.job_posts?.title}</div>
-                    </div>
-                  </div>
+                <div className="candidate-info clickable" onClick={() => openModal(app)}>
+  <div className="avatar-circle">{app.profiles?.fullname?.[0]}</div>
+  <div>
+    <div className="name link-name">{app.profiles?.fullname}</div>
+    <div className="email">{app.job_posts?.title}</div>
+  </div>
+</div>
+
                   <span className={`status-badge ${app.status.toLowerCase().includes('approved') ? 'approved' : app.status.toLowerCase()}`}>
                     {app.status === 'Company_Approved_Waiting_Coordinator' ? 'Approved' : app.status}
                   </span>
@@ -298,57 +330,91 @@ export default function ApplicantsPage() {
         </>
       )}
       
-      {modalOpen && selectedApplicant && (
-        <div className="modal-overlay" onClick={closeModal}>
-          <div className="profile-modal" onClick={e => e.stopPropagation()}>
-            <div className="modal-header-section">
-              <h2>{selectedApplicant.profiles?.fullname || 'Applicant Profile'}</h2>
-              <button className="modal-close-btn" onClick={closeModal}>×</button>
-            </div>
+{isProfileModalOpen && selectedApplicant && (
+  <div
+    className={`modal-overlay glass-bg ${isClosing ? 'modal-exit' : 'modal-enter'}`}
+    onClick={handleCloseModal}
+  >
+    <div className="profile-modal" onClick={(e) => e.stopPropagation()}>
+      <button className="close-x-btn" onClick={handleCloseModal}><X size={20} /></button>
 
-            <div className="profile-content-grid">
-              {/* Sidebar */}
-              <div className="profile-sidebar">
-                <div className="profile-card">
-                  <h3>{selectedApplicant.profiles?.fullname}</h3>
-                  {/* Displaying Job Title as Department/Role */}
-                  <div className="profile-dept">Applied for: {selectedApplicant.job_posts?.title || 'N/A'}</div> 
-                  
-                  <div className="contact-item">
-                    <Mail size={16} /> {selectedApplicant.profiles?.email || 'N/A'}
-                  </div>
-                  <div className="contact-item">
-                    <Briefcase size={16} /> {selectedApplicant.job_posts?.title || 'N/A'}
-                  </div>
-                  
-                  <div className="status-card">
-                    <div className="status-title">Current Status</div>
-                    <div>
-                      <span className={`status-badge ${selectedApplicant.status.toLowerCase().includes('approved') ? 'approved' : selectedApplicant.status.toLowerCase()}`}>
-                        {selectedApplicant.status === 'Company_Approved_Waiting_Coordinator' ? 'Approved' : selectedApplicant.status}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
+      <h2 className="modal-title">{selectedApplicant.profiles?.fullname}'s Profile</h2>
 
-              {/* Main Content */}
-              <div className="profile-main-content">
-                <div className="profile-section">
-                  <h3><FileText size={18} /> Resume & Documents</h3>
-                  {selectedApplicant.resume_url ? (
-                    <a href={selectedApplicant.resume_url} target="_blank" rel="noopener noreferrer" className="resume-btn">
-                      <FileText size={14} /> View Full Resume (PDF)
-                    </a>
-                  ) : (
-                    <p className="text-muted">No Resume uploaded by the applicant.</p>
-                  )}
-                </div>
-              </div>
+      <div className="profile-picture-section">
+        <img
+          src={selectedApplicant.profiles?.profile_pic_url || '/default-avatar.png'}
+          alt={selectedApplicant.profiles?.fullname}
+          className="profile-picture"
+        />
+      </div>
+
+      <div className="profile-content-columns">
+        {/* LEFT COLUMN */}
+        <div className="profile-column left-column">
+          <div className="profile-section">
+            <h3>Personal & Contact Details</h3>
+            <div className="info-grid">
+              <p><Mail size={16} className="icon-accent" /> <strong>Email:</strong> {selectedApplicant.profiles?.email || "N/A"}</p>
+              <p><Phone size={16} className="icon-accent" /> <strong>Phone:</strong> {selectedApplicant.profiles?.phone || "N/A"}</p>
+              <p><Briefcase size={16} className="icon-accent" /><strong>Department:</strong> {selectedApplicant.profiles?.department || "N/A"}</p>
+              <p><MapPin size={16} className="icon-accent" /><strong>Location:</strong> {selectedApplicant.profiles?.location || "N/A"}</p>
+              <p><Calendar size={16} className="icon-accent" /><strong>Applied On:</strong> {selectedApplicant.created_at ? new Date(selectedApplicant.created_at).toLocaleDateString() : "N/A"}</p>
             </div>
           </div>
+
+          <div className="profile-section">
+            <h3>Professional Summary</h3>
+            <p className="summary-text">{selectedApplicant.profiles?.summary || "N/A"}</p>
+          </div>
+
+          <div className="profile-section">
+            <h3>Education History</h3>
+            {Array.isArray(selectedApplicant.profiles?.education) && selectedApplicant.profiles.education.length > 0 ? (
+              selectedApplicant.profiles.education.map((edu, idx) => (
+                <div key={idx} className="info-grid border-bottom-light" style={{marginBottom: '10px'}}>
+                  <p><strong>Institution:</strong> {edu.institution || "N/A"}</p>
+                  <p><strong>Degree:</strong> {edu.degree || "N/A"}</p>
+                  <p><strong>Years:</strong> {edu.years || "N/A"}</p>
+                </div>
+              ))
+            ) : <p className="text-muted">No education listed.</p>}
+          </div>
         </div>
-      )}
+
+        {/* RIGHT COLUMN */}
+        <div className="profile-column right-column">
+          <div className="profile-section">
+            <h3>Key Skills</h3>
+            {Array.isArray(selectedApplicant.profiles?.skills) && selectedApplicant.profiles.skills.length > 0 ? (
+              <div className="skills-list">
+                {selectedApplicant.profiles.skills.map((skill, idx) => (
+                  <span key={idx} className="skill-tag">{skill}</span>
+                ))}
+              </div>
+            ) : <p className="text-muted">No skills listed.</p>}
+          </div>
+
+          <div className="profile-section resume-section">
+            <h3>Resume</h3>
+            {selectedApplicant.profiles?.resume_url ? (
+              <a href={selectedApplicant.profiles.resume_url} target="_blank" rel="noopener noreferrer" className="btn primary-btn resume-btn full-width" style={{justifyContent: 'center'}}>
+                <FileText size={16} /> View Resume
+              </a>
+            ) : <p className="text-muted">Resume not uploaded.</p>}
+          </div>
+        </div>
+      </div>
+
+      <div className="modal-actions">
+        <button className="btn tertiary-btn" onClick={handleCloseModal}>Close</button>
+      </div>
+    </div>
+  </div>
+)}
+
+
+
+
     </div>
   );
 }

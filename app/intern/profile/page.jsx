@@ -615,17 +615,88 @@ export default function Profile() {
             <FloatingAIChatWithCharts studentId={userId} />
 
             {/* Resume Modal */}
-            {isResumeModalOpen && (
-                <div className="modal-backdrop">
-                    <div className="modal-content">
-                        <button className="modal-close-btn" onClick={() => setIsResumeModalOpen(false)}><X /></button>
-                        <h2 className="modal-title">View Resume</h2>
-                        <div className="resume-viewer-placeholder">
-                            <a href={profileData.resumeURL} target="_blank" rel="noopener noreferrer" className="btn-primary"><Eye size={18} /> Open in New Tab</a>
-                        </div>
-                    </div>
+          {isResumeModalOpen && selectedApplicant && (
+  <div className="modal-backdrop" onClick={() => setIsResumeModalOpen(false)}>
+    <div className="modal-profile-container" onClick={(e) => e.stopPropagation()}>
+
+      {/* Close Button */}
+      <button className="modal-close-btn" onClick={() => setIsResumeModalOpen(false)}>
+        <X />
+      </button>
+
+      {/* HEADER */}
+      <div className="profile-header">
+        <img 
+          src={selectedApplicant.profiles?.avatar_url || "/default-avatar.png"} 
+          alt="Profile" 
+          className="profile-photo"
+        />
+
+        <div className="profile-header-info">
+          <h2>{selectedApplicant.profiles?.fullname}</h2>
+          <p className="profile-subtext">{selectedApplicant.job_posts?.title}</p>
+        </div>
+      </div>
+
+      {/* MAIN GRID */}
+      <div className="profile-grid">
+
+        {/* LEFT COLUMN */}
+        <div className="profile-left">
+          <div className="profile-card">
+            <h3>Contact</h3>
+            <div className="contact-item"><Mail size={16}/> {selectedApplicant.profiles?.email}</div>
+            <div className="contact-item"><Phone size={16}/> {selectedApplicant.profiles?.phone || "No phone added"}</div>
+          </div>
+
+          <div className="profile-card">
+            <h3>Skills</h3>
+            <div className="skills-container">
+              {(selectedApplicant.profiles?.skills || "No skills added")
+                .toString()
+                .split(',')
+                .map((skill, index) => (
+                <span key={index} className="skill-tag">{skill.trim()}</span>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* RIGHT COLUMN */}
+        <div className="profile-right">
+          <div className="profile-card">
+            <h3>Education</h3>
+            {selectedApplicant.profiles?.education?.length > 0 ? (
+              selectedApplicant.profiles.education.map((edu, i) => (
+                <div key={i} className="education-item">
+                  <strong>{edu.school}</strong>
+                  <span>{edu.degree} — {edu.year}</span>
                 </div>
+              ))
+            ) : (
+              <p className="text-muted">No education data provided.</p>
             )}
+          </div>
+
+          <div className="profile-card">
+            <h3>Resume</h3>
+            <a 
+              href={selectedApplicant.resume_url} 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="btn-primary"
+            >
+              <Eye size={18} /> View Resume (PDF)
+            </a>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+)}
+
         </div>
     );
 }

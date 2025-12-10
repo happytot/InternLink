@@ -1,9 +1,4 @@
 {
-  "/page": "app/page.js",
-  "/auth/internAuthPage/page": "app/auth/internAuthPage/page.js",
-  "/api/match/[internId]/route": "app/api/match/[internId]/route.js",
-  "/api/chatbot/route": "app/api/chatbot/route.js",
-  "/admin/users/page": "app/admin/users/page.js",
-  "/company/applicants/page": "app/company/applicants/page.js",
-  "/intern/dashboard/page": "app/intern/dashboard/page.js"
+  "/_not-found/page": "app/_not-found/page.js",
+  "/company/applicants/page": "app/company/applicants/page.js"
 }

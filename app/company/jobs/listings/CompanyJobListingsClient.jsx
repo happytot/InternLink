@@ -152,7 +152,14 @@ export default function CompanyJobListingsClient({ initialJobs }) {
                     <td className="px-4 py-2 font-medium">{job.title}</td>
                     <td className="px-4 py-2">{job.location}</td>
                     <td className="px-4 py-2">{job.salary || '—'}</td>
-                    <td className="px-4 py-2">{new Date(job.created_at).toLocaleDateString()}</td>
+                    <td className="px-4 py-2">
+  {new Date(job.created_at).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  })}
+</td>
+
                     <td className="px-4 py-2 space-x-2">
                       <div className="flex gap-2">
                         <button onClick={() => openEditModal(job)} className="edit-btn">Edit</button>
