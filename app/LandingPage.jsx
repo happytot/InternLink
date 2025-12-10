@@ -2,21 +2,18 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-// 🟢 FIX 1: Import the core function correctly
 import { createClient } from "@supabase/supabase-js"; 
 import "./LandingPage.css"; 
 import { 
   FiCpu, FiCheckCircle, FiTrendingUp, FiUsers, 
-  FiFileText, FiShield, FiArrowRight, FiSun, FiMoon 
+  FiFileText, FiShield, FiArrowRight, FiSun, FiMoon, FiInfo 
 } from "react-icons/fi";
 import { BsStars, BsBuilding, BsMortarboard } from "react-icons/bs";
 
 // 🟢 SAFE INITIALIZATION
-// This prevents the app from crashing if the keys are missing
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-// 🟢 FIX 2: Only create client if keys exist
 const supabase = (supabaseUrl && supabaseKey) 
   ? createClient(supabaseUrl, supabaseKey) 
   : null;
@@ -27,9 +24,6 @@ export default function HomePage() {
   const [jobTitles, setJobTitles] = useState([]);
   const [showAllJobs, setShowAllJobs] = useState(false);
   
-  // 🔴 REMOVE THIS LINE: const supabase = createClientComponentClient(); 
-  // We use the 'supabase' variable defined outside to avoid crashes.
-
   const toggleTheme = () => {
     setTheme((curr) => (curr === "light" ? "dark" : "light"));
   };
@@ -37,27 +31,15 @@ export default function HomePage() {
   // 🟢 FETCH COMPANIES LOGIC
   useEffect(() => {
     const fetchCompanies = async () => {
-      // 1. Safety Check: Stop if Supabase isn't ready
-      if (!supabase) {
-        console.error("⚠️ Supabase Client is missing. Check your .env.local file and restart the server.");
-        return;
-      }
+      if (!supabase) return;
 
       try {
-        console.log("🔄 Fetching companies...");
-        
-        // 2. The Query
         const { data, error } = await supabase
           .from('companies') 
           .select('*') 
           .limit(2); 
 
-        if (error) {
-          console.error("🛑 Supabase API Error:", error.message);
-        } else if (data) {
-          console.log("✅ Companies Fetched:", data);
-          setRecentCompanies(data);
-        }
+        if (data) setRecentCompanies(data);
       } catch (err) {
         console.error("Unexpected Error:", err);
       }
@@ -69,20 +51,14 @@ export default function HomePage() {
   // 🟢 FETCH JOB TITLES LOGIC
   useEffect(() => {
     const fetchJobTitles = async () => {
-      if (!supabase) return; // Safety check
+      if (!supabase) return;
 
       try {
         const { data, error } = await supabase
           .from('job_posts')
           .select('title');
 
-        if (error) {
-          console.error("Error fetching job titles:", error);
-          return;
-        }
-
         if (data) {
-          // Remove duplicates
           const uniqueTitles = [...new Set(data.map(item => item.title))];
           const cleanTitles = uniqueTitles.filter(title => title && title.trim() !== "");
           setJobTitles(cleanTitles);
@@ -121,6 +97,52 @@ export default function HomePage() {
   return (
     <div className={`homepage-wrapper ${theme === "light" ? "light-mode" : ""}`}>
       
+      {/* Inline styles to handle the new layout changes immediately */}
+      <style jsx>{`
+        .cta-split-layout {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 40px;
+          align-items: center;
+          max-width: 1200px;
+          margin: 0 auto;
+          width: 100%;
+        }
+        .about-card {
+          background: rgba(255, 255, 255, 0.05);
+          backdrop-filter: blur(10px);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          padding: 40px;
+          border-radius: 24px;
+          height: 100%;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+        }
+        .about-card h3 {
+          font-size: 1.5rem;
+          margin-bottom: 1rem;
+          color: var(--primary-color, #EE7428);
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+        .about-card p {
+          color: var(--text-muted, #94a3b8);
+          line-height: 1.6;
+          font-size: 1.1rem;
+        }
+        @media (max-width: 968px) {
+          .cta-split-layout {
+            grid-template-columns: 1fr;
+            text-align: center;
+          }
+          .hero-visual {
+            margin-top: 2rem;
+          }
+        }
+      `}</style>
+
       <div className="bg-gradient-orb orb-1"></div>
       <div className="bg-gradient-orb orb-2"></div>
 
@@ -147,6 +169,7 @@ export default function HomePage() {
 
       {/* --- 2. HERO SECTION --- */}
       <section className="hero-section">
+        {/* Left Side: Hero Text */}
         <div className="hero-text reveal-on-scroll">
           <div className="badge-capsule">
             <BsStars className="icon-yellow" /> 
@@ -172,50 +195,43 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* --- DYNAMIC FLOATING UI ELEMENT --- */}
+        {/* Right Side: REDESIGNED ABOUT VISUAL (Expanded Text) */}
         <div className="hero-visual reveal-on-scroll delay-200">
-          <div className="glass-card float-animation">
-            <div className="card-header">
-              <div className="circle bg-red"></div>
-              <div className="circle bg-yellow"></div>
-              <div className="circle bg-green"></div>
-            </div>
-            
-            <div className="card-content">
-              {recentCompanies.length > 0 ? (
-                recentCompanies.map((company, index) => {
-                  const displayName = company.company_name || company.name || "Unknown Company";
-                  const displayIndustry = company.industry || company.sector || "Partner";
-                  const initials = displayName.substring(0, 2).toUpperCase();
+           <div className="about-showcase-card">
+              <div className="card-glow"></div>
+              
+              <div className="about-content-inner">
+                <div className="about-header">
+                  <div className="icon-circle"><FiCpu /></div>
+                  <h3>About InternLink</h3>
+                </div>
+                
+                <div className="about-text-content">
+                  <p>
+                    InternLink revolutionizes the internship experience by replacing outdated manual logbooks and paper resumes with a <strong>unified digital platform</strong>.
+                  </p>
+                  <p style={{marginTop: '12px'}}>
+                    We empower <strong>Universities</strong> with real-time monitoring, help <strong>Companies</strong> spot talent instantly via AI, and give <strong>Students</strong> a verified career head start.
+                  </p>
+                </div>
 
-                  return (
-                    <div className="match-row" key={company.id || index}>
-                      <div className={`avatar ${index === 1 ? 'av-2' : ''}`}>
-                        {initials}
-                      </div>
-                      <div className="text-block">
-                        <strong>{displayName}</strong> is now hiring
-                        <div className="skill-tags">
-                          <span>{displayIndustry}</span>
-                          <span style={{color: '#22c55e'}}>Active</span>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })
-              ) : (
-                <div className="match-row">
-                  <div className="avatar">IL</div>
-                  <div className="text-block">
-                     <strong>InternLink System</strong>
-                     <div className="skill-tags">
-                       <span>Waiting for data...</span>
-                     </div>
+                {/* Mini Stats Grid */}
+                <div className="about-mini-stats">
+                  <div className="mini-stat">
+                    <span className="stat-val">AI</span>
+                    <span className="stat-label">Matching</span>
+                  </div>
+                  <div className="mini-stat">
+                    <span className="stat-val">100%</span>
+                    <span className="stat-label">Paperless</span>
+                  </div>
+                  <div className="mini-stat">
+                    <span className="stat-val"><FiShield /></span>
+                    <span className="stat-label">Verified</span>
                   </div>
                 </div>
-              )}
-            </div>
-          </div>
+              </div>
+           </div>
         </div>
       </section>
 
@@ -337,18 +353,72 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* --- 6. CTA SECTION --- */}
+      {/* --- 6. CTA SECTION + DYNAMIC FLOATING UI (Moved Here) --- */}
       <section className="cta-wrapper reveal-on-scroll">
-        <div className="cta-box">
-          <h2>Ready to streamline your internship program?</h2>
-          <div className="cta-buttons">
-             <Link href="/auth/coordinatorAuthPage" className="btn btn-primary">
-               Partner with us (Schools)
-             </Link>
-             <Link href="/auth/internAuthPage" className="btn btn-outline">
-               I'm a Student <FiArrowRight />
-             </Link>
+        <div className="cta-split-layout">
+          
+          {/* Left: CTA Text */}
+          <div className="cta-box" style={{textAlign: 'left', margin: 0}}>
+            <h2>Ready to streamline your internship program?</h2>
+            <p style={{marginBottom: '20px', color: 'var(--text-muted)'}}>
+              Join thousands of students and companies already using InternLink.
+            </p>
+            <div className="cta-buttons" style={{justifyContent: 'flex-start'}}>
+               <Link href="/auth/coordinatorAuthPage" className="btn btn-primary">
+                 Partner with us (Schools)
+               </Link>
+               <Link href="/auth/internAuthPage" className="btn btn-outline">
+                 I'm a Student <FiArrowRight />
+               </Link>
+            </div>
           </div>
+
+          {/* Right: Dynamic Floating UI (Moved from Hero) */}
+          <div className="hero-visual" style={{width: '100%'}}>
+            <div className="glass-card float-animation">
+              <div className="card-header">
+                <div className="circle bg-red"></div>
+                <div className="circle bg-yellow"></div>
+                <div className="circle bg-green"></div>
+              </div>
+              
+              <div className="card-content">
+                {recentCompanies.length > 0 ? (
+                  recentCompanies.map((company, index) => {
+                    const displayName = company.company_name || company.name || "Unknown Company";
+                    const displayIndustry = company.industry || company.sector || "Partner";
+                    const initials = displayName.substring(0, 2).toUpperCase();
+
+                    return (
+                      <div className="match-row" key={company.id || index}>
+                        <div className={`avatar ${index === 1 ? 'av-2' : ''}`}>
+                          {initials}
+                        </div>
+                        <div className="text-block">
+                          <strong>{displayName}</strong> is now hiring
+                          <div className="skill-tags">
+                            <span>{displayIndustry}</span>
+                            <span style={{color: '#22c55e'}}>Active</span>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })
+                ) : (
+                  <div className="match-row">
+                    <div className="avatar">IL</div>
+                    <div className="text-block">
+                       <strong>InternLink System</strong>
+                       <div className="skill-tags">
+                         <span>Waiting for data...</span>
+                       </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
         </div>
       </section>
 
