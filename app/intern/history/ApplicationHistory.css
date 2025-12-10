@@ -308,6 +308,7 @@ body {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 1.5rem;
+    margin-top: 15px;
 }
 
 .job-card {
@@ -315,6 +316,7 @@ body {
     border: 1px solid var(--border-color);
     border-radius: var(--radius-card);
     padding: 1.5rem;
+    width: 96%;
     box-shadow: var(--shadow-card);
     border-top: 4px solid var(--border-color); /* Status Indicator Bar */
     transition: transform 0.2s ease;

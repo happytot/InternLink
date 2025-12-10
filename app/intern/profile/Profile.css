@@ -20,7 +20,7 @@
 
 .profile-content-area {
     width: 95%;
-    max-width: 1300px;
+    max-width: 100%;
     margin: 20px auto 0; 
     padding: 0 32px;
     
@@ -115,7 +115,6 @@
 }
 
 .profile-card:hover {
-    transform: translateY(-8px);
     border-color: var(--primary-orange);
     box-shadow: 0 20px 40px -10px rgba(0,0,0,0.25);
 }
@@ -512,7 +511,7 @@
 @media (max-width: 600px) {
     /* Fix the top spacing so content isn't hidden behind navbar */
     .profile-content-area {
-        padding-top: 80px; 
+        padding-top: 40px; 
         width: 100%;
         box-sizing: border-box;
     }
