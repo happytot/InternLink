@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+// 🟢 FIX 1: Import the core function correctly
+import { createClient } from "@supabase/supabase-js"; 
 import "./LandingPage.css"; 
 import { 
   FiCpu, FiCheckCircle, FiTrendingUp, FiUsers, 
@@ -9,14 +11,89 @@ import {
 } from "react-icons/fi";
 import { BsStars, BsBuilding, BsMortarboard } from "react-icons/bs";
 
-export default function HomePage() {
-  // 1. State for Theme
-  const [theme, setTheme] = useState("dark");
+// 🟢 SAFE INITIALIZATION
+// This prevents the app from crashing if the keys are missing
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-  // 2. Toggle Logic
+// 🟢 FIX 2: Only create client if keys exist
+const supabase = (supabaseUrl && supabaseKey) 
+  ? createClient(supabaseUrl, supabaseKey) 
+  : null;
+
+export default function HomePage() {
+  const [theme, setTheme] = useState("dark");
+  const [recentCompanies, setRecentCompanies] = useState([]);
+  const [jobTitles, setJobTitles] = useState([]);
+  const [showAllJobs, setShowAllJobs] = useState(false);
+  
+  // 🔴 REMOVE THIS LINE: const supabase = createClientComponentClient(); 
+  // We use the 'supabase' variable defined outside to avoid crashes.
+
   const toggleTheme = () => {
     setTheme((curr) => (curr === "light" ? "dark" : "light"));
   };
+
+  // 🟢 FETCH COMPANIES LOGIC
+  useEffect(() => {
+    const fetchCompanies = async () => {
+      // 1. Safety Check: Stop if Supabase isn't ready
+      if (!supabase) {
+        console.error("⚠️ Supabase Client is missing. Check your .env.local file and restart the server.");
+        return;
+      }
+
+      try {
+        console.log("🔄 Fetching companies...");
+        
+        // 2. The Query
+        const { data, error } = await supabase
+          .from('companies') 
+          .select('*') 
+          .limit(2); 
+
+        if (error) {
+          console.error("🛑 Supabase API Error:", error.message);
+        } else if (data) {
+          console.log("✅ Companies Fetched:", data);
+          setRecentCompanies(data);
+        }
+      } catch (err) {
+        console.error("Unexpected Error:", err);
+      }
+    };
+
+    fetchCompanies();
+  }, []);
+
+  // 🟢 FETCH JOB TITLES LOGIC
+  useEffect(() => {
+    const fetchJobTitles = async () => {
+      if (!supabase) return; // Safety check
+
+      try {
+        const { data, error } = await supabase
+          .from('job_posts')
+          .select('title');
+
+        if (error) {
+          console.error("Error fetching job titles:", error);
+          return;
+        }
+
+        if (data) {
+          // Remove duplicates
+          const uniqueTitles = [...new Set(data.map(item => item.title))];
+          const cleanTitles = uniqueTitles.filter(title => title && title.trim() !== "");
+          setJobTitles(cleanTitles);
+        }
+      } catch (err) {
+        console.error("Unexpected error:", err);
+      }
+    };
+
+    fetchJobTitles();
+  }, []);
 
   // Scroll Animation Logic
   useEffect(() => {
@@ -39,11 +116,11 @@ export default function HomePage() {
     return () => observer.disconnect();
   }, []);
 
+  const visibleJobs = showAllJobs ? jobTitles : jobTitles.slice(0, 20);
+
   return (
-    // 3. Apply the theme class dynamically here
     <div className={`homepage-wrapper ${theme === "light" ? "light-mode" : ""}`}>
       
-      {/* ✨ Background Elements ✨ */}
       <div className="bg-gradient-orb orb-1"></div>
       <div className="bg-gradient-orb orb-2"></div>
 
@@ -62,7 +139,6 @@ export default function HomePage() {
             Coordinator Portal
           </Link>
 
-                    {/* THEME TOGGLE BUTTON */}
           <button onClick={toggleTheme} className="theme-toggle-btn" aria-label="Toggle Theme">
             {theme === "dark" ? <FiSun /> : <FiMoon />}
           </button>
@@ -96,7 +172,7 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Dynamic Floating UI Element */}
+        {/* --- DYNAMIC FLOATING UI ELEMENT --- */}
         <div className="hero-visual reveal-on-scroll delay-200">
           <div className="glass-card float-animation">
             <div className="card-header">
@@ -104,23 +180,40 @@ export default function HomePage() {
               <div className="circle bg-yellow"></div>
               <div className="circle bg-green"></div>
             </div>
+            
             <div className="card-content">
-              <div className="match-row">
-                <div className="avatar">JD</div>
-                <div className="text-block">
-                  <strong>John Doe</strong> matched with <strong>TechCorp</strong>
-                  <div className="skill-tags">
-                    <span>React</span><span>Node.js</span><span>98% Match</span>
+              {recentCompanies.length > 0 ? (
+                recentCompanies.map((company, index) => {
+                  const displayName = company.company_name || company.name || "Unknown Company";
+                  const displayIndustry = company.industry || company.sector || "Partner";
+                  const initials = displayName.substring(0, 2).toUpperCase();
+
+                  return (
+                    <div className="match-row" key={company.id || index}>
+                      <div className={`avatar ${index === 1 ? 'av-2' : ''}`}>
+                        {initials}
+                      </div>
+                      <div className="text-block">
+                        <strong>{displayName}</strong> is now hiring
+                        <div className="skill-tags">
+                          <span>{displayIndustry}</span>
+                          <span style={{color: '#22c55e'}}>Active</span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="match-row">
+                  <div className="avatar">IL</div>
+                  <div className="text-block">
+                     <strong>InternLink System</strong>
+                     <div className="skill-tags">
+                       <span>Waiting for data...</span>
+                     </div>
                   </div>
                 </div>
-              </div>
-              <div className="match-row">
-                <div className="avatar av-2">AS</div>
-                <div className="text-block">
-                  <strong>Anna Smith</strong> submitted <strong>Daily Log</strong>
-                  <div className="progress-bar"><div className="fill" style={{width: '80%'}}></div></div>
-                </div>
-              </div>
+              )}
             </div>
           </div>
         </div>
@@ -130,7 +223,6 @@ export default function HomePage() {
       <section className="ecosystem-section reveal-on-scroll">
         <h2>Built for the Entire Ecosystem</h2>
         <div className="ecosystem-grid">
-          
           <div className="role-card">
             <div className="icon-box blue"><BsMortarboard /></div>
             <h3>Students</h3>
@@ -160,7 +252,6 @@ export default function HomePage() {
               <li><FiCheckCircle /> Analytics Dashboard</li>
             </ul>
           </div>
-
         </div>
       </section>
 
@@ -211,16 +302,51 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* --- 5. CTA SECTION --- */}
+      {/* --- 5. JOB BUBBLES --- */}
+      <section className="job-bubbles-section reveal-on-scroll">
+        <div className="job-bubbles-container">
+          <div className="job-header">
+            <h2>Find the right job or <br /> internship for you</h2>
+          </div>
+          
+          <div className="bubbles-wrapper">
+            {visibleJobs.length > 0 ? (
+              visibleJobs.map((title, index) => (
+                <Link 
+                  href={`/jobs/search?q=${encodeURIComponent(title)}`} 
+                  key={index} 
+                  className="job-bubble"
+                >
+                  {title}
+                </Link>
+              ))
+            ) : (
+              <p style={{color: 'var(--text-muted)'}}>Loading job categories...</p>
+            )}
+            
+            {jobTitles.length > 10 && (
+              <button 
+                className="bubble-toggle-btn"
+                onClick={() => setShowAllJobs(!showAllJobs)}
+              >
+                {showAllJobs ? "Show Less" : "Show more"} 
+                <FiArrowRight style={{transform: showAllJobs ? "rotate(270deg)" : "rotate(90deg)"}} />
+              </button>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* --- 6. CTA SECTION --- */}
       <section className="cta-wrapper reveal-on-scroll">
         <div className="cta-box">
           <h2>Ready to streamline your internship program?</h2>
           <div className="cta-buttons">
              <Link href="/auth/coordinatorAuthPage" className="btn btn-primary">
-                Partner with us (Schools)
+               Partner with us (Schools)
              </Link>
              <Link href="/auth/internAuthPage" className="btn btn-outline">
-                I'm a Student <FiArrowRight />
+               I'm a Student <FiArrowRight />
              </Link>
           </div>
         </div>
@@ -230,8 +356,8 @@ export default function HomePage() {
       <footer className="modern-footer">
         <div className="footer-content">
           <div className="footer-brand">
-             <span className="intern-text">Intern</span>Link
-             <p>© 2025. Transforming Education.</p>
+              <span className="intern-text">Intern</span>Link
+              <p>© 2025. Transforming Education.</p>
           </div>
           <div className="footer-links">
             <a href="#">Privacy</a>

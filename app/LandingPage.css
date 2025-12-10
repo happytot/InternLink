@@ -199,9 +199,9 @@ p {
 .hero-section {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    padding: 80px 5%;
+    padding: 30px 5%;
     align-items: center;
-    min-height: 85vh;
+    min-height: 50vh;
     gap: 60px;
     position: relative; z-index: 1;
 }
@@ -331,7 +331,7 @@ p {
    ECOSYSTEM
    ========================================= */
 .ecosystem-section {
-    padding: 100px 5%;
+    padding: 50px 5%;
     text-align: center;
     position: relative; z-index: 1;
 }
@@ -377,7 +377,7 @@ p {
    BENTO GRID
    ========================================= */
 .bento-section {
-    padding: 120px 5%;
+    padding: 80px 5%;
     max-width: 100%;
     margin: 0 auto;
     position: relative; z-index: 1;
@@ -436,7 +436,7 @@ p {
 /* =========================================
    CTA & FOOTER
    ========================================= */
-.cta-wrapper { padding: 100px 5%; display: flex; justify-content: center; position: relative; z-index: 1; }
+.cta-wrapper { padding: 50px 5%; display: flex; justify-content: center; position: relative; z-index: 1; }
 
 .cta-box {
     background: linear-gradient(135deg, var(--primary-orange), #f97316);
@@ -624,5 +624,100 @@ p {
     /* Ensure BENTO/GRIDS don't overflow */
     .bento-grid, .ecosystem-grid {
         gap: 15px;
+    }
+}
+
+/* =========================================
+   🌟 NEW: JOB BUBBLES SECTION
+   ========================================= */
+.job-bubbles-section {
+    padding: 60px 5%;
+    position: relative;
+    z-index: 2;
+    margin-bottom: 0;
+    margin-top: 30px;
+}
+
+.job-bubbles-container {
+    max-width: 1500px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 60px;
+}
+
+.job-header h2 {
+    font-size: 2.5rem;
+    color: var(--text-main);
+    line-height: 1.2;
+    max-width: 400px;
+}
+
+.bubbles-wrapper {
+    flex: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: flex-start;
+}
+
+.job-bubble {
+    display: inline-block;
+    padding: 12px 24px;
+    border-radius: 50px; /* Pill shape */
+    border: 1px solid var(--border-color);
+    color: var(--text-muted);
+    background: var(--bg-card);
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.job-bubble:hover {
+    border-color: var(--primary-orange);
+    color: var(--text-main);
+    background: rgba(238, 116, 40, 0.1); /* Subtle orange tint */
+    transform: translateY(-2px);
+}
+
+.bubble-toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border-radius: 50px;
+    border: 1px solid var(--border-color);
+    background: transparent;
+    color: var(--text-main);
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-family: var(--font-body);
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.bubble-toggle-btn:hover {
+    background: var(--bg-card-hover);
+    border-color: var(--text-muted);
+}
+
+/* 📱 Responsive adjustments for Job Bubbles */
+@media (max-width: 900px) {
+    .job-bubbles-container {
+        flex-direction: column;
+        gap: 30px;
+    }
+    
+    .job-header h2 {
+        max-width: 100%;
+        text-align: center;
+        font-size: 2rem;
+    }
+
+    .bubbles-wrapper {
+        justify-content: center;
     }
 }
