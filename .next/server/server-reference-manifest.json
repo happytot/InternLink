@@ -1,14 +1,5 @@
 {
-  "node": {
-    "75f387054cc8190513d13afdabf0913276eb8ed5": {
-      "workers": {
-        "app/company/applicants/page": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22C%3A%5C%5CUsers%5C%5Cace%5C%5CDocuments%5C%5Cintern-link-next-complete%5C%5Capp%5C%5Ccompany%5C%5Capplicants%5C%5Cactions.js%22%2C%5B%22updateJobApplicationStatus%22%5D%5D%5D&__client_imported__=true!"
-      },
-      "layer": {
-        "app/company/applicants/page": "action-browser"
-      }
-    }
-  },
+  "node": {},
   "edge": {},
-  "encryptionKey": "40sm61RoVix8qVRaRBLhve3KXM+EjYuDPMRi2wma/yc="
+  "encryptionKey": "Bzxx39FCQ8aM1R8E2/IlGF9hwlbztdPIjLmxD9vxVOU="
 }

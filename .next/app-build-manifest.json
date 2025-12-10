@@ -1,21 +1,21 @@
 {
   "pages": {
-    "/company/applicants/page": [
+    "/admin/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/css/css-app_company_applicants_applicants_css.css",
-      "static/chunks/app/company/applicants/page.js"
+      "static/css/css-app_admin_AdminDashboard_module_css.css",
+      "static/chunks/app/admin/page.js"
     ],
-    "/company/layout": [
+    "/admin/layout": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/css/css-app_components_CompanyNav_css-app_globals_css.css",
-      "static/chunks/app/company/layout.js"
+      "static/css/css-app_globals_css-app_index_css-app_components_AdminSidebar_module_css.css",
+      "static/chunks/app/admin/layout.js"
     ],
     "/layout": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/css/css-app_index_css.css",
+      "static/css/css-app_globals_css-app_index_css-app_components_AdminSidebar_module_css.css",
       "static/chunks/app/layout.js"
     ],
     "/_not-found/page": [
