@@ -271,12 +271,12 @@ export default function AdminDashboard() {
       // --- C. TABLE 1: KPI OVERVIEW ---
       doc.setFontSize(14);
       doc.setTextColor(0);
-      doc.text("1. General Overview", 14, currentY);
+      doc.text("1. Internship Key Statistics", 14, currentY);
       
       // Date Range Subtitle
       doc.setFontSize(9);
       doc.setTextColor(100);
-      doc.text(`Data Range: ${dateRanges.overall}`, 150, currentY, { align: 'right' }); // Right aligned next to title
+      doc.text(`Date: ${dateRanges.overall}`, 150, currentY, { align: 'right' }); // Right aligned next to title
       currentY += 6;
 
       autoTable(doc, {
@@ -296,7 +296,7 @@ export default function AdminDashboard() {
       
       doc.setFontSize(9);
       doc.setTextColor(100);
-      doc.text(`Data Range: ${dateRanges.overall}`, 150, currentY, { align: 'right' });
+      doc.text(`Date: ${dateRanges.overall}`, 150, currentY, { align: 'right' });
       currentY += 6;
 
       const trendsBody = lineData ? lineData.labels.map((month, i) => [
@@ -324,7 +324,7 @@ export default function AdminDashboard() {
 
       doc.setFontSize(9);
       doc.setTextColor(100);
-      doc.text(`Data Range: ${dateRanges.jobs}`, 150, currentY, { align: 'right' });
+      doc.text(`Date: ${dateRanges.jobs}`, 150, currentY, { align: 'right' });
       currentY += 6;
 
       const pieHead = pieData ? pieData.labels : ['Remote', 'On-site', 'Hybrid'];
@@ -349,7 +349,7 @@ export default function AdminDashboard() {
 
       doc.setFontSize(9);
       doc.setTextColor(100);
-      doc.text(`Data Range: ${dateRanges.apps}`, 150, currentY, { align: 'right' });
+      doc.text(`Date: ${dateRanges.apps}`, 150, currentY, { align: 'right' });
       currentY += 6;
 
       const activityBody = tableData.map(row => [

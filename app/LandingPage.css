@@ -29,13 +29,13 @@
     --bg-glass: rgba(255, 255, 255, 0.9);
     --bg-card: #FFFFFF;
     --bg-card-hover: #F1F5F9;
-    --bg-item: #FFFFFF;
+    --bg-item: #FFFFFF; /* Ensures bento items are white */
     --primary-orange: #EA580C;
-    --text-main: #0F172A;     
-    --text-muted: #475569;    
+    --text-main: #0F172A;     /* Dark Navy for text */
+    --text-muted: #475569;    /* Slate for secondary text */
     --text-inverse: #FFFFFF;
     --border-color: #E2E8F0;  
-    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
     --orb-opacity: 0.15;     
 }
 
@@ -283,6 +283,7 @@ p { margin-bottom: 1.5rem; word-wrap: break-word; }
     padding: 40px; border-radius: 24px; text-align: left;
     transition: transform 0.3s, border-color 0.3s;
 }
+.role-card p, h3 { color: var(--text-muted)}
 .role-card:hover { transform: translateY(-8px); border-color: var(--primary-orange); }
 
 .icon-box {
@@ -303,6 +304,7 @@ p { margin-bottom: 1.5rem; word-wrap: break-word; }
     background: var(--bg-item); border: 1px solid var(--border-color);
     border-radius: 24px; padding: 40px; position: relative; overflow: hidden;
 }
+.bento-item p { color: var(--text-muted)}
 .large { grid-column: 1 / span 2; }
 .wide { grid-column: 2 / span 2; display: flex; flex-direction: column; justify-content: center; }
 .bento-icon { font-size: 2.2rem; color: var(--primary-orange); margin-bottom: 24px; }
