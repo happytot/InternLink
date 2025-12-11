@@ -9,26 +9,8 @@
     "/layout": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/css/css-app_globals_css-app_index_css-app_components_AdminSidebar_module_css.css",
+      "static/css/css-app_globals_css-app_index_css.css",
       "static/chunks/app/layout.js"
-    ],
-    "/auth/internAuthPage/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/css/css-app_components_AuthPage_module_css.css",
-      "static/chunks/app/auth/internAuthPage/page.js"
-    ],
-    "/admin/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/css/css-app_admin_AdminDashboard_module_css.css",
-      "static/chunks/app/admin/page.js"
-    ],
-    "/admin/layout": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/css/css-app_globals_css-app_index_css-app_components_AdminSidebar_module_css.css",
-      "static/chunks/app/admin/layout.js"
     ]
   }
 }

@@ -48,6 +48,25 @@ export default function HomePage() {
     fetchCompanies();
   }, []);
 
+  // Smooth scroll for "Back to Top"
+useEffect(() => {
+  const button = document.getElementById("backToTopBtn");
+  if (!button) return;
+
+  const handleClick = (e) => {
+    e.preventDefault();
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
+
+  button.addEventListener("click", handleClick);
+
+  return () => button.removeEventListener("click", handleClick);
+}, []);
+
+
   // 🟢 FETCH JOB TITLES LOGIC
   useEffect(() => {
     const fetchJobTitles = async () => {
@@ -168,7 +187,7 @@ export default function HomePage() {
       </header>
 
       {/* --- 2. HERO SECTION --- */}
-      <section className="hero-section">
+      <section id="top" className="hero-section">
         {/* Left Side: Hero Text */}
         <div className="hero-text reveal-on-scroll">
           <div className="badge-capsule">
@@ -249,7 +268,15 @@ export default function HomePage() {
             </ul>
           </div>
 
-          <div className="role-card">
+        <div 
+            className="role-card"
+            style={{
+                // Using a linear gradient overlay so text remains readable over the image
+                backgroundImage: "linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.8)), url('/assets/building.jpg')",
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+            }}
+          >
             <div className="icon-box orange"><BsBuilding /></div>
             <h3>Companies</h3>
             <p>Post internships, manage applicants, and submit evaluations in one portal.</p>
@@ -259,7 +286,16 @@ export default function HomePage() {
             </ul>
           </div>
 
-          <div className="role-card">
+        <div 
+            className="role-card"
+            style={{
+                // Using a linear gradient overlay so text remains readable over the image
+                backgroundImage: "linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.8)), url('/assets/school.jpg')",
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+            }}
+          >
+          
             <div className="icon-box green"><FiUsers /></div>
             <h3>Schools</h3>
             <p>Monitor attendance, view logbooks, and generate reports for CHED/TESDA.</p>
@@ -318,42 +354,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* --- 5. JOB BUBBLES --- */}
-      <section className="job-bubbles-section reveal-on-scroll">
-        <div className="job-bubbles-container">
-          <div className="job-header">
-            <h2>Find the right job or <br /> internship for you</h2>
-          </div>
-          
-          <div className="bubbles-wrapper">
-            {visibleJobs.length > 0 ? (
-              visibleJobs.map((title, index) => (
-                <Link 
-                  href={`/jobs/search?q=${encodeURIComponent(title)}`} 
-                  key={index} 
-                  className="job-bubble"
-                >
-                  {title}
-                </Link>
-              ))
-            ) : (
-              <p style={{color: 'var(--text-muted)'}}>Loading job categories...</p>
-            )}
-            
-            {jobTitles.length > 10 && (
-              <button 
-                className="bubble-toggle-btn"
-                onClick={() => setShowAllJobs(!showAllJobs)}
-              >
-                {showAllJobs ? "Show Less" : "Show more"} 
-                <FiArrowRight style={{transform: showAllJobs ? "rotate(270deg)" : "rotate(90deg)"}} />
-              </button>
-            )}
-          </div>
-        </div>
-      </section>
-
-      {/* --- 6. CTA SECTION + DYNAMIC FLOATING UI (Moved Here) --- */}
+            {/* --- 6. CTA SECTION + DYNAMIC FLOATING UI (Moved Here) --- */}
       <section className="cta-wrapper reveal-on-scroll">
         <div className="cta-split-layout">
           
@@ -422,6 +423,43 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* --- 5. JOB BUBBLES --- */}
+      <section className="job-bubbles-section reveal-on-scroll">
+        <div className="job-bubbles-container">
+          <div className="job-header">
+            <h2>Find the right job or <br /> internship for you</h2>
+          </div>
+          
+          <div className="bubbles-wrapper">
+            {visibleJobs.length > 0 ? (
+              visibleJobs.map((title, index) => (
+                <Link 
+                  href={`/jobs/search?q=${encodeURIComponent(title)}`} 
+                  key={index} 
+                  className="job-bubble"
+                >
+                  {title}
+                </Link>
+              ))
+            ) : (
+              <p style={{color: 'var(--text-muted)'}}>Loading job categories...</p>
+            )}
+            
+            {jobTitles.length > 10 && (
+              <button 
+                className="bubble-toggle-btn"
+                onClick={() => setShowAllJobs(!showAllJobs)}
+              >
+                {showAllJobs ? "Show Less" : "Show more"} 
+                <FiArrowRight style={{transform: showAllJobs ? "rotate(270deg)" : "rotate(90deg)"}} />
+              </button>
+            )}
+          </div>
+        </div>
+      </section>
+
+
+
       {/* --- FOOTER --- */}
       <footer className="modern-footer">
         <div className="footer-content">
@@ -433,6 +471,7 @@ export default function HomePage() {
             <a href="#">Privacy</a>
             <a href="#">Terms</a>
             <a href="#">Support</a>
+            <a href="#top" id="backToTopBtn">Back to Top</a>
           </div>
         </div>
       </footer>
