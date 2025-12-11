@@ -121,11 +121,16 @@ p { margin-bottom: 1.5rem; word-wrap: break-word; }
 .theme-toggle-btn:hover { background: var(--primary-orange); color: white; border-color: var(--primary-orange); }
 
 .nav-cta {
-    background: rgba(125, 125, 125, 0.1); padding: 10px 22px; border-radius: 50px;
+   background: var(--bg-glass-subtle); 
+    padding: 10px 22px; border-radius: 50px;
     color: var(--text-main); text-decoration: none; font-weight: 600; font-size: 0.9rem;
     border: 1px solid var(--border-color); transition: all 0.3s; white-space: nowrap;
 }
-.nav-cta:hover { background: var(--primary-orange); border-color: var(--primary-orange); color: white; }
+.nav-cta:hover { 
+    background: var(--primary-orange); 
+    border-color: var(--primary-orange); 
+    color: white; 
+}
 
 /* =========================================
    HERO SECTION
@@ -135,9 +140,9 @@ p { margin-bottom: 1.5rem; word-wrap: break-word; }
     grid-template-columns: 2fr 1fr;
     padding: 80px 5%;
     align-items: center;
-    min-height: 40vh;
+    min-height: 50vh;
     position: relative; z-index: 1;
-    margin-left: 2rem;
+   
 }
 
 .badge-capsule {
@@ -183,7 +188,7 @@ p { margin-bottom: 1.5rem; word-wrap: break-word; }
 }
 
 .about-showcase-card {
-    position: relative; width: 100%; max-width: 600px;
+    position: relative; width: 100%; max-width: 800px;
     background: var(--bg-card); border: 1px solid var(--border-color);
     border-radius: 24px; padding: 2px;
     box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.5);
@@ -221,10 +226,16 @@ p { margin-bottom: 1.5rem; word-wrap: break-word; }
 
 .mini-stat {
     display: flex; flex-direction: column; align-items: center; text-align: center;
-    background: rgba(255, 255, 255, 0.03); padding: 12px; border-radius: 12px;
+    background: var(--bg-glass-subtle); /* Changed from fixed rgba */
+    padding: 12px; border-radius: 12px;
     border: 1px solid transparent; transition: 0.3s;
 }
-.mini-stat:hover { background: rgba(255, 255, 255, 0.06); border-color: var(--primary-orange); transform: translateY(-3px); }
+
+.mini-stat:hover { 
+    background: var(--bg-card-hover); 
+    border-color: var(--primary-orange); 
+    transform: translateY(-3px); 
+}
 
 .stat-val { font-size: 1.25rem; font-weight: 800; color: var(--text-main); font-family: var(--font-heading); margin-bottom: 4px; display: flex; align-items: center; }
 .stat-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); font-weight: 600; }
@@ -300,7 +311,7 @@ p { margin-bottom: 1.5rem; word-wrap: break-word; }
 .section-header h2 { font-size: 2.75rem; color: var(--text-main); }
 .bento-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; }
 .bento-item {
-    background: var(--bg-item); border: 1px solid var(--border-color);
+     background: var(--bg-card); border: 1px solid var(--border-color);
     border-radius: 24px; padding: 40px; position: relative; overflow: hidden;
 }
 .bento-item p { color: var(--text-muted)}
@@ -317,12 +328,19 @@ p { margin-bottom: 1.5rem; word-wrap: break-word; }
 .bubbles-wrapper { width: 100%; display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
 
 .job-bubble {
-    padding: 12px 24px; border-radius: 50px; border: 1px solid var(--border-color);
-    color: var(--text-muted); background: var(--bg-card); text-decoration: none;
+    padding: 12px 24px; border-radius: 50px; 
+    border: 1px solid var(--border-color);
+    color: var(--text-muted); 
+    background: var(--bg-card); /* This now switches correctly */
+    text-decoration: none;
     font-size: 0.95rem; font-weight: 500; transition: all 0.2s ease;
     white-space: nowrap;
 }
-.job-bubble:hover { border-color: var(--primary-orange); color: var(--text-main); background: rgba(238, 116, 40, 0.1); transform: translateY(-2px); }
+.job-bubble:hover {
+    border-color: var(--primary-orange);
+    color: var(--primary-orange); /* Ensure text gets color on hover */
+    background: rgba(238, 116, 40, 0.1);
+}
 .bubble-toggle-btn {
     padding: 12px 24px; border-radius: 50px; border: 1px solid var(--border-color);
     background: transparent; color: var(--text-main); cursor: pointer; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; font-family: var(--font-body); transition: all 0.2s ease;
@@ -452,3 +470,210 @@ p { margin-bottom: 1.5rem; word-wrap: break-word; }
     .footer-links { flex-direction: column; gap: 15px; }
     .footer-links a { margin: 0; }
 }
+
+/* STUDENT CARD CUSTOM STYLE */
+.student-card {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
+}
+
+.student-card h3, 
+.student-card p, 
+.student-card li {
+    color: #FFFFFF !important; 
+    z-index: 2;
+    position: relative;
+}
+
+.student-card .icon-box {
+    background: rgba(255, 255, 255, 0.2);
+    color: #FFFFFF;
+    backdrop-filter: blur(5px);
+}
+
+/* Smooth hover animation */
+.student-card:hover {
+  transform: translateY(-6px) scale(1.03);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+}
+
+/* Extra readability layer */
+.student-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.1),
+    rgba(0, 0, 0, 0.45),
+    rgba(0, 0, 0, 0.75)
+  );
+  z-index: 0;
+}
+
+/* Make sure card content stays above overlays */
+.student-card > * {
+  position: relative;
+  z-index: 2;
+}
+
+.post-job-cta {
+  padding: 60px 20px;
+  text-align: center;
+  border-radius: 20px;
+  margin-top: 40px;
+}
+
+ /* Existing Layout fixes */
+        .cta-split-layout {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 40px;
+          align-items: center;
+          max-width: 1200px;
+          margin: 0 auto;
+          width: 100%;
+        }
+        .about-card {
+         background: var(--bg-glass-subtle); /* Changed from fixed rgba */
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border-color);
+          padding: 40px;
+          border-radius: 24px;
+          height: 100%;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+        }
+        .about-card h3 {
+          font-size: 1.5rem;
+          margin-bottom: 1rem;
+          color: var(--primary-color, #EE7428);
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+        .about-card p {
+          color: var(--text-muted, #94a3b8);
+          line-height: 1.6;
+          font-size: 1.1rem;
+        }
+
+        /* =========================================
+           NEW BACKGROUND DESIGNS (Rockets & Space)
+        ========================================= */
+        .deep-space-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0; /* Behind content, with the orbs */
+            pointer-events: none;
+        }
+
+        /* Stars */
+       .space-star {
+    position: absolute;
+    background: white;
+    border-radius: 50%;
+    opacity: 0.3;
+    animation: twinkle 4s infinite ease-in-out;
+}
+
+.light-mode .space-star {
+    background: #94a3b8; 
+    opacity: 0.6;
+}
+        .star-sm { width: 1px; height: 1px; }
+        .star-md { width: 2px; height: 2px; }
+        .star-lg { width: 3px; height: 3px; }
+
+        /* Blueprint Objects (Rockets/Satellites) */
+        .blueprint-obj {
+            position: absolute;
+            opacity: 0.08; /* Very subtle */
+            color: var(--primary-color, #EE7428); /* Uses theme color */
+        }
+        .light-mode .blueprint-obj {
+             opacity: 0.15; /* A bit darker for light mode */
+             color: #334155;
+        }
+
+        /* Rocket Animation */
+        .rocket-ship {
+            top: 80%;
+            left: -5%;
+            width: 150px;
+            height: auto;
+            transform: rotate(45deg);
+            animation: driftRocket 60s linear infinite;
+        }
+
+        /* Satellite Animation */
+        .satellite-obj {
+            top: 10%;
+            right: -10%;
+            width: 100px;
+            height: auto;
+            animation: driftSatellite 80s linear infinite;
+        }
+
+        /* Distant Planet */
+        .distant-planet {
+            position: absolute;
+            top: 15%;
+            left: 10%;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, rgba(238, 116, 40, 0.1), transparent 70%);
+            border: 1px solid rgba(238, 116, 40, 0.05);
+            z-index: 0;
+            opacity: 0.4;
+            
+        }
+        .light-mode .distant-planet {
+             background: radial-gradient(circle at 30% 30%, rgba(100, 116, 140, 0.1), transparent 70%);
+             border: 1px solid rgba(100, 116, 140, 0.1);
+        }
+
+
+        /* Keyframes */
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+        @keyframes driftRocket {
+            0% { transform: translate(0, 0) rotate(45deg) scale(0.8); }
+            100% { transform: translate(120vw, -120vh) rotate(45deg) scale(1); }
+        }
+        @keyframes driftSatellite {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            50% { transform: translate(-20vw, 5vh) rotate(180deg); }
+            100% { transform: translate(0, 0) rotate(360deg); }
+        }
+
+        @media (max-width: 968px) {
+          .cta-split-layout {
+            grid-template-columns: 1fr;
+            text-align: center;
+          }
+          .hero-visual {
+            margin-top: 2rem;
+          }
+          /* Hide big elements on mobile so it's not cluttered */
+          .rocket-ship, .satellite-obj { display: none; }
+        }
+
+        .post-job-cta h2, p {
+          color: var(--text-main);
+
+        }
