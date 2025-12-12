@@ -116,54 +116,52 @@ useEffect(() => {
   return (
     <div className={`homepage-wrapper ${theme === "light" ? "light-mode" : ""}`}>
       
-      {/* Inline styles to handle the new layout changes immediately */}
-      <style jsx>{`
-        .cta-split-layout {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 40px;
-          align-items: center;
-          max-width: 1200px;
-          margin: 0 auto;
-          width: 100%;
-        }
-        .about-card {
-          background: rgba(255, 255, 255, 0.05);
-          backdrop-filter: blur(10px);
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          padding: 40px;
-          border-radius: 24px;
-          height: 100%;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-        }
-        .about-card h3 {
-          font-size: 1.5rem;
-          margin-bottom: 1rem;
-          color: var(--primary-color, #EE7428);
-          display: flex;
-          align-items: center;
-          gap: 10px;
-        }
-        .about-card p {
-          color: var(--text-muted, #94a3b8);
-          line-height: 1.6;
-          font-size: 1.1rem;
-        }
-        @media (max-width: 968px) {
-          .cta-split-layout {
-            grid-template-columns: 1fr;
-            text-align: center;
-          }
-          .hero-visual {
-            margin-top: 2rem;
-          }
-        }
-      `}</style>
+    
 
+      {/* Existing Orbs */}
       <div className="bg-gradient-orb orb-1"></div>
       <div className="bg-gradient-orb orb-2"></div>
+
+      {/* === NEW: Deep Space Background Elements === */}
+      <div className="deep-space-background">
+          <div className="distant-planet"></div>
+
+          {/* Generate 30 random stars */}
+          {[...Array(30)].map((_, i) => {
+              const size = i % 3 === 0 ? 'lg' : i % 2 === 0 ? 'md' : 'sm';
+              const top = Math.floor(Math.random() * 100);
+              const left = Math.floor(Math.random() * 100);
+              const delay = Math.random() * 5;
+              return (
+                  <div 
+                      key={i} 
+                      className={`space-star star-${size}`}
+                      style={{ top: `${top}%`, left: `${left}%`, animationDelay: `${delay}s` }}
+                  ></div>
+              );
+          })}
+
+          {/* SVG Blueprint Rocket */}
+          <svg className="blueprint-obj rocket-ship" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/>
+            <path d="m12 15-3-3a22 22 0 0 1 2-7 24 24 0 0 1 7-2c-.4 2.3-1 4.9-2 7a22 22 0 0 1-3-3z"/>
+            <path d="M12 15c.5 2 2.5 3.5 4 4 1.5.5 4 1.5 4 1.5s-1 2.5-1.5 4c-.5 1.5-1 3.5-3 4l-3.5-3.5"/>
+            <path d="M12 15 9 18"/>
+            <line x1="9" y1="2" x2="9" y2="2"></line> {/* Extra detail dots */}
+            <line x1="15" y1="2" x2="15" y2="2"></line>
+          </svg>
+
+          {/* SVG Satellite */}
+          <svg className="blueprint-obj satellite-obj" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M13 7 9 3 5 7l4 4"></path>
+            <path d="m17 11 4 4-4 4-4-4"></path>
+            <path d="m8 12 4 4 6-6-4-4Z"></path>
+            <path d="m16 8 3-3"></path>
+            <path d="M9 15l-3 3"></path>
+          </svg>
+      </div>
+      {/* === END New Background === */}
+
 
       {/* --- 1. HEADER --- */}
       <header className="main-header">
@@ -208,15 +206,24 @@ useEffect(() => {
             <Link href="/auth/internAuthPage" className="btn btn-primary">
               Get Started
             </Link>
-            <Link href="#features" className="btn btn-glass">
-              Explore Features
-            </Link>
+           <button 
+  className="btn btn-glass"
+  onClick={() => {
+    const target = document.getElementById("features");
+    if (target) {
+      target.scrollIntoView({ behavior: "smooth" });
+    }
+  }}
+>
+  Explore Features
+</button>
+
           </div>
         </div>
 
         {/* Right Side: REDESIGNED ABOUT VISUAL (Expanded Text) */}
         <div className="hero-visual reveal-on-scroll delay-200">
-           <div className="about-showcase-card">
+            <div className="about-showcase-card">
               <div className="card-glow"></div>
               
               <div className="about-content-inner">
@@ -258,18 +265,28 @@ useEffect(() => {
       <section className="ecosystem-section reveal-on-scroll">
         <h2>Built for the Entire Ecosystem</h2>
         <div className="ecosystem-grid">
-          <div className="role-card">
-            <div className="icon-box blue"><BsMortarboard /></div>
-            <h3>Students</h3>
-            <p>Build your skills profile, get AI-matched to internships, and track your hours digitally.</p>
-            <ul className="feature-list">
-              <li><FiCheckCircle /> AI Resume Parser</li>
-              <li><FiCheckCircle /> One-click Apply</li>
-            </ul>
-          </div>
+         <div
+  className="role-card student-card"
+  style={{
+    backgroundImage:
+      "linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.8)), url('/assets/students.jpg')",
+  }}
+>
+  <div className="icon-box blue"><BsMortarboard /></div>
+  <h3>Students</h3>
+  <p>
+    Build your skills profile, get AI-matched to internships, and track your
+    hours digitally.
+  </p>
+  <ul className="feature-list">
+    <li><FiCheckCircle /> AI Resume Parser</li>
+    <li><FiCheckCircle /> One-click Apply</li>
+  </ul>
+</div>
+
 
         <div 
-            className="role-card"
+            className="role-card student-card"
             style={{
                 // Using a linear gradient overlay so text remains readable over the image
                 backgroundImage: "linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.8)), url('/assets/building.jpg')",
@@ -287,7 +304,7 @@ useEffect(() => {
           </div>
 
         <div 
-            className="role-card"
+            className="role-card student-card"
             style={{
                 // Using a linear gradient overlay so text remains readable over the image
                 backgroundImage: "linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.8)), url('/assets/school.jpg')",
@@ -409,10 +426,10 @@ useEffect(() => {
                   <div className="match-row">
                     <div className="avatar">IL</div>
                     <div className="text-block">
-                       <strong>InternLink System</strong>
-                       <div className="skill-tags">
-                         <span>Waiting for data...</span>
-                       </div>
+                        <strong>InternLink System</strong>
+                        <div className="skill-tags">
+                          <span>Waiting for data...</span>
+                        </div>
                     </div>
                   </div>
                 )}
@@ -457,6 +474,19 @@ useEffect(() => {
           </div>
         </div>
       </section>
+
+      <section className="post-job-cta">
+  <h2>Need Interns or Trainees?</h2>
+  <p>Post job openings and find qualified students instantly.</p>
+
+  <button 
+    className="btn btn-primary"
+    onClick={() => window.location.href = "/auth/companyAuthPage"}
+  >
+    Post a Job
+  </button>
+</section>
+
 
 
 
