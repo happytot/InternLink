@@ -296,12 +296,26 @@ p { margin-bottom: 1.5rem; word-wrap: break-word; }
 .ecosystem-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 32px; }
 
 .role-card {
-    background: var(--bg-card); border: 1px solid var(--border-color);
-    padding: 40px; border-radius: 24px; text-align: left;
-    transition: transform 0.3s, border-color 0.3s;
+    background: var(--bg-card);
+    border: none; /* Border is removed */
+    padding: 40px;
+    border-radius: 24px;
+    text-align: left;
+    background-clip: padding-box;
+    /* Keeping transition on border-color, but it won't do much without a base border */
+    transition: transform 0.3s, border-color 0.3s; 
 }
-.role-card p, h3 { color: var(--text-muted)}
-.role-card:hover { transform: translateY(-8px); border-color: var(--primary-orange); }
+
+.role-card p, h3 { 
+    color: var(--text-muted)
+}
+
+.role-card:hover { 
+    transform: translateY(-8px); /* Keeping the float animation */
+    /* If you remove the base border, you might want to add a shadow or border on hover */
+    /* Example: box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); */
+    border-color: var(--primary-orange); 
+}
 
 .icon-box {
     width: 56px; height: 56px; border-radius: 14px; display: flex; align-items: center; justify-content: center;
